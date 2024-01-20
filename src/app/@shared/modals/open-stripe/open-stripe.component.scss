@@ -1,0 +1,60 @@
+:host{
+    .btnBox {
+        display: flex;
+        gap: 16px;
+        justify-content: end;
+        margin-top: 20px;
+    }
+    .btnClear {
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 29px;
+      letter-spacing: -0.015em;
+      color: #171954;
+      background-color: #fff;
+      border-radius: 6px;
+      border: 1px solid #171954;
+      padding: 10px 34px;
+    }
+    .btnSubmit {
+      font-weight: 400;
+      font-size: 20px !important;
+      line-height: 29px;
+      letter-spacing: -0.015em;
+      background-color: #171954;
+      color: #fff;
+      border-radius: 6px;
+      border: none;
+      padding: 10px 34px;
+      background: #171954;
+      border-radius: 6px;
+
+      span{
+        color: #fff;
+      }
+    }
+    .card-number{
+        border: 1px solid #e6e6e6;
+        padding: 10px;
+        border-radius: 5px;
+        width: 100%;
+    }
+    .error{
+        font-size: 10px;
+        color: red;
+    }
+    .modal-header h4{
+        color: #292f36;
+        font-size: 22px;
+        text-align: center;
+        width: 100%;
+    }
+    // .modal-body{
+    //     height: 360px;
+    // }
+    .modal-body h2{
+        margin: 10px 0;
+        font-size: 17px;
+        color: #292f36;
+    }
+}

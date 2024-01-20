@@ -1,0 +1,110 @@
+<div class="modal-header pt-0 pb-0 border-0">
+  <h4 class="modal-title">Selected Amount : $ {{ data?.totalAmt }}.00</h4>
+</div>
+<div class="modal-body">
+  <ng-container *ngIf="loadStripe">
+    <div class="d-flex align-items-center h-100 justify-content-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </ng-container>
+  <h2>User Details:</h2>
+  <form [formGroup]="paymentForm">
+    <div class="d-flex flex-column">
+      <div class="d-flex gap-5 pb-4">
+        <div class="d-flex flex-column">
+          <label class="form-label">First Name</label>
+          <input
+            type="text"
+            class="input-area"
+            name="FirstName"
+            placeholder="Enter Your Name"
+            formControlName="FirstName"
+          />
+        </div>
+        <div class="d-flex flex-column">
+          <label class="form-label">Last Name</label>
+          <input
+            type="text"
+            class="input-area"
+            name="LastName"
+            placeholder="Enter Your Name"
+            formControlName="LastName"
+          />
+        </div>
+      </div>
+  
+      <div class="d-flex gap-5 pb-4">
+        <div class="d-flex flex-column">
+          <label class="form-label"
+            >Phone<span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="input-area"
+            name="Phone"
+            placeholder="Enter your Phone number"
+            formControlName="PhoneNo"
+          />
+          <!-- <div class="text-danger">Phone number is required.</div> -->
+        </div>
+        <div class="d-flex flex-column">
+          <label class="form-label"
+            >Email Address<span class="text-danger">*</span></label
+          >
+          <input
+            type="email"
+            name="Email"
+            class="input-area"
+            required
+            placeholder="Enter your email"
+            formControlName="Email"
+            autocomplete="Email"
+          />
+          <!-- <div class="text-danger">Please enter valid Email.</div> -->
+        </div>
+      </div>
+  
+      <div class="col-12 mb-3">
+        <label class="form-label">Skype<span class="text-danger">*</span></label>
+        <input
+          type="email"
+          name="Skype"
+          class="input-area"
+          required
+          placeholder="Enter your Skype"
+          formControlName="Skype"
+          autocomplete="Skype"
+        />
+        <!-- <div class="text-danger">Please enter valid Skype.</div> -->
+      </div>
+    </div>
+  </form>
+  <h2 *ngIf="!loadStripe">Card Details:</h2>
+  <div class="alert alert-{{ type }}" role="alert" *ngIf="msg">
+    {{ msg }}
+  </div>
+  <div id="payment" [hidden]="loadStripe"></div>
+  <div class="btnBox" *ngIf="!loadStripe">
+    <button
+      class="btn btn-primary btnClear"
+      onClick="handleClose"
+      (click)="activeModal.close(false)"
+    >
+      Cancel
+    </button>
+    <button class="btn btnSubmit" type="button" (click)="pay()">
+      <ng-container *ngIf="!loading; else other_content">
+        <span> Submit </span>
+      </ng-container>
+      <ng-template #other_content>
+        <div class="d-flex align-items-center justify-content-center h-100">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </ng-template>
+    </button>
+  </div>
+</div>

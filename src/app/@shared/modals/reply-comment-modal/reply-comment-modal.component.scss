@@ -1,0 +1,15 @@
+h5 {
+  text-transform: none;
+}
+
+::ng-deep {
+  mention-list {
+    top: 70px !important;
+  }
+  .edit-comment-emoji {
+    .select-emaojies {
+      right: 55px !important;
+      top: 20px !important;
+    }
+  }
+}

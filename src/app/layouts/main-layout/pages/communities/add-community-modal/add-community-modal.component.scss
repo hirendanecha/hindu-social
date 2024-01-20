@@ -1,0 +1,63 @@
+.add-pratitioner-contaner{
+  background-color: var(--section-1st-color);
+  padding: 25px;
+  border-radius: 15px;
+
+  .form-dark {
+    label {
+      color: var(--heading-1st-color) !important;
+    }
+    .login-button {
+      padding: 0.8rem 2.6rem;
+    }
+  }
+  .custom-textarea{
+    textarea{
+      color: var(--heading-1st-color);
+    }
+  }
+
+  .title-container {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    label{
+      font-weight: 500;
+    }
+  }
+  .form-check-input {
+    padding: 12px !important;
+    margin-bottom: 5px;
+  }
+}
+.edit-pratitioner-contaner{
+  padding: 10px;
+}
+.card {
+  width: 235px;
+  background: var(--section-1st-color);
+  box-shadow: var(--box-shadow);
+  border-radius: 10px;
+  margin: 10px;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 20px;
+
+    .card-title{
+      border-bottom: 1px solid var(--font-icon-color);
+    }
+  }
+  .card-text {
+    color: var(--para-2nd-color);
+    font-size: 16px;
+    line-height: 22px;
+  }
+}
+.feture-card{
+  width: 100%;
+}
