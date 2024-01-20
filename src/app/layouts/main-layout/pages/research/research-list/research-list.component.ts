@@ -65,7 +65,7 @@ export class ResearchListComponent {
     private socketService: SocketService
   ) {
     const data = {
-      title: 'HealingTube Research',
+      title: 'HinduSocial Research',
       url: `${window.location.href}`,
       description: '',
     };

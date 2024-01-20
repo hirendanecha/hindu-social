@@ -84,14 +84,14 @@ export function app(): express.Express {
         }
         const params = req.params[0];
         var seo: any = {
-          title: 'Healing Tube',
+          title: 'Hindu Social',
           description:
             'Private video consultations with Naturopathic Doctors and Holistic Healers from around the world. Social Discussion on how to heal various ailments.',
           image:
             'https://www.healing.tube/assets/images/Ht-Profile-pic-default.png',
           site: 'https://www.healing.tube/',
           url: 'https://www.healing.tube' + params,
-          keywords: 'HealingTube',
+          keywords: 'Hindu Social',
         };
         if (
           params.indexOf('communities/') > -1 ||
@@ -170,7 +170,7 @@ export function app(): express.Express {
 
           console.log('group===>', group);
           const talent = {
-            name: `HealingTube Research ${group?.PageTitle}`,
+            name: `HinduSocial Research ${group?.PageTitle}`,
             description: group?.PageDescription,
             image: group?.CoverPicName || group?.ProfilePicName
           };

@@ -121,7 +121,7 @@ export class HealingPractitionerRegistrationComponent implements OnInit {
 
     this.profileId = Number(localStorage.getItem('profileId'));
     const data = {
-      title: 'HealingTube Registration',
+      title: 'HinduSocial Registration',
       url: `${window.window.location.href}`,
       description: '',
     };
@@ -204,10 +204,10 @@ export class HealingPractitionerRegistrationComponent implements OnInit {
         selectedState: this.selectedState,
         selectedAreas: this.selectedAreaValues
       };
-      this.router.navigate(['/health-practitioner'], { state: { data: practitionerRequirements } });
+      this.router.navigate(['/community'], { state: { data: practitionerRequirements } });
     } else if (this.isWorldwideChecked && this.selectedCards.length <= 0) {
       const areaValues = { selectedAreas: this.selectedAreaValues } 
-      this.router.navigate(['/health-practitioner'], { state: { data: areaValues } });
+      this.router.navigate(['/community'], { state: { data: areaValues } });
     }
     else {
       this.toastService.danger('Please select What emphasis are you interested in healing');
