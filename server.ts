@@ -88,9 +88,9 @@ export function app(): express.Express {
           description:
             'Private video consultations with Naturopathic Doctors and Holistic Healers from around the world. Social Discussion on how to heal various ailments.',
           image:
-            'https://www.healing.tube/assets/images/Ht-Profile-pic-default.png',
-          site: 'https://www.healing.tube/',
-          url: 'https://www.healing.tube' + params,
+            'https://www.hindu.social/assets/images/profile-cover.png',
+          site: 'https://www.hindu.social/',
+          url: 'https://www.hindu.social' + params,
           keywords: 'Hindu Social',
         };
         if (
@@ -153,9 +153,9 @@ export function app(): express.Express {
           const pdhtml = document.createElement('div');
           pdhtml.innerHTML = post?.postdescription || post?.metadescription;
           const talent = {
-            name: post?.title || post?.albumname || 'Healing.Tube Post',
+            name: post?.title || post?.albumname || 'Hindu.Social Post',
             description: pdhtml?.textContent || 'Post content',
-            image: post?.thumbfilename || post?.metaimage || post?.imageUrl || 'https://www.healing.tube/assets/images/Ht-Profile-pic-default.png',
+            image: post?.thumbfilename || post?.metaimage || post?.imageUrl || 'https://www.hindu.social/assets/images/profile-cover.png',
           };
           seo.title = talent.name;
           seo.description = strip_html_tags(talent.description);
