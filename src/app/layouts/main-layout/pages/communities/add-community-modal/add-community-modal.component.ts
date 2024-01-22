@@ -27,7 +27,7 @@ import { PaymentService } from 'src/app/@shared/services/payment.service';
   styleUrls: ['./add-community-modal.component.scss'],
 })
 export class AddCommunityModalComponent implements OnInit, AfterViewInit {
-  @Input() title: string | undefined = 'Apply to be Health Practitioner';
+  @Input() title: string | undefined = 'Apply to be Community';
   @Input() cancelButtonLabel: string | undefined = 'Cancel';
   @Input() confirmButtonLabel: string | undefined = 'Create';
   @Input() closeIcon: boolean | undefined;
@@ -40,7 +40,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
   selectedFile: File;
   userId = '';
   profileId = '';
-  originUrl = environment.webUrl + 'health-practitioner/';
+  originUrl = environment.webUrl + 'community/';
   logoImg: any = {
     file: null,
     url: '',
@@ -216,7 +216,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
           },
           error: (err) => {
             this.toastService.danger(
-              'Please change practitioner. this practitioner name already in use.'
+              'Please change Community. this Community name already in use.'
             );
             this.spinner.hide();
           },
@@ -239,14 +239,14 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
               this.submitted = true;
               // this.createCommunityAdmin(res.data);
               this.toastService.success(
-                'Your Health Practitioner edit successfully!'
+                'Your Community edit successfully!'
               );
               this.activeModal.close('success');
             }
           },
           error: (err) => {
             this.toastService.danger(
-              'Please change Health Practitioner. this Health Practitioner name already in use.'
+              'Please change Community. this Community name already in use.'
             );
             this.spinner.hide();
           },
@@ -378,7 +378,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
 
   clearForm() {
     this.activeModal.close();
-    this.router.navigate(['/health-practitioner']);
+    this.router.navigate(['/community']);
   }
 
   isSelected(id: number): boolean {
@@ -437,7 +437,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
       modalRef.componentInstance.cancelButtonLabel = 'Cancel';
       modalRef.componentInstance.data = selectedSlot;
       modalRef.result.then((res) => {
-        this.router.navigate(['/health-practitioner']);
+        this.router.navigate(['/community']);
       });
     } else {
       this.toastService.danger('Please select your preference for billing.');

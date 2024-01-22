@@ -123,7 +123,7 @@ export class OpenStripeComponent implements AfterViewInit, OnInit {
     const { error, result } = await this.stripe.confirmPayment({
       elements: this.elements,
       confirmParams: {
-        return_url: `${environment.webUrl}health-practitioner/`,
+        return_url: `${environment.webUrl}community/`,
         // return_url: 'http://localhost:4200/',
       },
     });

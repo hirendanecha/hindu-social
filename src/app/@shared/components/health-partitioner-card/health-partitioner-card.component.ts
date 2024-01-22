@@ -32,7 +32,7 @@ export class HealthPraatitionerCardComponent {
       this.router.navigate(['pages', this.community?.slug]);
     } else {
       if (this.community?.isApprove === 'Y') {
-        this.router.navigate([`health-practitioner/details/${this.community?.slug}`]);
+        this.router.navigate([`community/details/${this.community?.slug}`]);
       } else {
         this.toastService.danger('This community not approve yet.');
       }
