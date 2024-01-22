@@ -1,6 +1,6 @@
 const url = 'https://api.hindu.social';
 const webUrl = 'https://hindu.social/';
-const tubeUrl = 'https://video.hindu.social/'
+const tubeUrl = 'https://tube.hindu.social/'
 // const url = 'http://localhost:8080';
 // const webUrl = 'http://localhost:4200/';
 
