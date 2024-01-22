@@ -1,6 +1,6 @@
-const url = 'https://api.healing.tube';
-const webUrl = 'https://healing.tube/';
-const tubeUrl = 'https://video.healing.tube/'
+const url = 'https://api.hindu.social';
+const webUrl = 'https://hindu.social/';
+const tubeUrl = 'https://video.hindu.social/'
 // const url = 'http://localhost:8080';
 // const webUrl = 'http://localhost:4200/';
 

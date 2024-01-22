@@ -106,7 +106,7 @@ export class AppointmentModalComponent implements AfterViewInit {
     {
       title: 'Featured Practitioner',
       id: 22,
-      description: `Become a Featured Practitioner and your practice will be featured throughout Healing.tube`,
+      description: `Become a Featured Practitioner and your practice will be featured throughout Hindu.Social`,
       pricing: `$100.00 per month`,
       rate: 100,
     },

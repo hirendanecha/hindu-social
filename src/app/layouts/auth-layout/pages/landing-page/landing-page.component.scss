@@ -4,11 +4,11 @@
   // background: #11134d;
 
   .text-s {
-    font-size: min(max(16px, 1vw), 22px);
+    font-size: min(max(22px, 3vw), 50px);
   }
   .c-fonts {
     // font-size: min(max(25px, 2vw), 44px);
-    font-size: 22px;
+    font-size: min(max(14px, 2vw), 22px);
 
     @media (max-width: 999px) {
       font-size: 16px;
@@ -23,12 +23,19 @@
     object-fit: cover;
     height: calc(100vh - 48px);
 
+    @media (max-width:750px){
+      background-size: cover;
+      background-position: 50%;
+    }
+
+
     .banner-text {
-      max-width: 600px;
+      max-width: 500px;
       width: 100%;
       background-color: #0b0d0ed4;
       border-radius: 5px;
       padding: 40px;
+      
       // height: 300px;
     }
 
