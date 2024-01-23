@@ -86,7 +86,7 @@ export function app(): express.Express {
         var seo: any = {
           title: 'Hindu Social',
           description:
-            'Private video consultations with Naturopathic Doctors and Holistic Healers from around the world. Social Discussion on how to heal various ailments.',
+            'Virtually Divine, Truly Yours: Join the Pious Pulse of our Hindu Haven.',
           image:
             'https://www.hindu.social/assets/images/profile-cover.png',
           site: 'https://www.hindu.social/',
