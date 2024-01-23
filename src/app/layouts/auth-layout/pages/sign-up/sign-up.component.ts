@@ -69,7 +69,7 @@ export class SignUpComponent implements OnInit, AfterViewInit {
       title: 'HinduSocial Registration',
       url: `${environment.webUrl}sign-up`,
       description: 'Registration page',
-      image: `${environment.webUrl}assets/images/landingpage/HinduSocial Logo.jpg`,
+      image: `${environment.webUrl}assets/images/landingpage/HinduSocial-Logo.jpg`,
     };
     // this.seoService.updateSeoMetaData(data);
   }

@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
       title: 'HinduSocial login',
       url: `${environment.webUrl}login`,
       description: 'login page',
-      image: `${environment.webUrl}assets/images/landingpage/HinduSocial Logo.jpg`,
+      image: `${environment.webUrl}assets/images/landingpage/HinduSocial-Logo.jpg`,
     };
     // this.seoService.updateSeoMetaData(data);
   }
