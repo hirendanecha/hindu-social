@@ -42,7 +42,6 @@
             required
             name="Country"
             class="input-area w-100"
-            (change)="changeCountry()"
             formControlName="Country"
           >
             <option [value]="defaultCountry">United states</option>
@@ -65,6 +64,7 @@
             formControlName="Zip"
             placeholder="Enter your Zip"
             #zipCode
+            (input)="convertToUppercase($event)"
           />
         </div>
       </div>
