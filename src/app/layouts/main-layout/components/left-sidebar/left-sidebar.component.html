@@ -4,7 +4,7 @@
     'mh-100 vh-100': (breakpointService?.screen | async).lg.lessThen
   }"
 >
-  <ng-container *ngIf="tokenService.getCredentials()">
+  <ng-container *ngIf="tokenService.getToken()">
     <div class="profile-pic d-flex gap-2" routerLink="/home">
       <div class="position-relative">
         <img
@@ -230,7 +230,7 @@
       </div>
     </ng-container>
   </ng-container>
-  <ng-container *ngIf="!tokenService.getCredentials()">
+  <ng-container *ngIf="!tokenService.getToken()">
     <div class="dashboard-img mb-5">
       <img
         class="w-100 rounded-3"
@@ -239,13 +239,16 @@
       <!-- <span class="mt-3 text-start font-14-px">
         The Umbrella platform for All freedom based projects worldwide.
       </span> -->
-      <span class="c-fonts text-center mt-6">
+      <!-- <span class="c-fonts text-center mt-6">
         Private video consultations with Naturopathic Doctors <br />
         and Holistic Healers from around the world
       </span>
       <span class="c-fonts py-6 mt-10 text-center"
         >Social Discussion on how to heal various ailments</span
-      >
+      > -->
+      <span class="c-fonts text-center mt-6">
+        Virtually Divine, Truly Yours: Join the Pious Pulse of our Hindu Haven.
+      </span>
     </div>
   </ng-container>
 </div>

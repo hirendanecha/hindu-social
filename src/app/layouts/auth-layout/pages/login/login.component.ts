@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,6 +12,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from 'src/environments/environment';
 import { CustomerService } from 'src/app/@shared/services/customer.service';
 import { SeoService } from 'src/app/@shared/services/seo.service';
+import { SocketService } from 'src/app/@shared/services/socket.service';
+declare var turnstile: any;
 
 @Component({
   selector: 'app-login',
@@ -29,6 +31,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
   loginMessage = '';
   msg = '';
   type = 'danger';
+  theme = '';
+  captchaToken = '';
+  @ViewChild('captcha', { static: false }) captchaElement: ElementRef;
 
   constructor(
     private modalService: NgbModal,
@@ -42,7 +47,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private sharedService: SharedService,
     private customerService: CustomerService,
     private tokenStorageService: TokenStorageService,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private socketService: SocketService
   ) {
     const isVerify = this.route.snapshot.queryParams.isVerify;
     if (isVerify === 'false') {
@@ -76,29 +82,48 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.loadCloudFlareWidget();
+  }
+  loadCloudFlareWidget() {
+    turnstile?.render(this.captchaElement.nativeElement, {
+      sitekey: environment.siteKey,
+      theme: this.theme === 'dark' ? 'light' : 'dark',
+      callback: function (token) {
+        localStorage.setItem('captcha-token', token);
+        this.captchaToken=token;
+        console.log(`Challenge Success ${token}`);
+        if (!token) {
+          this.msg = 'invalid captcha kindly try again!';
+          this.type = 'danger';
+        }
+      },
+    });
   }
 
   onSubmit(): void {
     this.spinner.show();
+    const token = localStorage.getItem('captcha-token');
+    if (!token) {
+      this.spinner.hide();
+      this.msg = 'Invalid captcha kindly try again!';
+      this.type = 'danger';
+      return;
+    }
     this.authService.customerlogin(this.loginForm.value).subscribe({
       next: (data: any) => {
         this.spinner.hide();
         if (!data.error) {
-          // this.cookieService.set('token', data?.accessToken);
-          // this.cookieService.set('auth-user', JSON.stringify(data?.user));
           this.tokenStorage.saveToken(data?.accessToken);
           this.tokenStorage.saveUser(data.user);
           localStorage.setItem('profileId', data.user.profileId);
           localStorage.setItem('communityId', data.user.communityId);
           localStorage.setItem('channelId', data.user?.channelId);
           localStorage.setItem('email', data.user?.Email);
-          window.localStorage.user_level_id = 2;
           window.localStorage.user_id = data.user.Id;
-          window.localStorage.user_country = data.user.Country;
-          window.localStorage.user_zip = data.user.ZipCode;
           this.sharedService.getUserDetails();
           this.isLoginFailed = false;
           this.isLoggedIn = true;
+          this.socketService.connect();
           this.toastService.success('Logged in successfully');
           this.router.navigate([`/home`]);
         } else {
@@ -117,27 +142,25 @@ export class LoginComponent implements OnInit, AfterViewInit {
         // this.toastService.danger(this.errorMessage);
         this.isLoginFailed = true;
         this.errorCode = err.error.errorCode;
-      }
+      },
     });
   }
 
   resend() {
     this.authService
       .userVerificationResend({ username: this.loginForm.value.login_email })
-      .subscribe(
-        {
-          next: (result: any) => {
-            this.msg = result.message;
-            // this.toastService.success(this.msg);
-            this.type = 'success';
-          },
-          error:
-            (error) => {
-              this.msg = error.message;
-              // this.toastService.danger(this.msg);
-              this.type = 'danger';
-            }
-        });
+      .subscribe({
+        next: (result: any) => {
+          this.msg = result.message;
+          // this.toastService.success(this.msg);
+          this.type = 'success';
+        },
+        error: (error) => {
+          this.msg = error.message;
+          // this.toastService.danger(this.msg);
+          this.type = 'danger';
+        },
+      });
   }
 
   forgotPasswordOpen() {
@@ -149,10 +172,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
     modalRef.componentInstance.cancelButtonLabel = 'Cancel';
     modalRef.componentInstance.confirmButtonLabel = 'Submit';
     modalRef.componentInstance.closeIcon = true;
-    modalRef.result.then(res => {
+    modalRef.result.then((res) => {
       if (res === 'success') {
-        this.msg = 'If the entered email exists you will receive a email to change your password.'
-        this.type = 'success'
+        this.msg =
+          'If the entered email exists you will receive a email to change your password.';
+        this.type = 'success';
       }
     });
   }

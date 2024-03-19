@@ -80,7 +80,6 @@
               name="country"
               class="input-area w-100"
               [(ngModel)]="customer.Country"
-              (change)="changeCountry()"
             >
               <option value="">Select Country</option>
               <option
@@ -97,10 +96,10 @@
               type="text"
               class="input-area"
               placeholder="Enter your zip code"
-              [disabled]="!customer.Country"
               [(ngModel)]="customer.Zip"
               name="zip"
               #zipCode
+              (input)="convertToUppercase($event)"
             />
           </div>
         </div>
@@ -111,7 +110,6 @@
               type="text"
               class="input-area"
               placeholder="Enter your state"
-              disabled
               name="state"
               [(ngModel)]="customer.State"
             />
@@ -132,7 +130,6 @@
               class="input-area"
               name="County"
               placeholder="Enter your city"
-              disabled
               [(ngModel)]="customer.County"
             />
           </div>
@@ -153,7 +150,6 @@
               class="input-area"
               name="city"
               placeholder="Enter your county"
-              disabled
               [(ngModel)]="customer.City"
             />
           </div>
