@@ -57,6 +57,6 @@
   overflow: auto;
 
   @media (max-width:991px) {
-    max-height: unset;
+    max-height: calc(100vh - 50px);
   }
 }
