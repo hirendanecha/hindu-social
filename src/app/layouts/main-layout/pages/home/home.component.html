@@ -28,7 +28,7 @@
           >
         </div>
 
-        <div>
+        <div *ngIf="tokenService.getCredentials()">
           <ng-container *ngIf="communityDetails?.adminIds.includes(+profileId)">
             <button
               class="btn btn-sm btn-primary me-2"
