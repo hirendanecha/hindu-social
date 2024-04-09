@@ -111,19 +111,23 @@ export class SharedService {
   getAdvertizeMentLink(id): void {
     if (id) {
       this.communityService.getLinkById(id).subscribe({
-        next: ((res: any) => {
+        next: (res: any) => {
           if (res.data) {
-            console.log(res.data)
             if (res.data[0]?.link1 || res.data[0]?.link2) {
-              this.getMetaDataFromUrlStr(res.data[0]?.link1);
-              this.getMetaDataFromUrlStr(res.data[0]?.link2);
+              this.advertizementLink = [];
+              if (res.data[0]?.link1) {
+                this.getMetaDataFromUrlStr(res.data[0]?.link1);
+              }
+              if (res.data[0]?.link2) {
+                this.getMetaDataFromUrlStr(res.data[0]?.link2);
+              }
             }
           }
-        }),
+        },
         error: (err) => {
           console.log(err);
-        }
-      })
+        },
+      });
     } else {
       this.advertizementLink = null;
     }
