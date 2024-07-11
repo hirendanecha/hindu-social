@@ -14,7 +14,7 @@ export class AppointmentCallComponent {
     const appointmentURLCall =
       this.route.snapshot['_routerState'].url.split('/appointment-call/')[1];
     this.appointmentCall = this.sanitizer.bypassSecurityTrustResourceUrl(
-      'https://facetime.tube/' + appointmentURLCall
+      'https://meet.facetime.tube/' + appointmentURLCall
     );
   }
 }

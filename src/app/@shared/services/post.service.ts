@@ -115,4 +115,9 @@ export class PostService {
     const url = environment.serverUrl
     return this.http.post(`${url}/posts/create-post`, postData);
   }
+
+  getAdvertisement(): Observable<any> {
+    const url = environment.serverUrl + 'advertizement'
+    return this.http.get(`${url}/get`);
+  }
 }
