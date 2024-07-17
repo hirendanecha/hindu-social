@@ -1,0 +1,61 @@
+:host {
+  .media-gallery {
+    .media-header {
+      background: var(--box-1st-color);
+    }
+    .media-content {
+      .message-media {
+        background: var(--box-1st-color);
+        border-radius: 10px;
+
+        .img-preview {
+          position: relative;
+          overflow: hidden;
+
+          .icon-eye {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            left: 0;
+            top: 0;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+
+            fa-icon {
+              transition: 0.3s ease-in-out;
+              color: transparent;
+            }
+
+            &:hover {
+              transition: 0.3s ease-in-out;
+              background-color: #00000075;
+
+              fa-icon {
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+    }
+    .cus-scrollbar-pending {
+      max-height: calc(100vh - 70px);
+    }
+
+    .dropdown-toggle {
+      &::after {
+        display: none;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border-radius: 10px !important;
+      background-color: var(--primary-color) !important;
+    }
+  }
+}

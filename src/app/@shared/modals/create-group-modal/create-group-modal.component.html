@@ -1,0 +1,114 @@
+<div class="modal-header">
+  <h6 class="text-start m-0">{{ title }}</h6>
+  <fa-icon
+    [icon]="['fas', 'xmark']"
+    class="font-20-px"
+    role="button"
+    (click)="activateModal.close()"
+  />
+</div>
+
+<div class="modal-body text-start">
+  <div class="input-area h-48-px d-flex align-items-center">
+    <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
+    <input
+      type="text"
+      name="search"
+      placeholder="Search"
+      [(ngModel)]="searchText"
+      autocomplete="off"
+      (keyup)="getUserList()"
+    />
+  </div>
+  <ng-container *ngIf="searchText">
+    <div #userSearchDropdownRef ngbDropdown>
+      <div
+        ngbDropdownMenu
+        class="search-user-list mt-2 w-260-px overflow-x-hidden overflow-y-auto"
+      >
+        <ng-container *ngIf="userList.length > 0; else noUserFound">
+          <ng-container *ngFor="let user of userList">
+            <div
+              (click)="addProfile(user)"
+              ngbDropdownItem
+              class="d-flex gap-3 pe-auto"
+              role="button"
+            >
+              <img
+                loading="lazy"
+                class="w-32-px h-32-px rounded"
+                data-src="{{ user.ProfilePicName }}"
+                [alt]="user.Username"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+              <span class="overflow-hidden text-truncate">{{
+                user?.Username?.split(" ")?.join("")
+              }}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #noUserFound>
+          <div class="text-center">
+            <span>No result found</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="chat-top p-2 px-5">
+    <span class="m-1">Group members:</span>
+  </div>
+  <div class="bg-box pe-3 rounded-2">
+    <div class="header-menu cus-scrollbar-pending overflow-auto">
+      <div
+        class="single-item messages-area d-flex justify-content-between align-items-baseline"
+        *ngFor="let item of addedInvitesList"
+      >
+        <div
+          class="text-start d-flex justify-content-between chat-single px-5 py-2"
+        >
+          <div class="d-flex gap-2">
+            <div class="avatar">
+              <img
+                class="avatar-img h-40-px w-40-px max-un"
+                src="{{ item?.ProfilePicName }}"
+                [alt]="item?.Username || item?.FirstName"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+            </div>
+            <div
+              class="text-area d-flex justify-content-between sidebar-items align-items-center"
+            >
+              <div class="title-area">
+                <h6 class="m-0">
+                  {{ item?.Username || item?.FirstName }}
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <fa-icon
+          [icon]="['fas', 'xmark']"
+          class="font-20-px"
+          role="button"
+          (click)="removeUser(item)"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer justify-content-end gap-2">
+  <!-- <button type="button" class="btn btn-sm btn-danger" (click)="activeModal.close('cancel')">
+    {{ cancelButtonLabel }}
+  </button> -->
+
+  <button
+    type="button"
+    class="btn btn-sm btn-secondary"
+    (click)="createGroup()"
+  >
+    {{ confirmButtonLabel }}
+  </button>
+</div>

@@ -6,7 +6,8 @@
       triggerChar: '@',
     }" [mentionListTemplate]="mentionListTemplate" (itemSelected)="selectTagUser($event)"></div>
   <ng-container *ngIf="isShowEmojis">
-    <div ngbDropdown placement="bottom-end" class="select-emaojies">
+    <!-- <div ngbDropdown placement="bottom-end" class="select-emaojies"> -->
+    <div ngbDropdown [placement]="placement" class="select-emaojies">
       <button type="button" id="emojiModel" ngbDropdownToggle title="Emojis">
         <img src="https://s3.us-east-1.wasabisys.com/freedom-social/freedom-emojies/Nerd.gif" class="emoji-select" alt="Emoji">
       </button>
@@ -58,7 +59,7 @@
     <app-post-meta-data-card [post]="metaData" class="pt-5" />
   </ng-container>
   
-  <ng-container *ngIf="copyImage">
+  <ng-container *ngIf="isCopyImagePreview && copyImage">
     <div class="rounded m-3">
       <!-- <fa-icon [icon]="['fas', 'xmark']" class="position-absolute start-100 translate-middle badge bg-danger py-1 font-16-px c-pointer c-icon-color" (click)="onClearFile()" /> -->
       <img [src]="copyImage">

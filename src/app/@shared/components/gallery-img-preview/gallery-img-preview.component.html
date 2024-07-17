@@ -1,0 +1,76 @@
+<!-- <div class="img-preview rounded-3" [ngClass]="classes">
+  <img
+    loading="lazy"
+    data-src="{{ src }}"
+    class="w-100 h-100 rounded-3"
+    alt="preview-img"
+    onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+  />
+
+  <div
+    class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+    (click)="openImagePreview(src)"
+  >
+    <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+  </div>
+</div> -->
+
+<ng-container *ngIf="previewSrc">
+  <div
+    class="img-preview-full-screen d-flex flex-column justify-content-center align-items-center p-5 c-icon-color"
+  >
+    <!-- (click)="closeImagePreview()" -->
+    <fa-icon
+      [icon]="['fas', 'xmark']"
+      class="c-pointer close-icon font-40-px"
+      (click)="closeImagePreview()"
+    />
+    <!-- carousel -->
+    <div class="slide" data-ride="carousel" [attr.data-interval]="false">
+      <div class="carousel-inner">
+        <ng-container *ngFor="let media of mediaList; let i = index">
+          <div class="carousel-item" [ngClass]="{ active: currentIndex === i }">
+            <ng-container *ngIf="isVideoFile(media.messageMedia); else imageMessage">
+              <video
+              class="w-100 h-300-px message-media"
+              [src]="media.messageMedia"
+              controls
+              ></video>
+              <!-- autoplay="autoplay" -->
+            </ng-container>
+            <ng-template #imageMessage>
+              <img
+              loading="lazy"
+              data-src="{{ media.messageMedia }}"
+              class="w-80 h-80 rounded-3 image-preview"
+              alt="preview-img"
+              onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+            />
+            </ng-template>
+          </div>
+          <!-- (click)="stopPropagation($event)" -->
+        </ng-container>
+      </div>
+      <ng-container *ngIf="currentIndex > 0">
+        <a
+          class="carousel-control-prev"
+          role="button"
+          (click)="prev()"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+      </ng-container>
+      <ng-container *ngIf="hasMoreData">
+        <a
+          class="carousel-control-next"
+          role="button"
+          (click)="next()"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,157 @@
+<div class="modal-header">
+  <h6 class="m-0">{{ title }}</h6>
+  <fa-icon
+    [icon]="['fas', 'xmark']"
+    class="font-20-px"
+    role="button"
+    (click)="activateModal.close('cancel')"
+  />
+</div>
+
+<div class="modal-body text-start">
+    <div class="parent-replay mb-2">
+      <fa-icon [icon]="['fas', 'reply']" />
+      <ng-container
+        *ngIf="message?.messageMedia"
+      >
+        <ng-container
+          *ngIf="
+            !isFileOrVideo(message?.messageMedia);
+            else fileReplay
+          "
+        >
+          <div class="w-100-px h-100-px">
+            <app-img-preview
+            classes="h-100-px"
+            [src]="message?.messageMedia"
+            ></app-img-preview>
+          </div>
+        </ng-container>
+        <ng-template #fileReplay>
+          <div class="d-flex align-items-center gap-3">
+            <fa-icon
+              [icon]="['fas', 'file']"
+              class="c-pointer close-icon font-40-px"
+            />
+            <span
+              class="c-pdf-show"
+              [title]="
+                message?.messageMedia?.replaceAll('%',' ')"
+              >{{ message?.messageMedia?.replaceAll("%", " ")}}</span
+            >
+          </div>
+        </ng-template>
+      </ng-container>
+      <p
+        *ngIf="message?.messageText !== null"
+        class="m-0"
+        [innerHTML]="message?.messageText"
+      ></p>
+      <!-- encryptDecryptService.decryptUsingAES256(
+      ) -->
+      <span class="font-12-px replay-border">
+        {{ message?.Username }},{{ message?.createdDate | date : "dd-MM-yyyy"}}
+      </span>
+      <input class="mt-2 tag-input-div" type="text" [(ngModel)]="textInput" placeholder="Type a message here (optional)">
+  </div>
+
+  <div class="input-area h-48-px d-flex align-items-center">
+    <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
+    <input
+      type="text"
+      name="search"
+      placeholder="Search"
+      [(ngModel)]="searchText"
+      autocomplete="off"
+      (keyup)="getUserList()"
+    />
+  </div>
+  <ng-container *ngIf="searchText">
+    <div #userSearchDropdownRef ngbDropdown>
+      <div
+        ngbDropdownMenu
+        class="search-user-list mt-2 w-260-px overflow-x-hidden overflow-y-auto"
+      >
+        <ng-container *ngIf="userList.length > 0; else noUserFound">
+          <ng-container *ngFor="let user of userList">
+            <div
+              (click)="addProfile(user)"
+              ngbDropdownItem
+              class="d-flex gap-3 pe-auto"
+              role="button"
+            >
+              <img
+                loading="lazy"
+                class="w-32-px h-32-px rounded"
+                data-src="{{ user.ProfilePicName }}"
+                [alt]="user.Username"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+              <span class="overflow-hidden text-truncate">{{
+                user?.Username?.split(" ")?.join("")
+              }}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #noUserFound>
+          <div class="text-center">
+            <span>No result found</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="chat-top p-2 px-5">
+    <span class="m-1">Suggested</span>
+  </div>
+  <div class="bg-box pe-3 rounded-2">
+    <div class="header-menu cus-scrollbar-pending overflow-auto c-min-height">
+      <div
+        class="single-item messages-area d-flex justify-content-between align-items-baseline"
+        *ngFor="let item of filteredChatList"
+      >
+        <div
+          class="text-start d-flex justify-content-between chat-single px-5 py-2"
+        >
+          <div class="d-flex gap-2">
+            <div class="avatar">
+              <img
+                class="avatar-img h-40-px w-40-px max-un"
+                src="{{ item?.roomId ? item?.ProfilePicName : item?.profileImage }}"
+                [alt]="item?.groupName || item?.Username"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+            </div>
+            <div
+              class="text-area d-flex justify-content-between sidebar-items align-items-center"
+            >
+              <div class="title-area">
+                <h6 class="m-0">
+                  {{ item?.groupName || item?.Username }}
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="me-1">
+          <button class="btn btn-primary rounded-5 w-68-px" [disabled]="isButtonDisabled(item)" (click)="sentMsgTo(item)">{{ isButtonDisabled(item) ? 'Sent' : 'Send' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer justify-content-end gap-2">
+  <!-- <button type="button" class="btn btn-sm btn-danger" (click)="activeModal.close('cancel')">
+    {{ cancelButtonLabel }}
+  </button> -->
+
+  <button
+    type="button"
+    class="btn btn-sm btn-secondary"
+    (click)="activateModal.close('success')"
+  >
+    {{ confirmButtonLabel }}
+  </button>
+</div>

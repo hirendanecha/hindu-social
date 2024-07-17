@@ -1,0 +1,12 @@
+:host {
+  .qr-box {
+    background-color: #0000008c;
+    border-radius: 10px;
+  }
+  .app-qr {
+    @media (max-width: 520px) {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}

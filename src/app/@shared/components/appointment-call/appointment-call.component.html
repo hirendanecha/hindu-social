@@ -1,0 +1,34 @@
+<!-- <div class="bg-black">
+  <iframe
+    class="iframe-model"
+    [src]="appointmentCall"
+    [title]="appointmentCall"
+    allow="microphone; camera; screen; display-capture"
+  ></iframe>
+</div> -->
+<div class="bg-black">
+  <div class="d-flex justify-content-between" *ngIf="tokenService.getCredentials()">
+    <button
+      class="button profile-active mb-4 mb-lg-0 d-flex align-items-center gap-2 ms-5"
+      (click)="openChatListSidebar()"
+    >
+      <fa-icon [icon]="['fas', 'sliders']" class="font-20-px" />
+      <span class="text-white">Contacts</span>
+    </button>
+    <button
+      class="button profile-active mb-4 mb-lg-0 d-flex align-items-center gap-2 me-5"
+      (click)="openRightSidebar()"
+    >
+      <fa-icon [icon]="['fas', 'message']" class="font-20-px" />
+      <span class="text-white">Chat</span>
+    </button>
+  </div>
+  <div
+    [ngClass]="{
+      isLeftSidebarOpen: isLeftSidebarOpen,
+      isRightSidebarOpen: isRightSidebarOpen
+    }"
+  >
+    <div id="meet" class="iframe-model"></div>
+  </div>
+</div>

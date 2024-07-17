@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes, mapToCanActivate } from '@angular/router';
 import { MainLayoutComponent } from './main-layout.component';
 import { AuthenticationGuard } from 'src/app/@shared/guards/authentication.guard';
-import { AppointmentCallComponent } from 'src/app/@shared/modals/appointment-call/appointment-call.component';
+import { AppointmentCallComponent } from 'src/app/@shared/components/appointment-call/appointment-call.component';
+// import { AppointmentCallComponent } from 'src/app/@shared/modals/appointment-call/appointment-call.component';
 
 const routes: Routes = [
   {
@@ -58,6 +59,33 @@ const routes: Routes = [
           isShowResearchLeftSideBar: true
         },
         canActivate: mapToCanActivate([AuthenticationGuard]),
+      },
+      {
+        path: 'profile-chats',
+        loadChildren: () =>
+          import('./pages/profile-chats/profile-chats.module').then(
+            (m) => m.ProfileChartsModule
+          ),
+        data: {
+          isShowLeftSideBar: false,
+          isShowRightSideBar: false,
+          isShowResearchLeftSideBar: false,
+          isShowChatListSideBar: true,
+          isShowChatModule: true
+        },
+        canActivate: mapToCanActivate([AuthenticationGuard]),
+      },
+      {
+        path: 'buzz-call/:callId',
+        component: AppointmentCallComponent,
+        data: {
+          isShowLeftSideBar: false,
+          isShowRightSideBar: false,
+          isShowResearchLeftSideBar: false,
+          isShowChatListSideBar: false,
+          isShowChatModule: true
+        },
+        // canActivate: mapToCanActivate([AuthenticationGuard]),
       },
       {
         path: 'request-video-call',

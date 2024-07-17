@@ -1,0 +1,19 @@
+// :host {
+//   display: flex;
+//   flex-direction: column;
+//   width: 100%;
+// }
+
+// ::ng-deep .c-icon-color{
+//   svg path {
+//     fill: var(--secondary-color) !important;
+//   }
+// }
+
+.bg-color {
+  background: var(--section-1st-color);
+  box-shadow: var(--box-shadow);
+  .chat-list-btn {
+    background-color: var(--body-color);
+  }
+}

@@ -68,6 +68,18 @@
       <li class="ms-1">
         <a
           class="d-flex gap-4"
+          [routerLink]="'/profile-chats'"
+          target="_blank"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
+          <span>Messaging</span>
+        </a>
+      </li>
+      <li class="ms-1">
+        <a
+          class="d-flex gap-4"
           routerLink="/request-video-call"
           routerLinkActive="active"
           (click)="closeSidebar()"

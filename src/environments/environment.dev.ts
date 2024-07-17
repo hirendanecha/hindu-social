@@ -12,8 +12,11 @@ export const environment = {
   socketUrl: `${url}/`,
   webUrl: webUrl,
   tubeUrl: tubeUrl,
+  EncryptIV: 8625401029409790,
+  EncryptKey: 8625401029409790,
   domain: '.healing.tube',
   stripe_key: 'pk_test_51MwOHTSJJZB3pTDyqpZk5NJDaWkbuGiruTp79We9CcR2oODObX93TleYFTJj2qLowRuRL1DRTSIl8Vb1YiFyW7e900BYWlZKSM',
   siteKey:'0x4AAAAAAAUxBHOVjM39yKUu',
-  secretKey:'0x4AAAAAAAUxBEy2WZ9uDMOfPPqInVM0Ixw'
+  secretKey:'0x4AAAAAAAUxBEy2WZ9uDMOfPPqInVM0Ixw',
+  qrLink: `${webUrl}settings/edit-profile/`,
 };

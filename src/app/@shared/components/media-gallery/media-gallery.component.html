@@ -1,0 +1,115 @@
+<div class="media-gallery">
+  <div
+    class="media-header d-flex justify-content-between align-items-center p-3"
+  >
+    <h5>Gallery</h5>
+    <div
+      class="d-flex flex-column justify-content-center align-items-center icon-container"
+    >
+      <fa-icon
+        [icon]="['fas', 'xmark']"
+        class="c-pointer close-icon font-32-px"
+        (click)="activeOffCanvas.close()"
+      />
+    </div>
+  </div>
+
+  <ng-container *ngIf="mediaList.length; else noMedia">
+    <div class="cus-scrollbar-pending overflow-y-auto">
+      <div class="media-content p-2" *ngFor="let media of mediaList">
+        <h4 class="mb-0">{{ media.date }}</h4>
+        <div
+          *ngFor="let message of media.messages; let i = index; let l = last"
+        >
+          <div class="btn-group d-flex options float-end">
+            <div ngbDropdown #editPopup="ngbDropdown" class="d-inline-block">
+              <button class="dropdown-btn" ngbDropdownToggle>
+                <fa-icon [icon]="['fas', 'ellipsis-v']" class="font-20-px" />
+              </button>
+              <div
+                ngbDropdownMenu
+                class="dropdown-menu"
+                (mouseleave)="editPopup.close()"
+              >
+                <button
+                  ngbDropdownItem
+                  (click)="downloadPdf(message.messageMedia)"
+                >
+                  <a class="droplist d-flex align-items-center gap-2">
+                    <fa-icon [icon]="['fas', 'download']" />
+                    <span class="data-text-color">Download</span>
+                  </a>
+                </button>
+              </div>
+            </div>
+          </div>
+          <span class="font-12-px"
+            >{{ message.sentBy === profileId ? "You" : message.Username }},{{
+              message.createdDate | date : "h:mm a"
+            }}</span
+          >
+          <div class="message-media m-1 mb-2">
+            <ng-container *ngIf="isFile(message?.messageMedia); else imageMsg">
+              <div class="message p-2" (click)="pdfView(message?.messageMedia)">
+                <fa-icon
+                  [icon]="['fas', 'file']"
+                  class="c-pointer close-icon font-44-px"
+                ></fa-icon>
+                <p class="pdf-name text-truncate mb-0" [title]="fileName">
+                  {{ fileName }}
+                </p>
+              </div>
+            </ng-container>
+            <ng-template #imageMsg>
+              <ng-container *ngIf="isVideoFile(message?.messageMedia); else imageMessage">
+                <video
+                class="w-100 h-200-px replay-message-media"
+                [src]="message?.messageMedia"
+                controls
+                ></video>
+                <!-- autoplay="autoplay" -->
+              </ng-container>
+              <ng-template #imageMessage>
+                <div class="replay-message-media">
+                  <!-- <app-gallery-img-preview
+                    class="msgImage"
+                    classes="h-180-px"
+                    [src]="message?.messageMedia"
+                  ></app-gallery-img-preview> -->
+                  <div class="img-preview rounded-3 h-180-px">
+                    <img
+                      loading="lazy"
+                      data-src="{{ message?.messageMedia }}"
+                      class="w-100 h-100 rounded-3"
+                      alt="preview-img"
+                      onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                    />
+  
+                    <div
+                      class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+                      (click)="openImagePreview(message?.messageMedia)"
+                    >
+                      <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div
+        class="d-center m-3 text-white c-pointer"
+        (click)="loadMoreMedia()"
+        *ngIf="hasMoreData"
+      >
+        <fa-icon [icon]="['fas', 'refresh']" class="font-24-px me-2"></fa-icon>
+        <span>Loadmore</span>
+      </div>
+    </div>
+  </ng-container>
+  <app-inline-loader *ngIf="isFileLoad" />
+  <ng-template #noMedia>
+    <p class="text-center h5 mt-5">No media available</p>
+  </ng-template>
+</div>

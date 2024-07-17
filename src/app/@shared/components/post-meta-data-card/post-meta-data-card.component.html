@@ -1,12 +1,13 @@
 <a
   class="post-description post-meta-description mdtxt pt-0 pb-1 text-start"
+  [ngClass]="post?.metaimage ? 'chat-meta-link' : ''"
   [href]="post.metalink"
   target="_blank"
   *ngIf="post?.metalink"
   >{{ post.metalink }}</a
 >
 
-<div class="border rounded-3 mb-3" *ngIf="post?.metaimage">
+<div class="border rounded-3 mb-3 chat-meta-card" *ngIf="post?.metaimage">
   <a [href]="post.metalink" target="_blank" class="post-img w-100">
     <img
       loading="lazy"

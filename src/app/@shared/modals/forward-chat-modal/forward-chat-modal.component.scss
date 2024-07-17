@@ -1,0 +1,41 @@
+:host{
+  h5 {
+    text-transform: none;
+  }
+
+  .modal-body{
+    max-height: 620px;
+    min-height: 440px;
+    overflow: auto;
+
+    .bg-box{
+      background-color: var(--box-1st-color);
+    }
+
+    .parent-replay {
+      border: 1px solid var(--box-1st-color);
+      border-radius: 7px;
+      padding: 5px;
+
+      .replay-border{
+        border-top: 1px solid var(--para-1st-color);
+      }
+    }
+
+    .tag-input-div {
+      background-color: var(--body-color);
+    }
+
+    .c-min-height{
+      min-height: 310px;
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 4px !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px !important;
+    background-color: var(--primary-color) !important;
+  }
+}

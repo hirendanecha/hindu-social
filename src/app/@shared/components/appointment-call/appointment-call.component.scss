@@ -1,0 +1,218 @@
+// .iframe-model {
+//   height: calc(100vh - 6px);
+//   width: 100vw;
+//   overflow-y: hidden;
+// }
+.iframe-model {
+  height: calc(89vh - 8px);
+  // width: 100vw;
+}
+
+.isLeftSidebarOpen {
+  margin-left: 300px;
+}
+.isRightSidebarOpen {
+  margin-right: 400px;
+}
+
+.bg-color {
+  background: var(--section-1st-color);
+  box-shadow: var(--box-shadow);
+  .chat-list-btn {
+    background-color: var(--body-color);
+  }
+}
+
+::ng-deep {
+  .show {
+    .chat-area {
+      background: var(--section-1st-color);
+      border-radius: 5px;
+      .cus-scrollbar {
+        max-height: 60vh;
+      }
+      aside {
+        .close-btn {
+          position: absolute;
+          right: 10px;
+          top: 5px;
+          cursor: pointer;
+          i {
+            color: var(--bs-white);
+          }
+        }
+        .chat-single {
+          cursor: pointer;
+          .btn-group {
+            opacity: 0;
+            transition: 0.3s;
+          }
+          &:hover {
+            .btn-group {
+              opacity: 1;
+            }
+          }
+        }
+        .cus-scrollbar {
+          max-height: 64vh;
+        }
+      }
+      .profile-status {
+        h5 {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+        }
+        span {
+          color: #00a469;
+        }
+      }
+      .main {
+        .chat-head {
+          background: var(--section-1st-color);
+          border-bottom: 1px solid var(--border-color);
+          img {
+            width: 60px;
+            height: 60px;
+          }
+          i {
+            color: var(--primary-color);
+          }
+        }
+        .chat-content-sidepanel {
+          height: calc(96vh - 205px) !important;
+          // height: calc(100vh - 205px) !important;
+          // height: calc(100vh - 160px) !important;
+          overflow-y: auto;
+        }
+      }
+      .main-chat-box {
+        top: initial;
+        background-color: var(--section-1st-color);
+        max-height: fit-content;
+        li {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+          max-width: 70%;
+          &:last-child {
+            margin-bottom: 0;
+          }
+          img {
+            max-width: unset;
+            max-height: unset;
+
+            @media (max-width: 991px) {
+              max-width: 100%;
+              max-height: 100%;
+              position: unset !important;
+            }
+          }
+          .message {
+            border-radius: 16px;
+            padding: 10px;
+          }
+          &.you {
+            .message {
+              background: var(--box-1st-color);
+              border-top-left-radius: 0;
+            }
+          }
+          &.me {
+            text-align: start;
+            align-items: flex-end;
+            margin-left: auto;
+            justify-content: flex-end;
+            .message {
+              background: #00a3ff;
+              border-bottom-right-radius: 0;
+            }
+            p {
+              color: var(--bs-white);
+            }
+            span {
+              color: rgba(255, 255, 255, 0.52);
+            }
+          }
+        }
+        span {
+          color: var(--para-1st-color);
+        }
+      }
+      .chat-footer {
+        form {
+          background-color: var(--box-1st-color);
+          border-radius: 10px;
+        }
+        input {
+          background-color: var(--body-color);
+        }
+      }
+    }
+
+    .drop-options {
+      .options {
+        visibility: hidden !important;
+      }
+      &:hover {
+        .options {
+          visibility: visible !important;
+        }
+      }
+    }
+
+    .dropdown-toggle::after {
+      display: none;
+    }
+    .message {
+      .dropdown-menu.show {
+        right: -20px;
+      }
+    }
+
+    .message-input-field {
+      position: absolute;
+      bottom: -20px;
+
+      .tag-input-div {
+        // margin-left: 50px;
+        // background-color: var(--body-color);
+        background-color: var(--input-field);
+        color: var(--input-field-text) !important;
+        max-width: calc(100% - 5px) !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        max-height: 170px;
+        overflow-y: auto !important;
+        padding: 9px;
+      }
+      .select-emaojies {
+        top: unset !important;
+        right: unset !important;
+        left: -7px;
+        // bottom: 48px;
+        top: 48px !important;
+      }
+    }
+  }
+
+  .group-input-field {
+    mention-list {
+      top: unset !important;
+      bottom: 225px;
+
+      .mention-menu {
+        max-height: 162px !important;
+        min-height: 162px;
+      }
+    }
+  }
+
+  // .profile-active{
+  //   fa-icon svg path {
+  //     fill: #ffff;
+  //   }
+  // }
+}

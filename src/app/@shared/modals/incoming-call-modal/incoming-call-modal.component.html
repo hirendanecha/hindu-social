@@ -1,0 +1,83 @@
+<div class="modal-body text-start">
+  <div class="text-center">
+    <img
+      [src]="calldata.ProfilePicName"
+      class="h-100-px w-100-px rounded-circle"
+      alt="image"
+      onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+    />
+    <h4 class="mt-5">{{ calldata?.groupName || calldata?.Username}}</h4>
+    <span class="mb-3">{{ title }}</span>
+
+    <div class="m-2" *ngIf="!isOnCall">
+      <button
+        type="button"
+        class="btn btn-sm btn-success me-2 font-20-px rounded-circle"
+        (click)="pickUpCall()"
+      >
+        <fa-icon class="c-icon-color" [icon]="['fas', 'phone']"></fa-icon>
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger ms-2 font-20-px rounded-circle"
+        (click)="hangUpCall(true, 'Call declined')"
+      >
+        <fa-icon class="c-icon-color" [icon]="['fas', 'phone-slash']"></fa-icon>
+      </button>
+    </div>
+    <div class="m-2" *ngIf="isOnCall">
+      <h5 class="text-center">Options:</h5>
+      <div class="d-flex align-items-baseline justify-content-between">
+        <p>I'll call you back later:</p>
+        <button
+          type="button"
+          class="btn btn-sm btn-info ms-2 font-16-px rounded-circle"
+          (click)="hangUpCall(true, 'Ill call you back later')"
+        >
+          <fa-icon class="c-icon-color" [icon]="['fas', 'voicemail']"></fa-icon>
+        </button>
+      </div>
+      <div class="d-flex align-items-baseline justify-content-between">
+        <p>Merge into existing call:</p>
+        <button
+          type="button"
+          class="btn btn-sm btn-success ms-2 font-16-px rounded-circle"
+          (click)="pickUpCall()"
+        >
+          <fa-icon class="c-icon-color" [icon]="['fas', 'repeat']"></fa-icon>
+        </button>
+      </div>
+      <div class="d-flex align-items-baseline justify-content-between">
+        <p>Ignore and hang up call:</p>
+        <button
+          type="button"
+          class="btn btn-sm btn-danger ms-2 font-16-px rounded-circle"
+          (click)="hangUpCall(true, 'Call declined')"
+        >
+          <fa-icon
+            class="c-icon-color"
+            [icon]="['fas', 'phone-slash']"
+          ></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="modal-footer justify-content-end gap-2">
+  <button
+    type="button"
+    class="btn btn-sm btn-danger"
+    (click)="activeModal.close('cancel')"
+  >
+    {{ cancelButtonLabel }}
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-sm btn-secondary"
+    (click)="activeModal.close('success')"
+  >
+    {{ confirmButtonLabel }}
+  </button>
+</div> -->

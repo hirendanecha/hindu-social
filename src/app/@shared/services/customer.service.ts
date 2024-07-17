@@ -122,4 +122,14 @@ export class CustomerService {
   verifyToken(token): Observable<any> {
     return this.http.get(`${this.baseUrl}/verify-token/${token}`);
   }
+  
+  startCallToBuzzRing(callerData: Object): Observable<any>{
+    const url = 'https://ring-api.hindu.social/api/v1/customers/call-notification';
+    return this.http.post(url, callerData);
+  }
+
+  startGroupCallToBuzzRing(callerData: Object): Observable<any>{
+    const url = 'https://ring-api.hindu.social/api/v1/customers/group-call-notification';
+    return this.http.post(url, callerData);
+  }
 }

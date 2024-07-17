@@ -1,4 +1,7 @@
 :host {
+  .image-render{
+    image-rendering: -webkit-optimize-contrast;
+  }
   .img-preview {
     position: relative;
     overflow: hidden;
@@ -62,20 +65,26 @@
 
       &:hover {
         transition: 0.3s ease-in-out;
-        // transform: rotate(180deg);
+        transform: rotate(180deg);
       }
     }
 
     .image-preview{
+      top: 0px;
       bottom: 0px;
-      height: 100%;
+      position: sticky;
+      max-width: calc(100vw - 100px);
+      max-height: 100vh;
+      z-index: -1;
+      // height: 100%;
       // left: 0px;
       // opacity: 0;
-      position: absolute;
       // right: 0px;
-      top: 0px;
       // width: 100%;
-      z-index: -1;
+
+      @media (max-width:600px) {
+        max-width: calc(100vw - 10px);
+      }
     }
   }
 }

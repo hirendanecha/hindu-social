@@ -1,0 +1,23 @@
+:host{
+  h5 {
+    text-transform: none;
+  }
+
+  .modal-body{
+    max-height: 620px;
+    min-height: 440px;
+    overflow: auto;
+
+    .bg-box{
+      background-color: var(--box-1st-color);
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 4px !important;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px !important;
+    background-color: var(--primary-color) !important;
+  }
+}

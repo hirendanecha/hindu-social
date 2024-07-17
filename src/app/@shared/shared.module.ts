@@ -83,6 +83,32 @@ import {
   faRefresh,
   faEyeSlash,
   faSquarePlus,
+  faTableList,
+  faChevronLeft,
+  faPhoneFlip,
+  faVoicemail,
+  faPhoneVolume,
+  faCircleChevronUp,
+  faCircleChevronDown,
+  faPhoneSlash,
+  faEnvelope,
+  faPaperclip,
+  faEllipsisH,
+  faSearch,
+  faBan,
+  faFileVideo,
+  faSliders,
+  faCopy,
+  faEllipsisV,
+  faCommentAlt,
+  faUsers,
+  faPencil,
+  faReply,
+  faUserTimes,
+  faPhotoFilm,
+  faRepeat,
+  faMobile,
+  faTicketAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { ClaimTokenModalComponent } from './modals/clai-1776-token-modal/claim-token-modal.component';
 import { WalletLinkComponent } from './modals/wallet-download-modal/1776-wallet.component';
@@ -91,6 +117,7 @@ import { PipeModule } from './pipe/pipe.module';
 import { VideoPostModalComponent } from './modals/video-post-modal/video-post-modal.component';
 import { ForgotPasswordComponent } from '../layouts/auth-layout/pages/forgot-password/forgot-password.component';
 import { MentionModule } from 'angular-mentions';
+import { QRCodeModule } from 'angularx-qrcode';
 //import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { PdfPreviewComponent } from './components/pdf-preview/pdf-preview.component';
 import {
@@ -111,6 +138,15 @@ import { AppointmentModalComponent } from './modals/appointment-modal/appointmen
 import { OpenStripeComponent } from './modals/open-stripe/open-stripe.component';
 import { AppointmentCallComponent } from './modals/appointment-call/appointment-call.component';
 import { ConferenceLinkComponent } from './modals/create-conference-link/conference-link-modal.component';
+import { AppQrModalComponent } from './modals/app-qr-modal/app-qr-modal.component';
+import { ForwardChatModalComponent } from './modals/forward-chat-modal/forward-chat-modal.component';
+import { QrScanModalComponent } from './modals/qrscan-modal/qrscan-modal.component';
+import { OutGoingCallModalComponent } from './modals/outgoing-call-modal/outgoing-call-modal.component';
+import { EditGroupModalComponent } from './modals/edit-group-modal/edit-group-modal.component';
+import { CreateGroupModalComponent } from './modals/create-group-modal/create-group-modal.component';
+import { MediaGalleryComponent } from './components/media-gallery/media-gallery.component';
+import { IncomingcallModalComponent } from './modals/incoming-call-modal/incoming-call-modal.component';
+import { GalleryImgPreviewComponent } from './components/gallery-img-preview/gallery-img-preview.component';
 
 
 const sharedComponents = [
@@ -137,6 +173,16 @@ const sharedComponents = [
   RePostCardComponent,
   HealthPraatitionerCardComponent,
   EditPostModalComponent,
+  ConferenceLinkComponent,
+  IncomingcallModalComponent,
+  OutGoingCallModalComponent,
+  CreateGroupModalComponent,
+  EditGroupModalComponent,
+  MediaGalleryComponent,
+  GalleryImgPreviewComponent,
+  QrScanModalComponent,
+  AppQrModalComponent,
+  ForwardChatModalComponent,
   AppointmentModalComponent,
   OpenStripeComponent,
   AppointmentCallComponent,
@@ -157,6 +203,7 @@ const sharedModules = [
   FontAwesomeModule,
   PipeModule,
   MentionModule,
+  QRCodeModule,
   // PdfViewerModule
 ];
 
@@ -232,10 +279,42 @@ export class SharedModule {
       faGlobe,
       faList,
       faCircle,
+      faEnvelope,
+      faPaperclip,
       faPhone,
+      faEllipsisH,
+      faSearch,
+      faBan,
+      faFileVideo,
+      faSliders,
+      faCopy,
+      faPhoneSlash,
+      faEllipsisV,
+      faUsers,
+      faCommentAlt,
+      faLayerGroup,
+      faGear,
+      faPencil,
       faRefresh,
+      faRightFromBracket,
+      faReply,
+      faUserTimes,
+      faPhotoFilm,
+      faRepeat,
+      faMobile,
+      faEye,
       faEyeSlash,
+      faTicketAlt,
+      faPhotoFilm,
+      faCopy,
       faSquarePlus,
+      faTableList,
+      faChevronLeft,
+      faPhoneFlip,
+      faVoicemail,
+      faPhoneVolume,
+      faCircleChevronUp,
+      faCircleChevronDown
     );
   }
 }

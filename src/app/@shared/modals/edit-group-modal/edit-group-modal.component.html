@@ -1,0 +1,196 @@
+<div class="modal-header">
+  <h6 class="text-start m-0">{{ title }}</h6>
+  <fa-icon
+    [icon]="['fas', 'xmark']"
+    class="font-20-px"
+    role="button"
+    (click)="activateModal.close()"
+  />
+</div>
+
+<div class="modal-body text-start">
+  <div class="d-flex align-items-center">
+    <app-img-picker
+      classes="w-100-px h-100-px"
+      accept="image/*"
+      (onFileChange)="selectFiles($event)"
+      [url]="data?.profileImage"
+    />
+    <div class="d-flex flex-column w-100">
+      <div class="d-flex align-items-baseline" *ngIf="!showInputField">
+        <h4>{{ data.groupName }}</h4>
+        <fa-icon
+          [icon]="['fas', 'pencil']"
+          class="ms-2"
+          (click)="editGroupName()"
+        />
+      </div>
+      <div *ngIf="showInputField" class="position-relative">
+        <fa-icon
+          [icon]="['fas', 'xmark']"
+          class="close-icon-color"
+          (click)="editGroupName()"
+        ></fa-icon>
+        <input
+          type="text"
+          class="form-control ps-1"
+          name="cSlug"
+          [(ngModel)]="changeGroupName"
+          [formControl]="chanageGroupNameFormControl"
+          placeholder="Change Group Name"
+          required
+        />
+        <div class="text-danger" *ngIf="chanageGroupNameFormControl.hasError('pattern')">
+          Please enter group name properly!
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="input-area h-48-px d-flex align-items-center">
+    <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
+    <input
+      type="text"
+      name="search"
+      placeholder="Search"
+      [(ngModel)]="searchText"
+      autocomplete="off"
+      (keyup)="getUserList()"
+    />
+  </div>
+  <ng-container *ngIf="searchText">
+    <div #userSearchDropdownRef ngbDropdown>
+      <div
+        ngbDropdownMenu
+        class="search-user-list mt-2 w-260-px overflow-x-hidden overflow-y-auto"
+      >
+        <ng-container *ngIf="userList.length > 0; else noUserFound">
+          <ng-container *ngFor="let user of userList">
+            <div
+              (click)="addProfile(user)"
+              ngbDropdownItem
+              class="d-flex gap-3 pe-auto"
+              role="button"
+            >
+              <img
+                loading="lazy"
+                class="w-32-px h-32-px rounded"
+                data-src="{{ user.ProfilePicName }}"
+                [alt]="user.Username"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+              <span class="overflow-hidden text-truncate">{{
+                user.Username.split(" ").join("")
+              }}</span>
+            </div>
+          </ng-container>
+        </ng-container>
+        <ng-template #noUserFound>
+          <div class="text-center">
+            <span>No result found</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="addedInvitesList.length">
+    <div class="chat-top p-2 px-5">
+      <h5 class="m-1">Selected members:</h5>
+    </div>
+    <div class="bg-box pe-3 rounded-2">
+      <div class="header-menu cus-scrollbar-pending overflow-auto">
+        <div
+          class="single-item messages-area d-flex justify-content-between align-items-baseline"
+          *ngFor="let item of addedInvitesList"
+        >
+          <div
+            class="text-start d-flex justify-content-between chat-single px-5 py-2"
+          >
+            <div class="d-flex gap-2">
+              <div class="avatar">
+                <img
+                  class="avatar-img h-40-px w-40-px max-un"
+                  src="{{ item?.ProfilePicName }}"
+                  [alt]="item?.Username || item?.FirstName"
+                  onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                />
+              </div>
+              <div
+                class="text-area d-flex justify-content-between sidebar-items align-items-center"
+              >
+                <div class="title-area">
+                  <h6 class="m-0">
+                    {{ item?.Username || item?.FirstName }}
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+          <fa-icon
+            [icon]="['fas', 'xmark']"
+            class="font-20-px"
+            role="button"
+            (click)="removeUser(item)"
+          />
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="chat-top p-2 px-5">
+    <h5 class="m-1">Group members:</h5>
+  </div>
+  <div class="bg-box pe-3 rounded-2">
+    <div class="header-menu cus-scrollbar-pending overflow-auto">
+      <div
+        class="single-item messages-area d-flex justify-content-between align-items-baseline"
+        *ngFor="let item of data.memberList"
+      >
+        <div
+          class="text-start d-flex justify-content-between chat-single px-5 py-2"
+        >
+          <div class="d-flex gap-2">
+            <div class="avatar">
+              <img
+                class="avatar-img h-40-px w-40-px max-un"
+                src="{{ item?.ProfilePicName }}"
+                [alt]="item?.Username || item?.FirstName"
+                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+              />
+            </div>
+            <div
+              class="text-area d-flex justify-content-between sidebar-items align-items-center"
+            >
+              <div class="title-area">
+                <h6 class="m-0">
+                  {{ item?.Username || item?.FirstName }}
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <fa-icon
+          *ngIf="item.profileId !== this.profileId"
+          [icon]="['fas', 'xmark']"
+          class="font-20-px"
+          role="button"
+          (click)="removeGroupUser(item.profileId)"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer justify-content-between gap-2">
+  <button
+    type="button"
+    class="btn btn-sm btn-danger"
+    (click)="removeGroupUser(profileId)"
+  >
+    {{ cancelButtonLabel }}
+  </button>
+  <!-- (click)="activateModal.close('cancel')" -->
+  <button type="button" class="btn btn-sm btn-secondary" (click)="upload()">
+    {{ confirmButtonLabel }}
+  </button>
+</div>

@@ -1,0 +1,96 @@
+<div class="d-block d-lg-none chat-list-btn">
+  <div class="d-flex justify-content-between p-3 mx-10">
+    <button
+      class="button profile-active d-flex align-items-center gap-2"
+      (click)="openChatListSidebar()"
+    >
+      <fa-icon [icon]="['fas', 'sliders']" class="font-20-px" />
+      <span>Contacts</span>
+    </button>
+    <div class="btn-group cus-dropdown d-flex gap-3">
+      <div ngbDropdown class="d-inline-block">
+        <button class="dropdown-btn" ngbDropdownToggle>
+          <fa-icon [icon]="['fas', 'ellipsis-v']" class="font-20-px" />
+        </button>
+        <div ngbDropdownMenu class="dropdown-menu">
+          <div class="dropdown-preferences">
+            <div class="d-flex flex-column px-3">
+              <div class="mt-2">
+                <label class="d-flex form-label">Sound Preferences</label>
+                <div class="d-flex align-items-baseline">
+                  <p class="m-1">
+                    Sound for new message<strong>{{isMessageSoundEnabled ? "On" : "Off"}}</strong>
+                  </p>
+                  <div class="form-switch">
+                    <input
+                      [(ngModel)]="isMessageSoundEnabled"
+                      class="form-check-input p-2"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckChecked"
+                      (change)="toggleSoundPreference('messageSoundEnabled',isMessageSoundEnabled)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex flex-column">
+                <div class="d-flex align-items-baseline">
+                  <p class="m-1">
+                    Call ring tone
+                    <strong>{{ isCallSoundEnabled ? "On" : "Off" }}</strong>
+                  </p>
+                  <div class="form-switch">
+                    <input
+                      [(ngModel)]="isCallSoundEnabled"
+                      class="form-check-input p-2"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckChecked"
+                      (change)="toggleSoundPreference('callSoundEnabled',isCallSoundEnabled)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="c-pointer d-flex align-items-baseline mt-3"
+                (click)="appQrmodal()"
+              >
+              <fa-icon [icon]="['fas', 'mobile']" class="font-20-px me-2"/>
+                <h6 class="d-flex">Buzz Ring App</h6>
+              </div>
+              <div
+              class="c-pointer d-flex align-items-baseline mt-3"
+              (click)="uniqueLink()"
+            >
+            <fa-icon [icon]="['fas', 'square-plus']" class="font-20-px me-2"/>
+              <h6 class="d-flex">Create Unique Link</h6>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center pt-lg-5">
+  <div
+    class="col-xxl-3 col-xl-4 col-lg-4 pe-0 m-0 p-0 d-none d-lg-block w-300-px"
+  >
+    <app-profile-chats-sidebar
+      (onNewChat)="onChatPost($event)"
+      [isRoomCreated]="isRoomCreated"
+      [selectedRoomId]="selectedRoomId"
+    ></app-profile-chats-sidebar>
+  </div>
+  <div
+    class="col-xxl-9 col-11 m-auto col-xl-8 col-lg-8 m-lg-0 p-lg-0 mx-md-0 px-md-0 px-sm-3 bg-color"
+  >
+  <ng-container *ngIf="userChat">
+    <app-profile-chats-list
+      [userChat]="userChat"
+      (newRoomCreated)="onNewChatRoom($event)"
+      (selectedChat)="onSelectChat($event)"
+    ></app-profile-chats-list>
+  </ng-container>
+  </div>
+</div>
