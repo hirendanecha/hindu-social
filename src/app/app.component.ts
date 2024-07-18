@@ -30,7 +30,7 @@ import { TokenStorageService } from './@shared/services/token-storage.service';
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output('newRoomCreated') newRoomCreated: EventEmitter<any> =
     new EventEmitter<any>();
-  title = 'freedom-ssr';
+  title = 'Hindu-social';
   showButton = false;
   tab: any;
 
