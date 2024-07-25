@@ -795,16 +795,23 @@ export class PostCardComponent implements OnInit {
       this.commentData.comment = content;
     }
   }
-
   focusTagInput(postId: number) {
     const tagUserInput = document.querySelector(`#replaycomment-${postId} .tag-input-div`) as HTMLInputElement || document.querySelector(`#comment-${postId} .tag-input-div`) as HTMLInputElement
     if (tagUserInput) {
       tagUserInput.focus();
       if (tagUserInput.innerHTML.length) {
         setTimeout(() => {
-          tagUserInput.innerHTML = tagUserInput.innerHTML.slice(0, -1);
+          tagUserInput.innerText = tagUserInput.innerText + ' '.slice(0, -1);
+          const range = document.createRange();
+          const selection = window.getSelection();
+          if (selection) {
+            range.selectNodeContents(tagUserInput);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
         }, 100);
       }
     }
   }
-}
+} 
