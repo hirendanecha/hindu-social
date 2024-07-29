@@ -44,7 +44,7 @@
               <button ngbDropdownItem *ngIf="notification.isRead === 'N'">
                 <a
                   class="droplist d-flex align-items-center gap-2"
-                  (click)="readUnreadNotification(notification.id, 'Y')"
+                  (click)="readUnreadNotification(notification, 'Y')"
                 >
                   <fa-icon [icon]="['fas', 'square-check']" />
                   <span>Mark as read</span>
@@ -53,7 +53,7 @@
               <button ngbDropdownItem *ngIf="notification.isRead === 'Y'">
                 <a
                   class="droplist d-flex align-items-center gap-2"
-                  (click)="readUnreadNotification(notification.id, 'N')"
+                  (click)="readUnreadNotification(notification, 'N')"
                 >
                   <fa-icon [icon]="['fas', 'square-xmark']" />
                   <span>Mark as unread</span>

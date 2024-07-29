@@ -19,7 +19,8 @@ export class ReplyCommentModalComponent implements AfterViewInit {
   commentData: any = {
     file: null,
     url: '',
-    tags: []
+    tags: [],
+    meta: {}
   };
 
   commentMessageInputValue: string = ''
@@ -79,10 +80,9 @@ export class ReplyCommentModalComponent implements AfterViewInit {
   }
 
   onTagUserInputChangeEvent(data: any): void {
-    // console.log('comments-data', data)
-    // this.commentData.comment = data?.html;
-    this.extractLargeImageFromContent(data.html);
+    this.extractLargeImageFromContent(data.html)
     this.commentMessageTags = data?.tags;
+    this.commentData.meta = data?.meta;
   }
 
   extractLargeImageFromContent(content: string): void {
