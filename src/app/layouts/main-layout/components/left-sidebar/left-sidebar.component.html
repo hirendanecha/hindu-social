@@ -266,12 +266,12 @@
       </span>
     </div>
   </ng-container>
-  <ng-container *ngIf="sharedService?.advertizementLink?.length">
-    <div class="mt-3">
+ 
+    <div class="mt-3" *ngIf="sharedService?.advertizementLink?.length">
       <h6>Advertizement Link</h6>
       <div *ngFor="let item of sharedService?.advertizementLink">
         <app-post-meta-data-card [post]="item" />
       </div>
     </div>
-  </ng-container>
+ 
 </div>

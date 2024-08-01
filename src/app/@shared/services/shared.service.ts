@@ -126,7 +126,7 @@ export class SharedService {
                 this.getMetaDataFromUrlStr(res.data[0]?.link2);
               }
             }
-          }
+          }  
         },
         error: (err) => {
           console.log(err);

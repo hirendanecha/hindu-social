@@ -101,6 +101,8 @@ export class AddFreedomPageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.inputLinkValue1 = this.data?.link1 || null;
+    this.inputLinkValue2 = this.data?.link2 || null;
     fromEvent(this.zipCode.nativeElement, 'input')
       .pipe(debounceTime(1000))
       .subscribe((event) => {
@@ -197,10 +199,10 @@ export class AddFreedomPageComponent implements OnInit, AfterViewInit {
               this.spinner.hide();
               if (!res.error) {
                 this.submitted = true;
-                this.createAdvertizeMentLink(res.data);
+                this.createAdvertizeMentLink(res.data)
                 this.createCommunityAdmin(res.data);
                 this.activeModal.close('success');
-                this.toastService.success('Pages created successfully');
+                this.toastService.success('Freedom page created successfully');
                 // this.router.navigateByUrl('/home');
               }
             },
@@ -239,6 +241,12 @@ export class AddFreedomPageComponent implements OnInit, AfterViewInit {
                 this.spinner.hide();
               }
           });
+          if (this.data.link1 || this.data.link2) {
+            this.editAdvertizeMentLink(this.data.Id);
+          } else {
+            this.createAdvertizeMentLink(this.data.Id);
+          }
+          this.sharedService.advertizementLink = [];
       }
     }
   }

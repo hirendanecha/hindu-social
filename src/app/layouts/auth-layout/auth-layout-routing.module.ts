@@ -25,7 +25,7 @@ const routes: Routes = [
         component: ResetPasswordComponent,
       },
       {
-        path: 'healing-registration',
+        path: 'hindu-registration',
         loadChildren: () => import('src/app/layouts/main-layout/pages/healing-practitioner-registration/healing-practitioner-registration.module').then((m) => m.HealingPractitionerRegistrationModule),
         data: {
           isShowLeftSideBar: false,

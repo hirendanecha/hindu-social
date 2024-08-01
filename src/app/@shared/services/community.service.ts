@@ -123,6 +123,6 @@ export class CommunityService {
   }
 
   getLinkById(id): Observable<any> {
-    return this.http.get(`${this.baseUrl}/get-link/${id}`);
+    return this.http.get(`${this.baseUrl}/get-link/${id}?q=${Date.now()}`);
   }
 }
