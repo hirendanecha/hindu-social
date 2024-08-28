@@ -10,6 +10,7 @@ import { SocketService } from '../../services/socket.service';
 import { SoundControlService } from '../../services/sound-control.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { SharedService } from '../../services/shared.service';
 
 @Component({
   selector: 'app-outgoing-call-modal',
@@ -32,18 +33,27 @@ export class OutGoingCallModalComponent
     public activateModal: NgbActiveModal,
     private socketService: SocketService,
     private soundControlService: SoundControlService,
-    private router: Router
+    private router: Router,
+    private sharedService: SharedService
   ) {}
 
   ngAfterViewInit(): void {
-    const SoundOct = JSON.parse(
-      localStorage.getItem('soundPreferences')
-    )?.callSoundEnabled;
-    if (SoundOct !== 'N') {
-      if (this.sound) {
-        this.sound?.play();
+    // const SoundOct = JSON.parse(
+    //   localStorage.getItem('soundPreferences')
+    // )?.callSoundEnabled;
+    // if (SoundOct !== 'N') {
+    //   if (this.sound) {
+    //     this.sound?.play();
+    //   }
+    // }
+    this.sharedService.loginUserInfo.subscribe((user) => {
+      const callNotificationSound = user.callNotificationSound;
+      if (callNotificationSound === 'Y') {
+        if (this.sound) {
+          this.sound?.play();
+        }
       }
-    }
+    });
     if (window.document.hidden) {
       this.soundEnabledSubscription =
         this.soundControlService.soundEnabled$.subscribe((soundEnabled) => {
@@ -84,7 +94,10 @@ export class OutGoingCallModalComponent
     this.sound?.stop();
     clearTimeout(this.hangUpTimeout);
     // this.router.navigate([`/appointment-call/${this.calldata.link}`]);
-    const callId = this.calldata.link.replace('https://meet.facetime.tube/', '');
+    const callId = this.calldata.link.replace(
+      'https://meet.facetime.tube/',
+      ''
+    );
     this.router.navigate([`/buzz-call/${callId}`]);
     // window.open(this.calldata.link, '_blank');
     this.activateModal.close('success');

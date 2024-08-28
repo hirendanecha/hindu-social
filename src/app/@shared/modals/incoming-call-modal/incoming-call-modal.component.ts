@@ -14,6 +14,7 @@ import { SoundControlService } from '../../services/sound-control.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../../services/customer.service';
+import { SharedService } from '../../services/shared.service';
 
 @Component({
   selector: 'app-incoming-call-modal',
@@ -41,7 +42,8 @@ export class IncomingcallModalComponent
     private customerService: CustomerService,
     private router: Router,
     private modalService: NgbModal,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sharedService: SharedService
   ) {
     this.profileId = +localStorage.getItem('profileId');
     this.isOnCall = this.router.url.includes('/buzz-call/') || false;
@@ -57,14 +59,22 @@ export class IncomingcallModalComponent
           this.sound?.stop();
         }
       });
-    const SoundOct = JSON.parse(
-      localStorage.getItem('soundPreferences')
-    )?.callSoundEnabled;
-    if (SoundOct !== 'N') {
-      if (this.sound) {
-        this.sound?.play();
+    // const SoundOct = JSON.parse(
+    //   localStorage.getItem('soundPreferences')
+    // )?.callSoundEnabled;
+    // if (SoundOct !== 'N') {
+    //   if (this.sound) {
+    //     this.sound?.play();
+    //   }
+    // }
+    this.sharedService.loginUserInfo.subscribe((user) => {
+      const callNotificationSound = user.callNotificationSound;
+      if (callNotificationSound === 'Y') {
+        if (this.sound) {
+          this.sound?.play();
+        }
       }
-    }
+    });
     if (!this.hangUpTimeout) {
       this.hangUpTimeout = setTimeout(() => {
         this.hangUpCall(false, '');
@@ -111,7 +121,10 @@ export class IncomingcallModalComponent
           state: { chatDataPass },
         });
       } else {
-        const callId = this.calldata.link.replace('https://meet.facetime.tube/', '');
+        const callId = this.calldata.link.replace(
+          'https://meet.facetime.tube/',
+          ''
+        );
         this.router.navigate([`/buzz-call/${callId}`], {
           state: { chatDataPass },
         });

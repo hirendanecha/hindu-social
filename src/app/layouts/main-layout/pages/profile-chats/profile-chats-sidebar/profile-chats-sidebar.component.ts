@@ -34,7 +34,8 @@ import { AppQrModalComponent } from 'src/app/@shared/modals/app-qr-modal/app-qr-
   styleUrls: ['./profile-chats-sidebar.component.scss'],
 })
 export class ProfileChatsSidebarComponent
-  implements AfterViewInit, OnChanges, OnInit {
+  implements AfterViewInit, OnChanges, OnInit
+{
   chatList: any = [];
   pendingChatList: any = [];
   groupList: any = [];
@@ -74,14 +75,20 @@ export class ProfileChatsSidebarComponent
     private modalService: NgbModal
   ) {
     this.profileId = +localStorage.getItem('profileId');
-    const notificationSound =
-      JSON.parse(localStorage.getItem('soundPreferences')) || {};
-    if (notificationSound?.messageSoundEnabled === 'N') {
-      this.isMessageSoundEnabled = false;
-    }
-    if (notificationSound?.callSoundEnabled === 'N') {
-      this.isCallSoundEnabled = false;
-    }
+    // const notificationSound =
+    //   JSON.parse(localStorage.getItem('soundPreferences')) || {};
+    // if (notificationSound?.messageSoundEnabled === 'N') {
+    //   this.isMessageSoundEnabled = false;
+    // }
+    // if (notificationSound?.callSoundEnabled === 'N') {
+    //   this.isCallSoundEnabled = false;
+    // }
+    this.sharedService.loginUserInfo.subscribe((user) => {
+      this.isCallSoundEnabled =
+        user?.callNotificationSound === 'Y' ? true : false;
+      this.isMessageSoundEnabled =
+        user?.messageNotificationSound === 'Y' ? true : false;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -100,7 +107,7 @@ export class ProfileChatsSidebarComponent
 
   ngOnInit(): void {
     // this.chatData = history.state.chatUserData;
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['chatUserData']) {
         this.chatData = JSON.parse(decodeURIComponent(params['chatUserData']));
         this.router.navigate([], { relativeTo: this.route, queryParams: {} });
@@ -109,7 +116,7 @@ export class ProfileChatsSidebarComponent
     this.socketService.connect();
     this.getChatList();
     this.getGroupList();
-    this.backCanvas =this.activeCanvas.hasOpenOffcanvas();
+    this.backCanvas = this.activeCanvas.hasOpenOffcanvas();
     if (this.chatData) {
       this.checkRoom();
     }
@@ -197,10 +204,23 @@ export class ProfileChatsSidebarComponent
   }
 
   toggleSoundPreference(property: string, ngModelValue: boolean): void {
-    const soundPreferences =
-      JSON.parse(localStorage.getItem('soundPreferences')) || {};
-    soundPreferences[property] = ngModelValue ? 'Y' : 'N';
-    localStorage.setItem('soundPreferences', JSON.stringify(soundPreferences));
+    // const soundPreferences =
+    //   JSON.parse(localStorage.getItem('soundPreferences')) || {};
+    // soundPreferences[property] = ngModelValue ? 'Y' : 'N';
+    // localStorage.setItem('soundPreferences', JSON.stringify(soundPreferences));
+    const soundObj = {
+      property: property,
+      value: ngModelValue ? 'Y' : 'N',
+    };
+    this.customerService.updateNotificationSound(soundObj).subscribe({
+      next: (res) => {
+        this.toasterService.success(res.message);
+        this.sharedService.getUserDetails();
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 
   clearChatList() {
@@ -259,12 +279,12 @@ export class ProfileChatsSidebarComponent
       }
     });
   }
-  appQrmodal(){
+  appQrmodal() {
     const modalRef = this.modalService.open(AppQrModalComponent, {
       centered: true,
     });
   }
-  uniqueLink(){
+  uniqueLink() {
     const modalRef = this.modalService.open(ConferenceLinkComponent, {
       centered: true,
     });
@@ -358,7 +378,7 @@ export class ProfileChatsSidebarComponent
       profileId2: this.chatData.Id,
     };
     this.socketService.checkRoom(oldUserChat, (res: any) => {
-      const data = res.find(obj => obj.isDeleted === "N");      
+      const data = res.find((obj) => obj.isDeleted === 'N');
       if (data && data.id) {
         const existingUser = {
           roomId: data.id,
@@ -368,20 +388,19 @@ export class ProfileChatsSidebarComponent
           isAccepted: data.isAccepted,
           isDeleted: data.isDeleted,
           lastMessageText: data.lastMessageText,
-          createdBy: this.chatData.Id
-        }
-        this.selectedChatUser = existingUser.roomId
+          createdBy: this.chatData.Id,
+        };
+        this.selectedChatUser = existingUser.roomId;
         this.onNewChat?.emit(existingUser);
       } else {
         const newUser = {
           Id: this.chatData.Id,
           Username: this.chatData.Username,
           ProfilePicName: this.chatData.ProfilePicName,
-          unReadMessage: 0
-        }
+          unReadMessage: 0,
+        };
         this.onNewChat?.emit(newUser);
       }
     });
-
   }
 }

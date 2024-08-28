@@ -4,9 +4,7 @@
       <div
         class="profile-area d-center justify-content-between align-items-baseline"
       >
-        <div
-          class="avatar-item d-flex mb-2 gap-3 align-items-center cursor"
-        >
+        <div class="avatar-item d-flex mb-2 gap-3 align-items-center cursor">
           <div ngbDropdown class="avatar-item position-relative online-status">
             <!--  -->
             <ng-container>
@@ -17,35 +15,76 @@
                   'abs-active ': sharedService.userData.userStatus === 'active',
                   'abs-away': sharedService.userData.userStatus === 'away',
                   'abs-dnd': sharedService.userData.userStatus === 'dnd',
-                  'abs-invisible': sharedService.userData.userStatus === 'invisible' }"
+                  'abs-invisible':
+                    sharedService.userData.userStatus === 'invisible'
+                }"
               ></button>
               <div ngbDropdownMenu class="dropdown-menu">
                 <div class="dropdown-preferences">
                   <div class="d-flex flex-column">
-                    <div class="c-pointer d-flex justify-content-between ">
-                      <h6 ngbDropdownItem class="d-flex w-100" (click)="profileStatus('active')">
+                    <div class="c-pointer d-flex justify-content-between">
+                      <h6
+                        ngbDropdownItem
+                        class="d-flex w-100"
+                        (click)="profileStatus('active')"
+                      >
                         Active
                       </h6>
-                      <fa-icon [icon]="['fas', 'check']" class="font-20-px"  *ngIf="sharedService.userData.userStatus === 'active'" />
-
+                      <fa-icon
+                        [icon]="['fas', 'check']"
+                        class="font-20-px"
+                        *ngIf="sharedService.userData.userStatus === 'active'"
+                      />
                     </div>
-                    <div class="c-pointer d-flex align-items-baseline justify-content-between">
-                      <h6 ngbDropdownItem class="d-flex w-100" (click)="profileStatus('away')">
+                    <div
+                      class="c-pointer d-flex align-items-baseline justify-content-between"
+                    >
+                      <h6
+                        ngbDropdownItem
+                        class="d-flex w-100"
+                        (click)="profileStatus('away')"
+                      >
                         Away
                       </h6>
-                      <fa-icon [icon]="['fas', 'check']" class="font-20-px"  *ngIf="sharedService.userData.userStatus === 'away'" />
+                      <fa-icon
+                        [icon]="['fas', 'check']"
+                        class="font-20-px"
+                        *ngIf="sharedService.userData.userStatus === 'away'"
+                      />
                     </div>
-                    <div class="c-pointer d-flex align-items-baseline justify-content-between">
-                      <h6 ngbDropdownItem class="d-flex w-100" (click)="profileStatus('dnd')">
+                    <div
+                      class="c-pointer d-flex align-items-baseline justify-content-between"
+                    >
+                      <h6
+                        ngbDropdownItem
+                        class="d-flex w-100"
+                        (click)="profileStatus('dnd')"
+                      >
                         Do not disturb
                       </h6>
-                      <fa-icon [icon]="['fas', 'check']" class="font-20-px"  *ngIf="sharedService.userData.userStatus === 'dnd'" />
+                      <fa-icon
+                        [icon]="['fas', 'check']"
+                        class="font-20-px"
+                        *ngIf="sharedService.userData.userStatus === 'dnd'"
+                      />
                     </div>
-                    <div class="c-pointer d-flex align-items-baseline justify-content-between">
-                      <h6 ngbDropdownItem class="d-flex w-100" (click)="profileStatus('invisible')">
+                    <div
+                      class="c-pointer d-flex align-items-baseline justify-content-between"
+                    >
+                      <h6
+                        ngbDropdownItem
+                        class="d-flex w-100"
+                        (click)="profileStatus('invisible')"
+                      >
                         Invisible
                       </h6>
-                      <fa-icon [icon]="['fas', 'check']" class="font-20-px"  *ngIf="sharedService.userData.userStatus === 'invisible'" />
+                      <fa-icon
+                        [icon]="['fas', 'check']"
+                        class="font-20-px"
+                        *ngIf="
+                          sharedService.userData.userStatus === 'invisible'
+                        "
+                      />
                     </div>
                   </div>
                 </div>
@@ -97,7 +136,7 @@
                           id="flexSwitchCheckChecked"
                           (change)="
                             toggleSoundPreference(
-                              'messageSoundEnabled',
+                              'messageNotificationSound',
                               isMessageSoundEnabled
                             )
                           "
@@ -120,7 +159,7 @@
                           id="flexSwitchCheckChecked"
                           (change)="
                             toggleSoundPreference(
-                              'callSoundEnabled',
+                              'callNotificationSound',
                               isCallSoundEnabled
                             )
                           "
@@ -427,7 +466,9 @@
     <div class="chat-top p-2 px-5">
       <span class="m-1">Pending Invites:</span>
     </div>
-    <div class="header-menu cus-scrollbar-pending overflow-auto justify-content-between d-flex flex-column">
+    <div
+      class="header-menu cus-scrollbar-pending overflow-auto justify-content-between d-flex flex-column"
+    >
       <ng-container *ngIf="pendingChatList.length; else noPendingRequest">
         <div
           class="single-item messages-area"
@@ -505,11 +546,14 @@
       <ng-template #noPendingRequest>
         <h5 class="text-center">No Pending Invites</h5>
       </ng-template>
-        <div *ngIf="backCanvas">
-          <button class="btn btn-primary float-end me-3 btn-sm d-sm-none" (click)="dismissSidebar()">
-            <fa-icon [icon]="['fas', 'chevron-left']" />Back
-          </button>
-        </div>
+      <div *ngIf="backCanvas">
+        <button
+          class="btn btn-primary float-end me-3 btn-sm d-sm-none"
+          (click)="dismissSidebar()"
+        >
+          <fa-icon [icon]="['fas', 'chevron-left']" />Back
+        </button>
       </div>
+    </div>
   </aside>
 </div>

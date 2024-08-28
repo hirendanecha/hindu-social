@@ -112,7 +112,7 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
     this.userList = [];
     if (this.isAllowTagUser) {
       let htmlText = this.tagInputDiv?.nativeElement?.innerHTML || '';
-      htmlText = htmlText.replace(/<[^>]*>/g, '');
+      htmlText = htmlText.replace(/<[^>]*>/g, ' ');
 
       const atSymbolIndex = htmlText.lastIndexOf('@');
       const validUserName = /^[A-Za-z0-9_]+$/.test('');

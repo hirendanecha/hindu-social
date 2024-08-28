@@ -15,10 +15,12 @@ export class SharedService {
   userData: any = {};
   notificationList: any = [];
   isNotify = false;
-  advertizementLink: any = []
+  advertizementLink: any = [];
   onlineUserList: any = [];
   private isRoomCreatedSubject: BehaviorSubject<boolean> =
-  new BehaviorSubject<boolean>(false);
+    new BehaviorSubject<boolean>(false);
+  loginUserInfo = new BehaviorSubject<any>(null);
+  loggedInUser$ = this.loginUserInfo.asObservable();
 
   constructor(
     public modalService: NgbModal,
@@ -26,7 +28,7 @@ export class SharedService {
     private customerService: CustomerService,
     private route: ActivatedRoute,
     private communityService: CommunityService,
-    private postService: PostService,
+    private postService: PostService
   ) {
     this.route.paramMap.subscribe((paramMap) => {
       const name = paramMap.get('name');
@@ -81,12 +83,13 @@ export class SharedService {
           if (data) {
             this.userData = data;
             localStorage.setItem('userData', JSON.stringify(this.userData));
+            this.getLoginUserDetails(this.userData);
           }
         },
         error: (error) => {
           this.spinner.hide();
           console.log(error);
-        }
+        },
       });
     }
   }
@@ -101,7 +104,7 @@ export class SharedService {
       page: 1,
       size: 20,
     };
-    this.customerService.getNotificationList(Number(id), data).subscribe({  
+    this.customerService.getNotificationList(Number(id), data).subscribe({
       next: (res: any) => {
         this.isNotify = false;
         this.notificationList = res?.data;
@@ -111,7 +114,7 @@ export class SharedService {
       },
     });
   }
-  
+
   getAdvertizeMentLink(id): void {
     if (id) {
       this.communityService.getLinkById(id).subscribe({
@@ -126,7 +129,7 @@ export class SharedService {
                 this.getMetaDataFromUrlStr(res.data[0]?.link2);
               }
             }
-          }  
+          }
         },
         error: (err) => {
           console.log(err);
@@ -164,5 +167,9 @@ export class SharedService {
 
   getIsRoomCreatedObservable(): Observable<boolean> {
     return this.isRoomCreatedSubject.asObservable();
+  }
+
+  getLoginUserDetails(userData: any = {}) {
+    this.loginUserInfo.next(userData);
   }
 }

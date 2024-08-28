@@ -107,14 +107,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 'https://s3.us-east-1.wasabisys.com/freedom-social/freedom-notification.mp3',
               ],
             });
-            const notificationSoundOct = JSON.parse(
-              localStorage.getItem('soundPreferences')
-            )?.notificationSoundEnabled;
-            if (notificationSoundOct !== 'N') {
-              if (sound) {
-                sound?.play();
+            // const notificationSoundOct = JSON.parse(
+            //   localStorage.getItem('soundPreferences')
+            // )?.notificationSoundEnabled;
+            // if (notificationSoundOct !== 'N') {
+            //   if (sound) {
+            //     sound?.play();
+            //   }
+            // }
+            this.sharedService.loginUserInfo.subscribe((user) => {
+              const tagNotificationSound = user.tagNotificationSound;
+              if (tagNotificationSound === 'Y') {
+                if (sound) {
+                  sound?.play();
+                }
               }
-            }
+            });
           }
           if (
             data?.actionType === 'M' &&
@@ -127,14 +135,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               ],
               volume: 0.5,
             });
-            const messageSoundOct = JSON.parse(
-              localStorage.getItem('soundPreferences')
-            )?.messageSoundEnabled;
-            if (messageSoundOct !== 'N') {
-              if (sound) {
-                sound?.play();
+            // const messageSoundOct = JSON.parse(
+            //   localStorage.getItem('soundPreferences')
+            // )?.messageSoundEnabled;
+            // if (messageSoundOct !== 'N') {
+            //   if (sound) {
+            //     sound?.play();
+            //   }
+            // }
+            this.sharedService.loginUserInfo.subscribe((user) => {
+              const messageNotificationSound = user.messageNotificationSound;
+              if (messageNotificationSound === 'Y') {
+                if (sound) {
+                  sound?.play();
+                }
               }
-            }
+            });
             this.toasterService.success(data?.notificationDesc);
             return this.sharedService.updateIsRoomCreated(true);
           }
