@@ -1,4 +1,9 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
@@ -23,9 +28,8 @@ import { environment } from 'src/environments/environment';
 })
 export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   customer: any = {};
-  // customer: Customer = new Customer();
   customerPostList: any = [];
-  userId: number;
+  userId = '';
   profilePic: any = {};
   coverPic: any = {};
   profileId: number;
@@ -35,6 +39,8 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   communityId = '';
   isExpand = false;
   pdfList: any = [];
+  searchText: string = '';
+  hasShownWarning: boolean = false;
   appointmentList = [];
 
   constructor(
@@ -53,11 +59,13 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     private toastService: ToastService
   ) {
     this.router.events.subscribe((event: any) => {
-      const id = event?.routerEvent?.url.split('/')[3];
-      this.profileId = id;
-      this.routeProfileId = id;
-      if (id) {
-        this.getProfile(id);
+      if (event?.routerEvent?.url.includes('/settings/view-profile')) {
+        const id = event?.routerEvent?.url.split('/')[3];
+        this.profileId = id;
+        this.routeProfileId = id;
+        if (id) {
+          this.getProfile(id);
+        }
       }
       this.profileId = +localStorage.getItem('profileId');
     });
@@ -81,7 +89,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           this.userId = res.data[0]?.UserID;
           const data = {
             title: this.customer?.Username,
-            url: `${environment.webUrl}settings/view-profile/${this.customer?.Id}`,
+            url: `${environment.webUrl}settings/view-profile/${this.customer?.profileId}`,
             description: '',
             image: this.customer?.ProfilePicName,
           };
@@ -169,7 +177,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     // pdfLink.download = "TestFile.pdf";
     pdfLink.click();
   }
-
+  
   getUserAppoinments(id): void {
     this.appointmentService.AppointmentViewProfile(id).subscribe({
       next: (res) => {
@@ -251,5 +259,20 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
+  }
+
+  searchPosts(event): void {
+    if (event.target.value.length > 3) {
+      this.searchText = event.target.value;
+      console.log(this.searchText);
+      this.hasShownWarning = false;
+    } else if (!event.target.value.length) {
+      this.searchText = '';
+    } else {
+      if (!this.hasShownWarning) {
+        this.toastService.warring('Please enter at least 4 characters');
+        this.hasShownWarning = true;
+      }
+    }
   }
 }

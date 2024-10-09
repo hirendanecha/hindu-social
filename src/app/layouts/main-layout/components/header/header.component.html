@@ -53,30 +53,47 @@
                 <fa-icon [icon]="['fas', 'bell']" class="font-20-px" />
               </div>
               <a
-              *ngIf="tokenService.getCredentials()"
+                *ngIf="tokenService.getCredentials()"
                 class="icon-area d-center position-relative ms-7"
                 [routerLink]="['/profile-chats']"
                 target="_blank"
               >
                 <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
-            </a>
+              </a>
+            </div>
+            <div
+              class="single-item ms-5"
+              *ngIf="sharedService.callId && !hideOngoingCallButton"
+            >
+              <div class="ongoing-call d-center position-relative">
+                <a
+                  routerLinkActive="active"
+                  [routerLink]="['/facetime/' + sharedService.callId]"
+                  ngbTooltip="On going Call"
+                  placement="bottom"
+                >
+                  <fa-icon
+                    [icon]="['fas', 'phone-volume']"
+                    class="font-20-px"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </ng-template>
 
         <div
           class="input-area h-48-px d-md-flex d-none align-items-center"
-          *ngIf="tokenService.getToken()"
+          *ngIf="tokenService.getCredentials() && !hideSubHeader"
         >
           <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
           <input
             type="text"
-            id="search"
             name="search"
-            placeholder="Search"
-            autocomplete="off"
+            placeholder="Search end users"
             [(ngModel)]="searchText"
-            (input)="getUserList()"
+            autocomplete="off"
+            (keyup)="getUserList()"
           />
         </div>
 
@@ -97,7 +114,7 @@
                     [alt]="user.Username"
                     onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                   />
-                  <span>{{ user.Username.split(" ").join("") }}</span>
+                  <span>{{ user.Username?.split(" ")?.join("") }}</span>
                 </div>
               </ng-container>
             </div>
@@ -106,15 +123,14 @@
       </div>
 
       <ul
-        *ngIf="tokenService.getToken()"
+        *ngIf="tokenService.getCredentials()"
         class="navbar-nav d-flex flex-row justify-content-around align-self-center ms-auto m-lg-auto gap-3 gap-xl-20 gap-lg-10 py-0"
       >
         <li>
           <!-- (click)="scrollToTop()" -->
-          <!-- (dblclick)="reloadPage()" -->
           <a
             routerLink="/home"
-            (click)="reloadPage()"
+            (dblclick)="reloadPage()"
             routerLinkActive="active"
             class="nav-icon home cursor"
             data-toggle="tooltip"
@@ -142,8 +158,12 @@
           <a
             [href]="
               channelId
-                ? environment.tubeUrl + '?channelId=' + channelId
-                : environment.tubeUrl
+                ? environment.tubeUrl +
+                  '?channelId=' +
+                  channelId +
+                  (authToken ? '&authToken=' + authToken : '')
+                : environment.tubeUrl +
+                  (authToken ? '?authToken=' + authToken : '')
             "
             target="_blank"
             routerLinkActive="active"
@@ -159,19 +179,32 @@
 
       <div
         class="right-area d-lg-flex d-none justify-content-end align-items-center gap-6 cus-z p-0"
-        *ngIf="tokenService.getToken()"
+        *ngIf="tokenService.getCredentials()"
       >
-      <div class="single-item">
-        <div class="icon-area d-center position-relative">
-          <a
-            target="_blank"
-            routerLinkActive="active"
-            [routerLink]="['/profile-chats']"
-          >
-            <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
-          </a>
+        <div
+          class="single-item"
+          *ngIf="sharedService.callId && !hideOngoingCallButton"
+        >
+          <div class="ongoing-call d-center position-relative">
+            <a
+              routerLinkActive="active"
+              [routerLink]="['/facetime/' + sharedService.callId]"
+            >
+              <fa-icon [icon]="['fas', 'phone-volume']" class="font-20-px" />
+            </a>
+          </div>
         </div>
-      </div>
+        <div class="single-item">
+          <div class="icon-area d-center position-relative">
+            <a
+              target="_blank"
+              routerLinkActive="active"
+              [routerLink]="['/profile-chats']"
+            >
+              <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
+            </a>
+          </div>
+        </div>
         <div class="single-item">
           <div
             class="icon-area d-center position-relative"
@@ -203,9 +236,9 @@
     </nav>
   </div>
 
-  <div class="c-color">
+  <div class="c-color" *ngIf="!hideSubHeader">
     <div class="container">
-      <ng-container *ngIf="(breakpointService?.screen | async).xl.lessThen">
+      <ng-container *ngIf="(breakpointService?.screen | async).xxl.lessThen">
         <div
           class="d-flex justify-content-between sticky-element p-3 p-sm-5 rounded-4"
         >
@@ -218,7 +251,9 @@
             </button>
           </ng-container>
 
-          <ng-container *ngIf="(breakpointService?.screen | async).xl.lessThen">
+          <ng-container
+            *ngIf="(breakpointService?.screen | async).xxl.lessThen"
+          >
             <button
               class="button d-flex align-items-center gap-2 ms-5"
               (click)="openRightSidebar()"

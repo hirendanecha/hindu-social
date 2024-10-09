@@ -25,7 +25,7 @@
     .hover-box-container {
       min-width: 267px;
       min-height: 125px;
-      z-index: 2;
+      z-index: 4;
       background: var(--body-color);
       border-radius: 15px;
       padding: 10px 10px;
@@ -354,28 +354,6 @@
     }
   }
   
-  .custom-width-comment{
-   .file-custom{
-    @media (max-width: 575px) {
-    position: relative;
-    right: 50px;
-    }
-   } 
-  }
-  .custom-width-comment ::ng-deep app-tag-user-input {
-    .tag-input-div {
-      @media (max-width: 575px) {
-        width: 100%;
-        z-index: 1;
-      }
-    }
-    .select-emaojies {
-      @media (max-width: 575px) {
-        right: 80px;
-        top: 58px;
-      }
-    }
-  }
 
   .video-albumname {
     color: var(--para-2nd-color);
@@ -392,6 +370,49 @@
     -webkit-box-orient: vertical;
   }
 
+  .text-transform{
+    text-transform: none;
+  }
+
+  .post-img {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  
+    .single {
+      flex: 1;
+      img {
+        width: 100%;
+        height: auto;
+      }
+  
+      &.d-grid {
+        display: grid;
+        gap: 8px;
+      }
+  
+      &:nth-child(2) {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, 1fr);
+      }
+  
+      &:nth-child(3) {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(2, 1fr);
+      }
+  
+      &:nth-child(4) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+      }
+    }
+  }
+
+  
   ::ng-deep {
     .post-description {
       h1,
@@ -405,6 +426,7 @@
       p,
       em,
       div,
+      font,
       strong,
       li {
         font-size: 18px !important;
@@ -424,7 +446,7 @@
         line-height: 22px !important;
         margin: unset !important;
         background-color: unset !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
       }
       img,
       svg {
@@ -455,7 +477,6 @@
       h5,
       h6,
       span,
-      a,
       em,
       li {
         font-size: 18px !important;
@@ -467,6 +488,13 @@
       em,
       span {
         color: var(--para-2nd-color) !important;
+      }
+      a{
+        font-size: 18px !important;
+        line-height: normal;
+        margin: unset;
+        background-color: unset !important;
+        font-weight: 600 !important;
       }
       .comment-description {
         img {
@@ -500,4 +528,14 @@
     display: unset !important;
     width: 70px;
   }
+}
+
+.hover-directive-box-container {
+  min-width: 267px;
+  min-height: 125px;
+  z-index: 3;
+  background: var(--body-color);
+  border-radius: 15px;
+  padding: 10px 10px;
+  margin: 0px 40px 40px 0px;
 }

@@ -1,14 +1,28 @@
 <div class="mt-2 border rounded">
   <ng-container *ngIf="post; else noPost">
-    <div class="d-flex p-2">
-      <img class="w-24-px h-24-px rounded" loading="lazy" data-src="{{ post?.ProfilePicName }}"
-        onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';" alt="avatar" />
-      <div class="d-flex flex-column h6 m-0 ms-2" *ngIf="post?.Username || post?.FirstName">
-        <div class="d-flex align-items-center cursor c-padding posted-wrap-text">
-          <div class="d-flex align-items-center" (click)="redirectToParentProfile(post)">
+    <div class="d-flex p-2" (click)="redirectToParentProfile(post)">
+      <img
+        class="w-24-px h-24-px rounded"
+        loading="lazy"
+        data-src="{{ post?.ProfilePicName }}"
+        onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        alt="avatar"
+      />
+      <div
+        class="d-flex flex-column h6 m-0 ms-2"
+        *ngIf="post?.Username || post?.FirstName"
+      >
+        <div
+          class="d-flex align-items-center cursor c-padding posted-wrap-text"
+        >
+          <div class="d-flex align-items-center">
             {{ post?.Username || post?.FirstName }}
             <div>
-              <fa-icon class="ms-2 me-1 font-12-px cursor" [icon]="['fas', 'clock']" placement="bottom" />
+              <fa-icon
+                class="ms-2 me-1 font-12-px cursor"
+                [icon]="['fas', 'clock']"
+                placement="bottom"
+              />
               {{ post?.postcreationdate | dateDay }}
             </div>
           </div>
@@ -16,30 +30,46 @@
       </div>
     </div>
     <div class="p-2">
-      <p class="post-description mdtxt m-0" [innerHTML]="post.postdescription | noSanitize"></p>
+      <p
+        class="post-description mdtxt m-0"
+        [innerHTML]="post.postdescription | noSanitize"
+      ></p>
       <ng-container *ngIf="descriptionimageUrl">
         <app-img-preview [src]="descriptionimageUrl" classes="w-100" />
       </ng-container>
       <ng-container *ngIf="post?.pdfUrl">
         <div class="d-flex align-items-center">
-          <fa-icon [icon]="['fas', 'file-pdf']" class="c-pointer close-icon font-60-px" />
+          <fa-icon
+            [icon]="['fas', 'file-pdf']"
+            class="c-pointer close-icon font-60-px"
+          />
           <span class="pdf-name c-pointer">
             {{ post.pdfUrl.split("/")[3].replaceAll("%", " ") }}
           </span>
         </div>
-      </ng-container>
-
-      <app-post-meta-data-card [post]="post" />
-
-      <ng-container *ngIf="post?.imageUrl">
-        <app-img-preview [src]="post?.imageUrl" classes="w-100" />
       </ng-container>
       <ng-container *ngIf="post?.streamname">
         <!-- <div class="video-albumname mb-3">
           {{ post.albumname }}
         </div> -->
         <!-- <app-img-preview [src]="post?.thumbfilename" classes="w-100" /> -->
-        <video [src]="post?.streamname" controls class="w-100 h-300-px mt-1 rounded" [autoplay]="false"></video>
+        <video
+        data-src="{{post.thumbfilename}}"
+        [src]="post?.streamname"
+        controls
+        class="w-100 mt-1 rounded"
+        [autoplay]="false"
+        poster="{{post.thumbfilename}}"
+        ></video>
+    
+      </ng-container>
+
+      <app-post-meta-data-card [post]="post" />
+      <ng-container *ngIf="post?.imagesList">
+        <app-img-layout [post]="post" />
+      </ng-container>
+      <ng-container *ngIf="post?.imageUrl">
+        <app-img-preview [src]="post?.imageUrl" classes="w-100" />
       </ng-container>
       <!-- <ng-container *ngIf="post?.streamname">
         <app-img-preview [src]="post?.thumbfilename" classes="w-100" />

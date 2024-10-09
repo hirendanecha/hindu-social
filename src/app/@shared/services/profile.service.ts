@@ -1,10 +1,10 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { environment } from "src/environments/environment";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ProfileService {
   private baseUrl = environment.serverUrl + 'profile';
@@ -20,14 +20,30 @@ export class ProfileService {
   }
 
   getGroupBasicDetails(uniqueLink: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/getGroupBasicDetails/${uniqueLink}`);
+    return this.http.get(
+      `${this.baseUrl}/getGroupBasicDetails/${uniqueLink}?q=${Date.now()}`
+    );
   }
 
-  getGroupPostById(id: string, page: number=0, limit: number=0): Observable<any> {
-    return this.http.get(`${this.baseUrl}/getGroupPostById/${id}?page=${page}&limit=${limit}`);
+  getGroupPostById(
+    id: string,
+    page: number = 0,
+    limit: number = 0
+  ): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/getGroupPostById/${id}?page=${page}&limit=${limit}`
+    );
   }
 
   getGroupFileResourcesById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/getGroupFileResourcesById/${id}`);
+  }
+
+  joinGroup(data): Observable<any> {
+    return this.http.post(`${this.baseUrl}/join-group`, data);
+  }
+
+  leaveGroup(data): Observable<any> {
+    return this.http.post(`${this.baseUrl}/leave-group`, data);
   }
 }

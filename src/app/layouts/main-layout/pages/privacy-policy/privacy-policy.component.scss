@@ -1,0 +1,51 @@
+.privacy-notice {
+  padding: 20px;
+  background: var(--section-1st-color);
+  box-shadow: var(--box-shadow);
+  border-radius: 10px;
+
+  &__title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  &__intro,
+  &__explanation {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+
+  &__link {
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__subtitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  &__subsubtitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
+
+  &__list {
+    padding-left: 20px;
+    // list-style-type: disc;
+
+    &-item {
+      margin-bottom: 10px;
+    }
+  }
+}

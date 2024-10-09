@@ -18,6 +18,7 @@ import { AppQrModalComponent } from 'src/app/@shared/modals/app-qr-modal/app-qr-
 import { ConferenceLinkComponent } from 'src/app/@shared/modals/create-conference-link/conference-link-modal.component';
 import { Router } from '@angular/router';
 import { CustomerService } from 'src/app/@shared/services/customer.service';
+import { TokenStorageService } from 'src/app/@shared/services/token-storage.service';
 import { ToastService } from 'src/app/@shared/services/toast.service';
 
 @Component({
@@ -62,12 +63,15 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private router: Router,
     private customerService: CustomerService,
+    private tokenStorageService: TokenStorageService,
     private toasterService: ToastService
   ) {
     this.profileId = +localStorage.getItem('profileId');
     if (this.sharedService.isNotify) {
       this.sharedService.isNotify = false;
     }
+    const data = this.tokenStorageService.getUser();
+    this.sharedService.getLoginUserDetails(data);
   }
   ngOnInit(): void {
     this.socketService.connect();
@@ -166,11 +170,14 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ConfirmationModalComponent, {
       centered: true,
     });
+    setTimeout(() => {
+      modalRef.close();
+    }, 30000);
     modalRef.componentInstance.title = 'Mobile screen detected';
     modalRef.componentInstance.confirmButtonLabel = 'Yes';
     modalRef.componentInstance.cancelButtonLabel = 'No';
     modalRef.componentInstance.message =
-      'Would you like to add a hindu.social icon to your mobile Home screen?';
+      'Would you like to add a Hindu.social icon to your mobile Home screen?';
     modalRef.result.then((res) => {
       localStorage.setItem('isMobilePopShow', 'N');
       if (res === 'success') {

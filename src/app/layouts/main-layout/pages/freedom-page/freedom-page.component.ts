@@ -29,7 +29,7 @@ export class FreedomPageComponent {
 
     this.getPages();
     const data = {
-      title: 'HinduSocial Pages',
+      title: 'Hindu.social Pages',
       url: `${location.href}`,
       description: '',
     };

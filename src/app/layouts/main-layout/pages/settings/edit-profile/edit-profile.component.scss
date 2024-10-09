@@ -34,4 +34,23 @@
       }
     }
   }
+
+  .set-btns{
+    width: 368px;
+    justify-content: space-between;
+    @media (max-width: 418px) {
+      width: max-content;
+    }
+
+    .form-check-input {
+      width: 50px;
+      padding: 14px;
+      cursor: pointer;
+    }
+  }
+
+  .qr-box{
+    background-color: #0000008c;
+    border-radius: 10px;
+  }
 }

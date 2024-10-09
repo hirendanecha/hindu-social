@@ -4,7 +4,7 @@
     'mh-100 vh-100': (breakpointService?.screen | async).lg.lessThen
   }"
 >
-  <ng-container *ngIf="tokenService.getToken()">
+  <ng-container *ngIf="tokenService.getCredentials()">
     <div class="profile-pic d-flex gap-2" routerLink="/home">
       <div class="position-relative">
         <img
@@ -21,7 +21,7 @@
         </h6>
       </div>
     </div>
-    <ul class="profile-link m-0 mt-5 p-0 border-bottom-0">
+    <ul class="profile-link m-0 mt-5 p-0 border-bottom-0 mb-15 mb-sm-0">
       <li class="ms-1">
         <a
           class="d-flex gap-4"
@@ -33,17 +33,7 @@
           <span>Home</span>
         </a>
       </li>
-      <!-- <li class="ms-1">
-        <a
-          class="d-flex gap-4"
-          routerLinkActive="active"
-          (click)="uniqueLink()"
-        >
-          <fa-icon [icon]="['fas', 'square-plus']" class="font-24-px" />
-          <span>Create Unique Link</span>
-        </a>
-      </li> -->
-      <li class="ms-1">
+      <li>
         <a
           class="d-flex gap-4"
           routerLink="/community"
@@ -51,7 +41,7 @@
           (click)="closeSidebar()"
         >
           <fa-icon [icon]="['fas', 'network-wired']" class="font-24-px" />
-          <span>Community</span>
+          <span>Communities</span>
         </a>
       </li>
       <li class="ms-1">
@@ -98,6 +88,7 @@
           data-toggle="tooltip"
           data-placement="bottom"
           title="Research"
+          (click)="closeSidebar()"
         >
           <fa-icon [icon]="['fas', 'book-open']" class="font-24-px" />
           <span>Research</span>
@@ -126,7 +117,7 @@
           [routerLink]="'settings/view-profile/' + profileId"
           routerLinkActive="active"
           (click)="closeSidebar()"
-        >
+          >
           <fa-icon [icon]="['fas', 'gear']" class="font-20-px" />
           <span>View Profile</span>
         </a>
@@ -164,19 +155,30 @@
           <span>Lamars List</span>
         </a>
       </li>
+      <li>
+        <a
+          class="d-flex gap-4"
+          routerLink="/platforms"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <fa-icon [icon]="['fas', 'table-list']" class="font-24-px" />
+          <span>Platforms</span>
+        </a>
+      </li>
       <!-- <li>
         <a class="d-flex gap-4" (click)="openWalletPopUp()">
           <fa-icon [icon]="['fas', 'download']" class="font-24-px" />
           <span>Download 1776 Wallet</span>
         </a>
-      </li> -->
-      <!-- <li>
+      </li>
+       <li>
         <a class="d-flex gap-4" (click)="openClaimTokenPopUp()">
           <fa-icon [icon]="['fas', 'certificate']" class="font-24-px" />
           <span>Claim 50 free 1776</span>
         </a>
       </li> -->
-
+ 
       <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <div
           class="d-flex gap-4 toggle-dropdown align-items-center"
@@ -215,6 +217,18 @@
               </a>
             </li>
 
+            <li>
+              <a
+                routerLink="/report-bugs"
+                routerLinkActive="active"
+                class="d-flex gap-4"
+                (click)="closeSidebar()"
+              >
+                <fa-icon [icon]="['fas', 'ticket-alt']" class="font-24-px" />
+                <span>Support Ticket page</span>
+              </a>
+            </li>
+
             <!-- <li>
               <a
                 routerLink="/settings/delete-profile"
@@ -245,33 +259,22 @@
       </li>
     </ul>
   </ng-container>
-  <ng-container *ngIf="!tokenService.getToken()">
+  <ng-container *ngIf="!tokenService.getCredentials()">
     <div class="dashboard-img mb-5">
       <img
         class="w-100 rounded-3"
         src="/assets/images/landingpage/HinduSocial-Logo.jpg"
       />
-      <!-- <span class="mt-3 text-start font-14-px">
-        The Umbrella platform for All freedom based projects worldwide.
-      </span> -->
-      <!-- <span class="c-fonts text-center mt-6">
-        Private video consultations with Naturopathic Doctors <br />
-        and Holistic Healers from around the world
-      </span>
-      <span class="c-fonts py-6 mt-10 text-center"
-        >Social Discussion on how to heal various ailments</span
-      > -->
-      <span class="c-fonts text-center mt-6">
+      <span class="mt-3 text-start font-14-px">
         Virtually Divine, Truly Yours: Join the Pious Pulse of our Hindu Haven.
       </span>
     </div>
   </ng-container>
- 
-    <div class="mt-3" *ngIf="sharedService?.advertizementLink?.length">
-      <h6>Advertizement Link</h6>
-      <div *ngFor="let item of sharedService?.advertizementLink">
-        <app-post-meta-data-card [post]="item" />
-      </div>
+  <div class="mt-3" *ngIf="sharedService?.advertizementLink?.length">
+    <h6>Advertizement Link</h6>
+    <div *ngFor="let item of sharedService?.advertizementLink">
+      <app-post-meta-data-card [post]="item" />
     </div>
- 
+  </div>
+  
 </div>

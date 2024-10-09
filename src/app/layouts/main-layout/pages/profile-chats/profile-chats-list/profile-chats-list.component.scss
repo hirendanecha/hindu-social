@@ -1,5 +1,5 @@
 :host {
-  .searchChatBar{
+  .searchChatBar {
     position: absolute;
     width: calc(100% - 50px);
     top: 76px;
@@ -8,14 +8,20 @@
   .main {
     background: var(--section-1st-color);
     height: 78vh;
-    max-height: calc(100vh - 220px);
+    max-height: calc(100vh - 200px);
 
     .chat-content {
       overflow-y: auto;
       height: calc(100vh - 310px);
       // min-height: calc(100vh - 350px);
-      @media (max-width: 991px) {
-        height: calc(88vh - 310px) !important;
+      @media (min-width: 576px) and (max-width: 991px) {
+        height: calc(82vh - 260px) !important;
+      }
+      @media (max-width: 575px) {
+        height: calc(82vh - 260px) !important;
+      }
+      @media (min-width: 1921px) {
+        height: calc(100vh - 410px) !important;
       }
     }
     .c-pdf-show {
@@ -139,6 +145,16 @@
   .bg-color {
     background: var(--section-1st-color);
     box-shadow: var(--box-shadow);
+    bottom: 0;
+    @media (max-width: 579px) {
+      bottom: -25px;
+    }
+    @media (min-width: 580px) and (max-width: 991px) {
+      bottom: -60px;
+    }
+    @media (min-width: 991px) and (max-width: 1440px) {
+      bottom: -10px;
+    }
   }
 
   .box-bg {
@@ -299,10 +315,9 @@
         .options {
           visibility: hidden !important;
         }
-        &:hover {
-          .options {
-            visibility: visible !important;
-          }
+        &:hover .options,
+        &:focus-within .options {
+          visibility: visible !important;
         }
       }
     }
@@ -483,7 +498,7 @@
       }
     }
   }
-  
+
   .parent-replay-alt,
   .parent-replay,
   .replay-message-box {

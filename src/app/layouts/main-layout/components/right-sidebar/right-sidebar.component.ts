@@ -61,7 +61,6 @@ export class RightSidebarComponent implements OnInit {
     this.isCommunitiesLoader = true;
     this.communityService.getLocalCommunities(profileId).subscribe({
       next: (res: any) => {
-        // console.log(res)
         if (res) {
           this.communities = res;
         }
@@ -77,7 +76,7 @@ export class RightSidebarComponent implements OnInit {
 
   goToCommunityDetails(community: any): void {
     this.closeSidebar();
-    this.router.navigate(['community']);
+    this.router.navigate(['community', community?.slug]);
   }
 
   closeSidebar(): void {

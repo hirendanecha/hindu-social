@@ -1,7 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
 import { EncryptDecryptService } from '../services/encrypt-decrypt.service';
-// import { EncryptDecryptService } from '../services/encrypt-decrypt.service';
 
 @Pipe({
   name: 'messageDate'

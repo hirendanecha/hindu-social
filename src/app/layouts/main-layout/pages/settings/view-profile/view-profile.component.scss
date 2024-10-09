@@ -10,6 +10,27 @@
     max-height: 90px;
     border-radius: 10px;
   }
+
+  .post-search-input {
+    max-width: 225px;
+    background-color: unset;
+    border-bottom: 1px solid;
+    border-radius: 0;
+
+    &:focus {
+      box-shadow: unset;
+      border-left: 0;
+      border-right: 0;
+      border-top: 0;
+    }
+  }
+  .close-icon {
+    right: 18px;
+    background-color: #7376767a;
+    border-radius: 20px;
+    padding: 1px 4px 1px 4px;
+    line-height: 1.3;
+  }
 }
 .list-content {
   background: var(--section-1st-color);
@@ -59,7 +80,7 @@
 }
 
 .c-color{
-  color: var( --para-2nd-color);
+  color: var(--para-2nd-color);
 }
 
 ::ng-deep{

@@ -4,7 +4,7 @@
     <div class="single-box p-0 mb-7" *ngIf="notification">
       <a
         class="d-flex justify-content-between align-items-center"
-        (click)="readUnreadNotification(notification.postId, notification.id)"
+        (click)="readUnreadNotification(notification.postId, notification)"
         [routerLink]="notification.postId ? 'post/' + notification.postId : 'profile-chats'"
         target="_blank"
 
@@ -25,10 +25,7 @@
           <div class="text-area">
             <h6 class="m-0 mb-1">
               {{ notification?.Username }}
-              <!-- <span
-                *ngIf="notification?.isRead === 'N'"
-                class="unread-notification smtxt"
-              ></span> -->
+              <span *ngIf="notification?.isRead === 'N'"></span>
               <span class="font-12-px text-lowercase">
                 <fa-icon class="ms-2" [icon]="['fas', 'clock']" />
                 {{ notification?.createDate | dateDay }}</span

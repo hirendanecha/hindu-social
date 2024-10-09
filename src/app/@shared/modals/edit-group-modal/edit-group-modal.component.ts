@@ -19,6 +19,7 @@ import { ConfirmationModalComponent } from '../confirmation-modal/confirmation-m
 import { SharedService } from '../../services/shared.service';
 import { FormControl, Validators } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
+import { UploadFilesService } from '../../services/upload-files.service';
 
 @Component({
   selector: 'app-edit-group-modal',
@@ -58,6 +59,7 @@ export class EditGroupModalComponent implements OnInit {
     private modalService: NgbModal,
     private router: Router,
     private sharedService: SharedService,
+    private uploadFilesService: UploadFilesService,
     private toastService: ToastService
   ) {
     this.profileId = +localStorage.getItem('profileId');
@@ -77,7 +79,7 @@ export class EditGroupModalComponent implements OnInit {
         if (res?.data?.length > 0) {
           this.userList = res.data.filter((user: any) => {
             return (
-              user.Id !== this.sharedService?.userData?.Id &&
+              user.Id !== this.sharedService?.userData?.profileId &&
               !this.addedInvitesList.some((invite) => invite.Id === user.Id) &&
               !this.data.memberList.some(
                 (member) => member.profileId === user.Id
@@ -128,7 +130,7 @@ export class EditGroupModalComponent implements OnInit {
   upload() {
     if (this.chanageGroupNameFormControl.valid) {
       if (this.profileImg.file) {
-        this.postService.uploadFile(this.profileImg.file).subscribe({
+        this.uploadFilesService.uploadFile(this.profileImg.file).subscribe({
           next: (res: any) => {
             if (res?.body?.url) {
               this.profileImg.url = res?.body?.url;

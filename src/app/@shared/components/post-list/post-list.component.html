@@ -7,10 +7,12 @@
       <app-post-card [post]="post" (onEditPost)="onEditPostData(post, i)" (getPostList)="getPostList()"></app-post-card>
       <ng-container *ngIf="(i + 1) % 5 === 0 && advertisementDataList?.length">
         <ng-container *ngFor="let ad of advertisementDataList | randomAdvertisementUrl: i">
-          <a class="img-preview rounded-3 w-100 advertisement-section" [attr.href]="ad.link ? ad.link : null" [attr.target]="ad.link ? '_blank' : null">
+          <a class="img-preview rounded-3 w-100 advertisement-section" [attr.href]="ad.link ? ad.link : null" [attr.target]="ad.link ? '_blank' : null"
+          [ngStyle]="{'background-image' : 'url(' + ad.imageUrl + ')'}"
+          >
             <img
               loading="lazy"
-              [src]="ad.imageUrl"
+              data-src="{{ ad.imageUrl }}"
               class="w-100 h-100 rounded-3 image-render"
               alt="advertisement"
             />

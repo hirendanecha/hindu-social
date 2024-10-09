@@ -1,9 +1,11 @@
 import {
   AfterViewInit,
   Component,
+  ElementRef,
   Input,
   OnDestroy,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SocketService } from '../../services/socket.service';
@@ -25,9 +27,11 @@ export class OutGoingCallModalComponent
   @Input() title: string = 'Outgoing call...';
   @Input() calldata: any;
   @Input() sound: any;
+  @ViewChild('focusElement') focusElement!: ElementRef;
 
   hangUpTimeout: any;
   soundEnabledSubscription: Subscription;
+  soundTrigger: string;
 
   constructor(
     public activateModal: NgbActiveModal,
@@ -47,13 +51,13 @@ export class OutGoingCallModalComponent
     //   }
     // }
     this.sharedService.loginUserInfo.subscribe((user) => {
-      const callNotificationSound = user.callNotificationSound;
-      if (callNotificationSound === 'Y') {
-        if (this.sound) {
-          this.sound?.play();
-        }
-      }
+      this.soundTrigger = user.callNotificationSound;
     });
+    if (this.soundTrigger === 'Y' && this.calldata.link) {
+      if (this.sound) {
+        this.sound?.play();
+      }
+    }
     if (window.document.hidden) {
       this.soundEnabledSubscription =
         this.soundControlService.soundEnabled$.subscribe((soundEnabled) => {
@@ -79,9 +83,13 @@ export class OutGoingCallModalComponent
         this.activateModal.close('success');
       }
     });
+    if (this.focusElement) {
+      this.focusElement.nativeElement.click();
+    }
   }
 
   ngOnInit(): void {
+    this.sharedService.generateSessionKey();
     this.socketService.socket?.on('notification', (data: any) => {
       if (data?.actionType === 'SC') {
         this.sound?.stop();
@@ -94,11 +102,8 @@ export class OutGoingCallModalComponent
     this.sound?.stop();
     clearTimeout(this.hangUpTimeout);
     // this.router.navigate([`/appointment-call/${this.calldata.link}`]);
-    const callId = this.calldata.link.replace(
-      'https://meet.facetime.tube/',
-      ''
-    );
-    this.router.navigate([`/buzz-call/${callId}`]);
+    const callId = this.calldata.link.replace('https://facetime.tube/', '');
+    this.router.navigate([`/facetime/${callId}`]);
     // window.open(this.calldata.link, '_blank');
     this.activateModal.close('success');
   }
@@ -121,5 +126,7 @@ export class OutGoingCallModalComponent
 
   ngOnDestroy(): void {
     this.soundEnabledSubscription?.unsubscribe();
+    this.calldata = null;
+    this.sound = null;
   }
 }

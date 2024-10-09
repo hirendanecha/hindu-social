@@ -5,7 +5,7 @@ import {
   NgbOffcanvas,
 } from '@ng-bootstrap/ng-bootstrap';
 import { SharedService } from '../../../../@shared/services/shared.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { CustomerService } from '../../../../@shared/services/customer.service';
 import { ProfileMenusModalComponent } from '../profile-menus-modal/profile-menus-modal.component';
 import { NotificationsModalComponent } from '../notifications-modal/notifications-modal.component';
@@ -43,6 +43,11 @@ export class HeaderComponent {
   };
   environment = environment;
   originalFavicon: HTMLLinkElement;
+
+  hideSearch = false;
+  hideSubHeader: boolean = false;
+  hideOngoingCallButton: boolean = false;
+  authToken = localStorage.getItem('auth-token');
   constructor(
     private modalService: NgbModal,
     public sharedService: SharedService,
@@ -54,15 +59,13 @@ export class HeaderComponent {
     private socketService: SocketService
   ) {
     this.originalFavicon = document.querySelector('link[rel="icon"]');
-    if (this.tokenService.getToken() && !this.router.routerState.snapshot.url.includes('community')){      
-      this.socketService.socket.on('isReadNotification_ack', (data) => {
-        if (data?.profileId) {
-          this.sharedService.isNotify = false;
-          localStorage.setItem('isRead', data?.isRead);
-          this.originalFavicon.href = '/assets/images/default-profile.jpg';
-        }
-      });
-    }
+    this.socketService?.socket?.on('isReadNotification_ack', (data) => {
+      if (data?.profileId) {
+        this.sharedService.isNotify = false;
+        localStorage.setItem('isRead', data?.isRead);
+        this.originalFavicon.href = '/assets/images/default-profile.jpg';
+      }
+    });
     const isRead = localStorage.getItem('isRead');
     if (isRead === 'N') {
       this.sharedService.isNotify = true;
@@ -70,6 +73,16 @@ export class HeaderComponent {
       this.sharedService.isNotify = false;
     }
     this.channelId = +localStorage.getItem('channelId');
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.hideSubHeader = this.router.url.includes('profile-chats');
+        this.hideOngoingCallButton = this.router.url.includes('facetime');
+        console.log(this.hideSubHeader);
+        this.sharedService.callId = sessionStorage.getItem('callId') || null;
+        console.log(this.sharedService.callId);
+      }
+    });
   }
 
   openProfileMenuModal(): void {
@@ -93,14 +106,14 @@ export class HeaderComponent {
   }
 
   openProfileMobileMenuModal(): void {
-    if(this.tokenService.getCredentials()){
-    this.offcanvasService.open(ProfileMenusModalComponent, {
-      position: 'start',
-      panelClass: 'w-300-px',
-    });
-  }else{
-    this.openRightSidebar();
-  }
+    if (this.tokenService.getCredentials()) {
+      this.offcanvasService.open(ProfileMenusModalComponent, {
+        position: 'start',
+        panelClass: 'w-300-px',
+      });
+    } else {
+      this.openRightSidebar();
+    }
   }
 
   openNotificationsMobileModal(): void {
@@ -168,10 +181,15 @@ export class HeaderComponent {
 
   redirectToTube(): void {
     const channelId = +localStorage.getItem('channelId');
+    let redirectUrl = `${environment.tubeUrl}`;
     if (channelId) {
-      window.open(`${environment.tubeUrl}?channelId=${channelId}`, '_blank');
-    } else {
-      window.open(`${environment.tubeUrl}`, '_blank');
+      redirectUrl += `?channelId=${channelId}`;
     }
+    if (this.authToken) {
+      redirectUrl += channelId
+        ? `&authToken=${this.authToken}`
+        : `?authToken=${this.authToken}`;
+    }
+    window.open(redirectUrl, '_blank');
   }
 }

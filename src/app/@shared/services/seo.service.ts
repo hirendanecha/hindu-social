@@ -155,7 +155,6 @@ export class SeoService {
       },
       ]
     };
-    console.log('seoObj', seoObj, obj?.description)
     this.updateComponentSeo(seoObj, isMainPage);
   }
 }

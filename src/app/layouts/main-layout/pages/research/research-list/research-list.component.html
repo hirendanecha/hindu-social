@@ -62,7 +62,7 @@
 
         <div class="col form-group">
           <label for="textpostdesc" class="form-label"
-          >Paste article or link</label
+            >Paste article or link</label
           >
           <!-- <input type="text" class="input-area" id="textpostdesc" formControlName="textpostdesc" placeholder="Paste article or video link..." trim="blur"> -->
           <app-tag-user-input
@@ -152,41 +152,6 @@
           </div>
         </div>
         <div class="col form-group" *ngIf="!selectedImgFile && !selectedVideoFile">
-          <label for="textpostdesc" class="form-label">Upload Image</label>
-          <div class="d-flex custom-input-area" *ngIf="!selectedImgFile">
-            <fa-icon
-              [icon]="['fas', 'image']"
-              class="text-primary cursor font-24-px"
-              (click)="uploadImage.click()"
-            />
-            <input
-              #uploadImage
-              class="d-none"
-              type="file"
-              id="fileInput"
-              (change)="onFileSelected($event)"
-              accept="image/*"
-            />
-          </div>
-          <ng-container *ngIf="selectedImgFile">
-            <div class="position-relative w-100-px h-100-px">
-              <img
-                loading="lazy"
-                data-src="{{ postImageUrl }}"
-                class="w-100 h-100 rounded-4"
-                alt="icon"
-                onerror="this.onerror=null;"
-              />
-              <fa-icon
-                [icon]="['fas', 'xmark']"
-                class="position-absolute top-0 start-100 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
-                role="button"
-                (click)="removeImgFile()"
-              />
-            </div>
-          </ng-container>
-        </div>
-        <div class="col form-group" *ngIf="!selectedImgFile">
           <label for="textpostdesc" class="form-label">Upload File</label>
           <div class="d-flex custom-input-area" *ngIf="!selectedpdfFile">
             <fa-icon
@@ -302,16 +267,16 @@
   </ng-container>
 
   <div class="single-box d-flex flex-column p-5 mb-3">
-    <h6 class="text-start mb-5">HinduSocial Messaging</h6>
+    <h6 class="text-start mb-5">Hindu.social Messaging</h6>
 
     <div class="d-flex flex-column border-top pt-5 gap-3">
-      <span class="font-12-px text-start"
+      <span class="smtxt text-start"
         >RESEARCH OF TRUTH IS HOW WE UNITE</span
       >
-      <span class="font-12-px text-start"
+      <span class="smtxt text-start"
         >UNINFORMED PROGRAMMED FOLKS MUST BE BROUGHT UP TO SPEED</span
       >
-      <span class="font-12-px text-start"
+      <span class="smtxt text-start"
         >PLEASE SHARE INFO IN FACEBOOK AND TWITTER, ETC</span
       >
     </div>

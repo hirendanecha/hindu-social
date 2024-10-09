@@ -1,4 +1,12 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../services/toast.service';
 import { getTagUsersFromAnchorTags } from '../../utils/utils';
@@ -14,85 +22,131 @@ export class EditPostModalComponent implements AfterViewInit {
   @Input() title: string = 'Confirmation Dialog';
   @Input() message: string;
   @Input() data: any;
-  @ViewChild('parentPostCommentElement', { static: false }) parentPostCommentElement: ElementRef;
+  @ViewChild('parentPostCommentElement', { static: false })
+  parentPostCommentElement: ElementRef;
 
   postData: any = {
     file: null,
     url: '',
-    tags: []
+    tags: [],
   };
 
-  postInputValue: string = ''
+  postInputValue: string = '';
   commentMessageTags: any[];
-  selectedImage = ''
-  pdfName = ''
+  selectedImage = '';
 
-  constructor(public activeModal: NgbActiveModal,
+  postMediaData: any[] = [];
+  selectedFiles: any[] = [];
+  editMediaData: any[] = [];
+  removeImagesList: any[] = [];
+
+  constructor(
+    public activeModal: NgbActiveModal,
     private toastService: ToastService,
     private renderer: Renderer2,
     private changeDetectorRef: ChangeDetectorRef
-  ) {
-  }
+  ) {}
 
   ngAfterViewInit(): void {
     if (this.data) {
-
-      // this.renderer.setProperty(
-      //   this.parentPostCommentElement?.nativeElement,
-      //   'innerHTML',
-      //   this.data.comment
-      // );
-      console.log(this.data)
-      this.postInputValue = this.data?.postdescription
-      this.pdfName = this.data?.pdfUrl?.split('/')[3];
-      // this.postData.id = this.data.id
-      // this.postData.postId = this.data.postId
-      // this.postData.profileId = this.data.profileId
-      // this.postData.imageUrl = this.data?.imageUrl
-      this.postData = { ...this.data }
+      this.postInputValue = this.data?.postdescription;
+      // this.pdfName = this.data?.pdfUrl?.split('/')[3];
+      this.postData = { ...this.data };
       this.changeDetectorRef.detectChanges();
+      // let media = this.postData?.imagesList;
+      this.postMediaData = this.postData?.imagesList.length
+        ? this.postData.imagesList
+        : this.postData.pdfUrl
+        ? [{ pdfUrl: this.postData.pdfUrl }]
+        : [];
     }
   }
 
   onPostFileSelect(event: any): void {
-    const file = event.target?.files?.[0] || {};
-    if (file.type.includes('image/')) {
-      this.postData['file'] = file;
-      this.selectedImage = URL.createObjectURL(file);
-    } else if (file.type.includes('application/pdf')) {
-      this.postData['file'] = file;
-      this.pdfName = file?.name;
+    const files = event.target?.files;
+    if (this.combinedMediaData.length > 3) {
+      this.toastService.warring(
+        'Please choose up to 4 photos, videos, or GIFs.'
+      );
+      return;
     }
-    else {
-      this.toastService.danger(`sorry ${file.type} are not allowed!`)
+    if (files.length > 4) {
+      this.toastService.warring(
+        'Please choose up to 4 photos, videos, or GIFs.'
+      );
+      return;
     }
-    // if (file?.size < 5120000) {
-    // } else {
-    //   this.toastService.warring('Image is too large!');
-    // }
+    let existingFileType = '';
+    if (this.combinedMediaData.length > 0) {
+      existingFileType = this.combinedMediaData[0].file.type.split('/')[0];
+    }
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileData: any = {
+        file: file,
+        pdfName: null,
+        imageUrl: null,
+      };
+      const fileType = file.type.split('/')[0];
+      if (existingFileType && fileType !== existingFileType) {
+        this.toastService.warring(
+          'Please select only one type of file at a time.'
+        );
+        return;
+      }
+      if (
+        file.type.includes('application/pdf') ||
+        file.type.includes('application/msword') ||
+        file.type.includes(
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+      ) {
+        fileData.pdfName = file.name;
+      } else if (file.type.includes('image/')) {
+        fileData.imageUrl = URL.createObjectURL(file);
+      }
+      this.selectedFiles.push(fileData);
+      // console.log(`File ${i + 1}:`, fileData);
+    }
+    this.editMediaData = (this.editMediaData || []).concat(this.selectedFiles);
+    // console.log('Selected files:', this.postMediaData);
   }
 
-  removePostSelectedFile(): void {
-    this.postData['file'] = null;
-    this.postData['imageUrl'] = '';
-    this.postData['pdfUrl'] = '';
-    this.selectedImage = '';
-    this.pdfName = '';
+  removePostSelectedFile(media: any = {}, type: string): void {
+    if (type === 'pdf') {
+      this.postData.pdfUrl = '';
+      this.postMediaData = [];
+      this.editMediaData = [];
+      this.selectedFiles = [];
+      return;
+    } else {
+      if (media.id) {
+        this.removeImagesList.push({ id: media.id });
+        this.postMediaData = this.postMediaData.filter(
+          (ele) => ele.id != media.id
+        );
+        console.log(this.removeImagesList);
+      } else {
+        this.editMediaData = this.editMediaData.filter(
+          (ele: any) => ele?.file?.name != media?.file?.name
+        );
+        console.log(this.editMediaData);
+      }
+    }
   }
 
   onChangeComment(): void {
     this.postData.tags = getTagUsersFromAnchorTags(this.commentMessageTags);
-    console.log(this.postData.tags)
+    this.postData['editImagesList'] = this.editMediaData;
+    this.postData['imagesList'] = this.postMediaData;
+    this.postData['removeImagesList'] = this.removeImagesList;
     this.activeModal.close(this.postData);
   }
 
   onTagUserInputChangeEvent(data: any): void {
-    // console.log('comments-data', data)
-    // this.postData.comment = data?.html;
-    this.extractLargeImageFromContent(data.html)
+    this.extractLargeImageFromContent(data.html);
     this.commentMessageTags = data?.tags;
   }
-
 
   extractLargeImageFromContent(content: string): void {
     const contentContainer = document.createElement('div');
@@ -108,30 +162,27 @@ export class EditPostModalComponent implements AfterViewInit {
         .endsWith('.gif');
       if (!imgTitle && !imgStyle && !imageGif) {
         const copyImage = imgTag.getAttribute('src');
-        const bytes = copyImage.length;
-        const megabytes = bytes / (1024 * 1024);
-        if (megabytes > 1) {
-          // this.postData.comment = content.replace(copyImage, '');
-          let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">'
-          this.postData.postdescription = `<div>${content.replace(copyImage, '').replace(/\<br\>/ig, '').replace(new RegExp(copyImageTag, 'g'), '')}</div>`;
-          const base64Image = copyImage
-            .trim()
-            .replace(/^data:image\/\w+;base64,/, '');
-          try {
-            const binaryString = window.atob(base64Image);
-            const uint8Array = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              uint8Array[i] = binaryString.charCodeAt(i);
-            }
-            const blob = new Blob([uint8Array], { type: 'image/jpeg' });
-            const fileName = `copyImage-${new Date().getTime()}.jpg`;
-            const file = new File([blob], fileName, { type: 'image/jpeg' });
-            this.postData['file'] = file;
-          } catch (error) {
-            console.error('Base64 decoding error:', error);
+        // this.postData.comment = content.replace(copyImage, '');
+        let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">';
+        this.postData.postdescription = `<div>${content
+          .replace(copyImage, '')
+          .replace(/\<br\>/gi, '')
+          .replace(new RegExp(copyImageTag, 'g'), '')}</div>`;
+        const base64Image = copyImage
+          .trim()
+          .replace(/^data:image\/\w+;base64,/, '');
+        try {
+          const binaryString = window.atob(base64Image);
+          const uint8Array = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            uint8Array[i] = binaryString.charCodeAt(i);
           }
-        } else {
-          this.postData.postdescription = content;
+          const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+          const fileName = `copyImage-${new Date().getTime()}.jpg`;
+          const file = new File([blob], fileName, { type: 'image/jpeg' });
+          this.postData['file'] = file;
+        } catch (error) {
+          console.error('Base64 decoding error:', error);
         }
       } else {
         this.postData.postdescription = content;
@@ -139,5 +190,9 @@ export class EditPostModalComponent implements AfterViewInit {
     } else {
       this.postData.postdescription = content;
     }
+  }
+
+  get combinedMediaData(): any[] {
+    return [...(this.editMediaData || []), ...(this.postMediaData || [])];
   }
 }

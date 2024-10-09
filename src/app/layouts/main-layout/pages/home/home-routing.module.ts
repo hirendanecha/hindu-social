@@ -18,7 +18,7 @@ const routes: Routes = [
     path: 'community/details/:name',
     component: HomeComponent,
     // canActivate: mapToCanActivate([AuthenticationGuard]),
-   
+
   },
   {
     path: 'pages/:name',

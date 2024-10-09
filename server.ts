@@ -99,16 +99,7 @@ export function app(): express.Express {
         ) {
           let id = params.split('/');
           id = id[id.length - 1];
-          // id = params[params.length - 1];
-          // id = Number(id);
-          // let id = 'local-organic-food-sources';
-          console.log({ id });
-
-          // if (!isNaN(id) || Math.sign(id) > 0) {
           const community: any = await getCommunity(id);
-
-          console.log({ params }, { id }, { community });
-
           const talent = {
             name: community?.CommunityName,
             description: community?.CommunityDescription,
@@ -121,15 +112,7 @@ export function app(): express.Express {
         } else if (params.indexOf('settings/view-profile/') > -1) {
           let id = params.split('/');
           id = +id[id.length - 1];
-          // id = params[params.length - 1];
-          // id = Number(id);
-          // let id = 'local-organic-food-sources';
-          // console.log({ id });
-
-          // if (!isNaN(id) || Math.sign(id) > 0) {
           const { data: profile }: any = await getProfile(id);
-
-          console.log({ params }, { id }, { profile: JSON.stringify(profile) });
           const talent = {
             name: profile[0]?.Username,
             description: profile[0].FirstName + ' ' + profile[0].LastName,
@@ -141,15 +124,7 @@ export function app(): express.Express {
         } else if (params.indexOf('post/') > -1) {
           let id = params.split('/');
           id = id[id.length - 1];
-          // id = params[params.length - 1];
-          // id = Number(id);
-          // let id = 'local-organic-food-sources';
-          console.log({ id });
-
-          // if (!isNaN(id) || Math.sign(id) > 0) {
           const [post]: any = await getPost(+id);
-
-          console.log('post===>', post);
           const pdhtml = document.createElement('div');
           pdhtml.innerHTML = post?.postdescription || post?.metadescription;
           const talent = {
@@ -160,15 +135,10 @@ export function app(): express.Express {
           seo.title = talent.name;
           seo.description = strip_html_tags(talent.description);
           seo.image = talent.image;
-          // }
-        }else if (params.indexOf('research/') > -1) {
+        } else if (params.indexOf('research/') > -1) {
           let id = params.split('/');
           id = id[id.length - 1];
-          console.log({ id });
-
           const group: any = await getResearchGroup(id);
-
-          console.log('group===>', group);
           const talent = {
             name: `HinduSocial Research ${group?.PageTitle}`,
             description: group?.PageDescription,
@@ -208,7 +178,6 @@ async function getCommunity(id: any) {
 }
 
 async function getPost(id: any) {
-  console.log(api_url);
   return fetch(api_url + 'posts/get/' + id).then((resp) => resp.json());
 }
 async function getProfile(id: any) {

@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LandingPageComponent } from './layouts/auth-layout/pages/landing-page/landing-page.component';
-// import { AppointmentCallComponent } from './@shared/components/appointment-call/appointment-call.component';
-// import { AppointmentCallComponent } from './layouts/main-layout/pages/appointment-call/appointment-call.component';
 
 const routes: Routes = [
   {
@@ -15,10 +13,6 @@ const routes: Routes = [
     component: LandingPageComponent,
     pathMatch: 'full',
   },
-  // {
-  //   path: 'appointment-call/:name',
-  //   component: AppointmentCallComponent,
-  // },
   {
     path: '',
     loadChildren: () =>

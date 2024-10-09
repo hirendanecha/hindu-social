@@ -5,10 +5,12 @@ import { NgbActiveOffcanvas, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { ProfileChatsListComponent } from 'src/app/layouts/main-layout/pages/profile-chats/profile-chats-list/profile-chats-list.component';
 import { ProfileChatsSidebarComponent } from 'src/app/layouts/main-layout/pages/profile-chats/profile-chats-sidebar/profile-chats-sidebar.component';
 import { SharedService } from '../../services/shared.service';
-// import { MessageService } from '../../services/message.service';
+import { MessageService } from '../../services/message.service';
 import { SeoService } from '../../services/seo.service';
 import { TokenStorageService } from '../../services/token-storage.service';
-import { MessageService } from '../../services/message.service';
+import { BreakpointService } from '../../services/breakpoint.service';
+import { Subscription } from 'rxjs';
+import { SocketService } from '../../services/socket.service';
 
 declare var JitsiMeetExternalAPI: any;
 @Component({
@@ -28,6 +30,9 @@ export class AppointmentCallComponent implements OnInit {
   selectedRoomId: number;
   isRoomCreated: boolean = false;
   openChatId: any = {};
+  isMobileScreen: boolean;
+  screenSubscription!: Subscription;
+  profileId: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,14 +43,17 @@ export class AppointmentCallComponent implements OnInit {
     private sharedService: SharedService,
     private messageService: MessageService,
     private seoService: SeoService,
-    public tokenService: TokenStorageService
+    public tokenService: TokenStorageService,
+    private breakpointService: BreakpointService,
+    private socketService: SocketService,
   ) {
     const data = {
-      title: 'Hindu.social Chat',
+      title: 'Buzz Chat',
       url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
+    this.profileId = +localStorage.getItem('profileId');
   }
 
   ngOnInit() {
@@ -57,7 +65,14 @@ export class AppointmentCallComponent implements OnInit {
       };
     }
     const appointmentURLCall =
-      this.route.snapshot['_routerState'].url.split('/buzz-call/')[1];
+      this.route.snapshot['_routerState'].url.split('/facetime/')[1];
+    sessionStorage.setItem('callId', appointmentURLCall);
+    this.screenSubscription = this.breakpointService?.screen.subscribe(
+      (screen) => {
+        this.isMobileScreen = screen.md?.lessThen ?? false;
+      }
+    );
+
     this.options = {
       roomName: appointmentURLCall,
       parentNode: document.querySelector('#meet'),
@@ -67,14 +82,22 @@ export class AppointmentCallComponent implements OnInit {
       },
       enableNoAudioDetection: true,
       enableNoisyMicDetection: true,
+      interfaceConfigOverwrite: {
+        TOOLBAR_ALWAYS_VISIBLE: this.isMobileScreen ? true : false,
+      },
     };
 
     const api = new JitsiMeetExternalAPI(this.domain, this.options);
-    const numberOfParticipants = api.getNumberOfParticipants();
-    const iframe = api.getIFrame();
-    // console.log(numberOfParticipants);
 
     api.on('readyToClose', () => {
+      this.sharedService.callId = null;
+      sessionStorage.removeItem('callId');
+      const data = {
+        profileId: this.profileId,
+        roomId: this.openChatId.roomId,
+        groupId: this.openChatId.groupId,
+      }
+      this.socketService?.endCall(data);
       this.router.navigate(['/profile-chats']).then(() => {
         // api.dispose();
         // console.log('opaaaaa');
@@ -150,5 +173,11 @@ export class AppointmentCallComponent implements OnInit {
 
   onSelectChat(id) {
     this.selectedRoomId = id;
+  }
+
+  ngOnDestroy(): void {
+    if (this.screenSubscription) {
+      this.screenSubscription.unsubscribe();
+    }
   }
 }

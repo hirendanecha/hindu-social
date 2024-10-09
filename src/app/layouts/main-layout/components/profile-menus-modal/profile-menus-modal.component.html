@@ -33,6 +33,14 @@
       </a>
     </li>
     <li>
+      <a 
+        [routerLink]="'/report-bugs/'"
+        class="mdtxt" (click)="closeMenu($event, 'support')">
+        <fa-icon [icon]="['fas', 'ticket-alt']" class="font-20-px" />
+        Support Page
+      </a>
+    </li>
+    <li>
       <a class="mdtxt" (click)="closeMenu($event, 'logout')">
         <fa-icon [icon]="['fas', 'right-from-bracket']" class="font-20-px" />
         Sign Out

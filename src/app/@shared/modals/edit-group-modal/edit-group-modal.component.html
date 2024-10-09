@@ -79,7 +79,7 @@
                 onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
               />
               <span class="overflow-hidden text-truncate">{{
-                user.Username.split(" ").join("")
+                user.Username?.split(" ")?.join("")
               }}</span>
             </div>
           </ng-container>

@@ -27,12 +27,9 @@ export class LandingPageComponent {
     } else if (this.tokenStorageService.getToken()) {
       this.router.navigate(['/home']);
     }
-    console.log('Constructor');
   }
 
   openLoginPage(): void {
-    console.log('Login Clicked!');
-    
     this.closeMenu();
     this.router.navigate(['/login']);
   }

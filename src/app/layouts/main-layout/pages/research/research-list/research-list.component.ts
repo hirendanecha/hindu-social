@@ -9,6 +9,7 @@ import { SeoService } from 'src/app/@shared/services/seo.service';
 import { SharedService } from 'src/app/@shared/services/shared.service';
 import { SocketService } from 'src/app/@shared/services/socket.service';
 import { ToastService } from 'src/app/@shared/services/toast.service';
+import { UploadFilesService } from 'src/app/@shared/services/upload-files.service';
 import {
   deleteExtraParamsFromReqObj,
   isFormSubmittedAndError,
@@ -66,11 +67,12 @@ export class ResearchListComponent {
     private breakpointService: BreakpointService,
     private toastService: ToastService,
     private seoService: SeoService,
+    private uploadFilesService: UploadFilesService,
     private socketService: SocketService
   ) {
     const data = {
-      title: 'HinduSocial Research',
-      url: `${window.location.href}`,
+      title: 'Hindu.social Research',
+      url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
@@ -119,17 +121,9 @@ export class ResearchListComponent {
   onTagUserInputChangeEvent(data: any, ctrlName: string): void {
     this.researchForm.get(ctrlName).setValue(data?.html);
     this.researchForm.get('meta').setValue(data?.meta || {});
-    // console.log('data : ', data);
-    // this.postData.postdescription = data?.html;
-    // this.postMessageTags = data?.tags;
   }
   onTagUserInputDescription(data: any, ctrlName: string): void {
     this.researchForm.get(ctrlName).setValue(data?.html);
-    // this.researchForm.get('meta').setValue(data?.meta || {});
-    // console.log('data : ', data);
-
-    // this.postData.postdescription = data?.html;
-    // this.postMessageTags = data?.tags;
   }
 
   groupsAndPosts(): void {
@@ -209,36 +203,10 @@ export class ResearchListComponent {
       reqObj['pdfUrl'] = this.postFile;
       reqObj['streamname'] = this.postVideo;
       reqObj['thumbfilename'] = this.postThumbfilename;
+      reqObj['posttype'] = 'R';
       this.socketService?.createOrEditPost(reqObj);
       this.toastService.success('Research added successfully.');
       this.resetPost();
-      // this.postService
-      //   .createPost(reqObj)
-      //   .subscribe({
-      //     next: (res) => {
-      //       if (res) {
-      //         console.log('res : ', res);
-      //         this.toastService.success('Research added successfully.');
-      //         this.groupsAndPosts();
-      //       } else {
-      //         this.toastService.danger(res['message']);
-      //       }
-      //     },
-      //     error: (error: any) => {
-      //       this.toastService.danger(error.message);
-      //     },
-      //   })
-      //   .add(() => {
-      //     this.researchForm.reset();
-      //     this.tagInputDefaultData = 'reset';
-      //     this.postImage = null;
-      //     this.postFile = null;
-      //     setTimeout(() => {
-      //       this.tagInputDefaultData = '';
-      //     }, 100);
-      //     this.formIsClicked.setValue(false);
-      //     this.formIsSubmitted.setValue(false);
-      //   });
     }
     this.removeImgFile();
     this.removePostSelectedFile();
@@ -260,49 +228,45 @@ export class ResearchListComponent {
 
   createImagePost(): void {
     const profileId = localStorage.getItem('profileId');
-    if (this.selectedImgFile && !this.selectedVideoFile){  
-      this.postService
-        .uploadFile(this.selectedImgFile)
-        .subscribe({
-          next: (res: any) => {
-            if (res?.body?.url) {
-              this.postImage = res?.body?.url;
-              this.createResearch();
-            }
-          },
-        });
+    if (this.selectedImgFile && !this.selectedVideoFile) {
+      this.uploadFilesService.uploadFile(this.selectedImgFile).subscribe({
+        next: (res: any) => {
+          if (res?.body?.url) {
+            this.postImage = res?.body?.url;
+            this.createResearch();
+          }
+        },
+      });
     } else if (this.selectedpdfFile) {
-      this.postService
-        .uploadFile(this.selectedpdfFile)
-        .subscribe({
-          next: (res: any) => {
-            if (res?.body?.url) {
-              this.postFile = res?.body?.url;
-              this.createResearch();
-            }
-          },
-        });
-      } else if (this.selectedVideoFile && this.selectedImgFile) {
-        this.spinner.show();
-        this.postService.uploadFile(this.selectedImgFile).subscribe({
-          next: (res: any) => {
-            if (res?.body?.url) {
-              this.postThumbfilename = res?.body?.url;
-            }
-          },
-        });
-        this.postService.uploadFile(this.selectedVideoFile).subscribe({
-          next: (res: any) => {
-            if (res?.body?.url) {
-              this.postVideo = res?.body?.url;
-              this.spinner.hide();
-              this.createResearch();
-            }
-          },
-          error: (err) => {
+      this.uploadFilesService.uploadFile(this.selectedpdfFile).subscribe({
+        next: (res: any) => {
+          if (res?.body?.url) {
+            this.postFile = res?.body?.url;
+            this.createResearch();
+          }
+        },
+      });
+    } else if (this.selectedVideoFile && this.selectedImgFile) {
+      this.spinner.show();
+      this.uploadFilesService.uploadFile(this.selectedImgFile).subscribe({
+        next: (res: any) => {
+          if (res?.body?.url) {
+            this.postThumbfilename = res?.body?.url;
+          }
+        },
+      });
+      this.uploadFilesService.uploadFile(this.selectedVideoFile).subscribe({
+        next: (res: any) => {
+          if (res?.body?.url) {
+            this.postVideo = res?.body?.url;
             this.spinner.hide();
-          },
-        });
+            this.createResearch();
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+        },
+      });
     } else {
       this.createResearch();
     }
@@ -326,26 +290,10 @@ export class ResearchListComponent {
 
   onPostFileSelect(event: any): void {
     const file = event.target?.files?.[0] || {};
-    console.log(file)
     if (file) {
       this.postFileUrl = URL.createObjectURL(event.target.files[0]);
       this.selectedpdfFile = file;
     }
-    // if (file.type.includes("application/pdf")) {
-    //   this.postData['file'] = file;
-    //   this.pdfName = file?.name
-    //   this.postData['imageUrl'] = null;
-    //   this.postData['streamname'] = null;
-    // } else {
-    //   this.postData['file'] = file;
-    //   this.postData['imageUrl'] = URL.createObjectURL(file);
-    //   this.pdfName = null;
-    //   this.postData['pdfUrl'] = null;
-    // }
-    // if (file?.size < 5120000) {
-    // } else {
-    //   this.toastService.warring('Image is too large!');
-    // }
   }
 
   removePostSelectedFile(): void {
@@ -358,11 +306,11 @@ export class ResearchListComponent {
     this.tagInputDefaultData = 'reset';
     this.selectedImgFile = null;
     this.selectedpdfFile = null;
-    this.postFile = null;
-    this.postImage = null;
     this.selectedVideoFile = null;
     this.postVideoUrl = null;
     this.postVideo = null;
+    this.postFile = null;
+    this.postImage = null;
     setTimeout(() => {
       this.tagInputDefaultData = null;
     }, 100);

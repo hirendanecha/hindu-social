@@ -68,20 +68,34 @@ import {
   faCheck,
   faSquareCheck,
   faSquareXmark,
+  faUpload,
   faFileUpload,
   faFile,
   faFilePdf,
+  faShareNodes,
   faShare,
-  faHouseMedical,
-  faStethoscope,
-  faArrowLeftLong,
-  faArrowRightLong,
-  faGlobe,
-  faList,
-  faCircle,
+  faEnvelope,
+  faPaperclip,
   faPhone,
+  faEllipsisH,
+  faSearch,
+  faBan,
+  faFileVideo,
+  faSliders,
+  faCopy,
+  faPhoneSlash,
+  faEllipsisV,
+  faUsers,
+  faCommentAlt,
+  faPencil,
   faRefresh,
+  faReply,
+  faUserTimes,
+  faPhotoFilm,
+  faRepeat,
+  faMobile,
   faEyeSlash,
+  faTicketAlt,
   faSquarePlus,
   faTableList,
   faChevronLeft,
@@ -90,25 +104,15 @@ import {
   faPhoneVolume,
   faCircleChevronUp,
   faCircleChevronDown,
-  faPhoneSlash,
-  faEnvelope,
-  faPaperclip,
-  faEllipsisH,
-  faSearch,
-  faBan,
-  faFileVideo,
-  faSliders,
-  faCopy,
-  faEllipsisV,
-  faCommentAlt,
-  faUsers,
-  faPencil,
-  faReply,
-  faUserTimes,
-  faPhotoFilm,
-  faRepeat,
-  faMobile,
-  faTicketAlt,
+  faSignIn,
+  faSignOut,
+  faArrowLeftLong,
+  faArrowRightLong,
+  faCircle,
+  faGlobe,
+  faHouseMedical,
+  faList,
+  faStethoscope,
 } from '@fortawesome/free-solid-svg-icons';
 import { ClaimTokenModalComponent } from './modals/clai-1776-token-modal/claim-token-modal.component';
 import { WalletLinkComponent } from './modals/wallet-download-modal/1776-wallet.component';
@@ -117,7 +121,6 @@ import { PipeModule } from './pipe/pipe.module';
 import { VideoPostModalComponent } from './modals/video-post-modal/video-post-modal.component';
 import { ForgotPasswordComponent } from '../layouts/auth-layout/pages/forgot-password/forgot-password.component';
 import { MentionModule } from 'angular-mentions';
-import { QRCodeModule } from 'angularx-qrcode';
 //import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { PdfPreviewComponent } from './components/pdf-preview/pdf-preview.component';
 import {
@@ -147,7 +150,9 @@ import { CreateGroupModalComponent } from './modals/create-group-modal/create-gr
 import { MediaGalleryComponent } from './components/media-gallery/media-gallery.component';
 import { IncomingcallModalComponent } from './modals/incoming-call-modal/incoming-call-modal.component';
 import { GalleryImgPreviewComponent } from './components/gallery-img-preview/gallery-img-preview.component';
-
+import { HoverDropdownDirective } from './directives/hover-dropdown.directive';
+import { QRCodeModule } from 'angularx-qrcode';
+import { ImgLayoutComponent } from './components/img-layout/img-layout.component';
 
 const sharedComponents = [
   ConfirmationModalComponent,
@@ -161,6 +166,7 @@ const sharedComponents = [
   ImgPreviewComponent,
   InlineLoaderComponent,
   CopyClipboardDirective,
+  HoverDropdownDirective,
   ClaimTokenModalComponent,
   WalletLinkComponent,
   ReplyCommentModalComponent,
@@ -183,10 +189,10 @@ const sharedComponents = [
   QrScanModalComponent,
   AppQrModalComponent,
   ForwardChatModalComponent,
+  ImgLayoutComponent,
   AppointmentModalComponent,
   OpenStripeComponent,
   AppointmentCallComponent,
-  ConferenceLinkComponent
 ];
 
 const sharedModules = [
@@ -204,7 +210,6 @@ const sharedModules = [
   PipeModule,
   MentionModule,
   QRCodeModule,
-  // PdfViewerModule
 ];
 
 @NgModule({
@@ -314,7 +319,9 @@ export class SharedModule {
       faVoicemail,
       faPhoneVolume,
       faCircleChevronUp,
-      faCircleChevronDown
+      faCircleChevronDown,
+      faSignIn,
+      faSignOut
     );
   }
 }

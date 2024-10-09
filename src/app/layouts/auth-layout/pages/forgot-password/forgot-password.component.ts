@@ -29,52 +29,8 @@ export class ForgotPasswordComponent {
     private tokenStorage: TokenStorageService,
     private modalService: NgbModal,
   ) {
-    this.userEmail = localStorage.getItem('email');
-
-    console.log('userEmail', this.userEmail)
+    this.userEmail = JSON.parse(localStorage.getItem('userData'))?.Email;
   }
-
-  // verifyEmailSend(form: NgForm) {
-
-  //   this.submitted = true;
-  //   if (form.form.invalid) {
-  //     return;
-  //   }
-  //   this.loading = true;
-  //   const user = this.tokenStorage.getUser();
-  //   const email = this.verifyEmail.form.controls['email'].value;
-  //   // const password = this.verifyEmail.form.controls?.password?.value;
-  //   if (email) {
-  //     this.spinner.show();
-  //     this.authService
-  //       .forgotPassword({
-  //         email: email,
-  //       })
-  //       .subscribe({
-  //         next:
-  //           (result: any) => {
-  //             this.spinner.hide();
-  //             this.submitted = false;
-  //             if (!result.error) {
-  //               this.activeModal.close('success');
-  //               this.loading = false;
-  //               this.msg =
-  //                 'Please check your email and click the link to set new password.';
-  //               this.type = 'success';
-  //             } else {
-  //               this.msg = result.message;
-  //               this.type = 'danger';
-  //               this.loading = false;
-  //             }
-  //           },
-  //         error:
-  //           (error) => {
-  //             this.spinner.hide();
-  //             this.loading = false;
-  //           }
-  //       });
-  //   }
-  // }
   verifyEmailSend(): void {
     if (this.userEmail) {
       this.spinner.show();
@@ -107,6 +63,9 @@ export class ForgotPasswordComponent {
               this.loading = false;
             }
         });
+    } else  {
+      this.msg = 'Please enter valid email address';
+      this.type = 'danger';
     }
   }
 

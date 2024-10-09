@@ -14,7 +14,7 @@
           />
         </div>
       </div>
-      <div class="row mt-5">
+      <div class="row mt-5 justify-content-between">
         <div class="col-md-4 profile text-start d-flex align-items-center">
           <img
             class="preview-image w-120-px h-120-px"
@@ -30,7 +30,7 @@
             <h3 class="d-flex">
               {{ customer?.Username }}
             </h3>
-            <div class="col-md" *ngIf="+profileId === customer.Id">
+            <div class="col-md" *ngIf="+profileId === customer?.profileId">
               <button
                 class="btn btn-sm btn-primary float-end d-flex"
                 (click)="openEditProfile()"
@@ -40,6 +40,24 @@
               </button>
             </div>
           </div>
+        </div>
+        <div
+          class="col-md-5 profile text-start d-flex align-items-center justify-content-sm-center mt-2 mt-md-0 position-relative"
+        >
+          <label for="">Search Profile posts:</label>
+          <input
+            type="text"
+            [(ngModel)]="searchText"
+            class="post-search-input"
+            placeholder="Search"
+            (input)="searchPosts($event)"
+          />
+          <fa-icon
+            *ngIf="searchText"
+            [icon]="['fas', 'xmark']"
+            class="font-12-px position-absolute close-icon"
+            (click)="searchText = ''"
+          />
         </div>
       </div>
       <div class="row mt-8">
@@ -60,7 +78,7 @@
               <a
                 class="nav-link d-center"
                 [ngClass]="activeTab === 2 ? 'active' : ''"
-                >Community</a
+                >Communities</a
               >
             </li>
             <li
@@ -99,8 +117,10 @@
     <div class="flex-column mb-15 w-100">
       <ng-container *ngIf="activeTab === 1">
         <app-post-list
+          class="post-card"
           parentComponent="ViewProfileComponent"
           [id]="profileId"
+          [searchText]="this.searchText"
         />
       </ng-container>
       <ng-container *ngIf="activeTab === 2">
@@ -178,9 +198,9 @@
                 <p class="smtxt public-group">
                   {{ community.CommunityDescription }}
                 </p>
-                <!-- <div class="friends-list d-center mt-3 gap-1 text-center">
+                <div class="friends-list d-center mt-3 gap-1 text-center">
                   <span class="smtxt m-0">{{ community.members }} Member</span>
-                </div> -->
+                </div>
                 <div class="d-center btn-border pt-5 gap-2 mt-4">
                   <button
                     class="cmn-btn p-2 alt third"
@@ -195,7 +215,7 @@
         </ng-container>
         <ng-template #noData>
           <div>
-            <h6 class="text-center">No Practitioner</h6>
+            <h6 class="text-center">No Communities</h6>
           </div>
         </ng-template>
       </ng-container>
@@ -254,6 +274,7 @@
                     <button ngbDropdownItem>
                       <a
                         class="droplist d-flex align-items-center gap-2"
+                        *ngIf="profileId == customer?.profileId"
                         (click)="deletePost(item.id)"
                       >
                         <fa-icon [icon]="['fas', 'trash-can']" />
@@ -339,7 +360,7 @@
       </ng-container>
     </div>
 
-    <ng-container *ngIf="(breakpointService?.screen | async).xl.gatherThen">
+    <ng-container *ngIf="(breakpointService?.screen | async).xxl.gatherThen">
       <div class="my-list-sidebar">
         <app-right-sidebar />
       </div>

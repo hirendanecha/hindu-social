@@ -19,39 +19,32 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./post-detail.component.scss'],
 })
 export class PostDetailComponent implements OnInit {
-
-  postId: string = '';
   post: any = {};
 
   constructor(
     private spinner: NgxSpinnerService,
     private postService: PostService,
     public sharedService: SharedService,
-    private route: ActivatedRoute,
     private seoService: SeoService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.router.events.subscribe((event: any) => {
-        const id = event?.routerEvent?.url.split('/')[2];
-        console.log(id);
-        this.postId = id;
-        if (this.postId) {
-          this.getPostsByPostId();
-        }
-      });
-    }
+    this.router.events.subscribe((event: any) => {
+      const id = event?.routerEvent?.url.split('/')[2];
+      if (id) {
+        this.getPostsByPostId(id);
+      }
+    });
   }
 
   ngOnInit(): void {
 
   }
 
-  getPostsByPostId(): void {
+  getPostsByPostId(id): void {
     this.spinner.show();
 
-    this.postService.getPostsByPostId(this.postId).subscribe(
+    this.postService.getPostsByPostId(id).subscribe(
       {
         next: (res: any) => {
           this.spinner.hide();
@@ -62,11 +55,12 @@ export class PostDetailComponent implements OnInit {
               this.post?.postdescription || this.post?.metadescription;
             const data = {
               title: this.post?.title,
-              url: `${environment.webUrl}post/${this.postId}`,
+              url: `${environment.webUrl}post/${this.post?.id}`,
               description: html.textContent,
               image: this.post?.imageUrl,
               video: this.post?.streamname,
             };
+            this.seoService.updateSeoMetaData(data);
           }
         },
         error:

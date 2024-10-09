@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes, mapToCanActivate } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { AuthLayoutComponent } from './auth-layout.component';
 import { LandingPageComponent } from './pages/landing-page/landing-page.component';
-import { AuthenticationGuard } from 'src/app/@shared/guards/authentication.guard';
 
 const routes: Routes = [
   {

@@ -1,0 +1,205 @@
+<div class="post-img d-flex justify-content-between flex-wrap gap-2 gap-lg-3">
+  <!-- One Image -->
+  <div class="single" *ngIf="post?.imagesList?.length === 1">
+    <app-img-preview
+      *ngIf="post.imagesList[0]?.imageUrl"
+      [src]="post.imagesList[0]?.imageUrl"
+      classes="w-100 h-100"
+    ></app-img-preview>
+  </div>
+
+  <!-- Two Images -->
+  <div class="single d-flex gap-2" *ngIf="post?.imagesList?.length === 2">
+    <div class="small-images" *ngIf="post.imagesList[0]?.imageUrl">
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[0]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(0)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[1]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(1)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three Images -->
+  <div class="single d-grid gap-3" *ngIf="post?.imagesList?.length === 3">
+    <div class="large-image" *ngIf="post.imagesList[0]?.imageUrl">
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[0]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(0)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+    </div>
+    <div class="small-images" *ngIf="post.imagesList[1]?.imageUrl">
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[1]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(1)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[2]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(2)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Four Images -->
+  <div class="single d-grid gap-3" *ngIf="post?.imagesList?.length === 4">
+    <div class="small-images" *ngIf="post.imagesList[0]?.imageUrl">
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[0]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(0)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[1]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(1)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+    </div>
+    <div class="small-images" *ngIf="post.imagesList[2]?.imageUrl">
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[2]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(2)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+      <div class="img-preview rounded-3">
+        <img
+          loading="lazy"
+          data-src="{{ post.imagesList[3]?.imageUrl }}"
+          class="w-100 h-100 rounded-3 image-render"
+          alt="preview-img"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+
+        <div
+          class="icon-eye d-flex flex-column justify-content-center align-items-center c-icon-color icon-container"
+          (click)="openImagePreview(3)"
+        >
+          <fa-icon [icon]="['fas', 'eye']" class="font-28-px" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="currentIndex"
+  class="img-preview-full-screen d-flex flex-column justify-content-center align-items-center p-5 c-icon-color"
+>
+  <!-- <div class="position-relative">
+  </div> -->
+  <fa-icon
+    [icon]="['fas', 'xmark']"
+    class="c-pointer close-icon font-40-px float-end"
+    (click)="closeImagePreview()"
+  />
+  <div class="w-100" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+    <ngb-carousel [activeId]="currentIndex" [interval]="0" (slide)="onSlide($event)">
+      <ng-template
+        ngbSlide
+        *ngFor="let img of post?.imagesList; let index = index"
+        id="{{ index }}"
+      >
+        <img
+          [src]="img.imageUrl"
+          class="d-block w-100 rounded-3 image-preview"
+          alt="Image {{ index + 1 }}"
+          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+        />
+      </ng-template>
+    </ngb-carousel>
+  </div>  
+</div>

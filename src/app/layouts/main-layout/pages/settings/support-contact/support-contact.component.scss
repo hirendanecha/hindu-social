@@ -1,0 +1,44 @@
+:host {
+  h5 {
+    text-transform: none;
+  }
+  .custom-input-area {
+    width: 100%;
+    border-radius: 10px;
+    padding: 15px 20px;
+    background-color: var(--box-1st-color);
+    color: var(--heading-1st-color) !important;
+    &:focus-within {
+      outline: 1px solid var(--primary-color);
+      border-color: transparent;
+      color: var(--heading-1st-color) !important;
+    }
+    &.second {
+      padding: 6px 10px;
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      input {
+        font-size: 16px;
+      }
+    }
+    i {
+      color: var(--para-3rd-color);
+    }
+    input,
+    textarea {
+      border-radius: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--heading-1st-color) !important;
+
+      &::placeholder {
+        opacity: 0.5;
+        color: #a6acd1;
+      }
+    }
+  }
+  .device{
+    width: min-content;
+  }
+}

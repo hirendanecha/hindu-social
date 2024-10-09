@@ -5,7 +5,7 @@
     !post?.hide &&
     (post?.postdescription ||
       post?.metadescription ||
-      post?.imageUrl ||
+      post?.imagesList?.length ||
       post?.pdfUrl ||
       post.parentPostId)
   "
@@ -46,11 +46,11 @@
                 class="d-flex align-items-center"
                 (mouseover)="showHoverBox = true"
               >
-                {{ (post?.Username || post?.FirstName).split(" ").join("") }}
+                {{ (post?.Username || post?.FirstName)?.split(" ")?.join("") }}
                 <!-- [ngbTooltip]="post.postcreationdate | date : ' h:mm a MMM d, y'" -->
                 <div>
                   <fa-icon
-                    class="ms-2 me-1 font-12-px cursor"
+                    class="ms-2 me-sm-1 font-12-px cursor"
                     [icon]="['fas', 'clock']"
                     placement="bottom"
                   />
@@ -92,20 +92,20 @@
                 alt="avatar"
               />
               <div class="d-flex gap-3 align-items-baseline">
-              <p class="cursor mt-2">
-                {{ (post?.Username || post?.FirstName).split(" ").join("") }}
-              </p>
-
-              <button>
-                <a
-                  class="droplist d-flex align-items-center gap-2"
-                  [appCopyClipboard]="post.Username"
-                >
-                  <fa-icon [icon]="['fas', 'copy']" />
+                <a class="h6 cursor mt-2" [href]="webUrl + 'settings/view-profile/' + post.profileid" target="_blank">
+                  &#64;{{ (post?.Username || post?.FirstName)?.split(" ")?.join("") }}
                 </a>
-              </button>
-            </div>
-              
+                
+                <button>
+                  <a
+                    class="droplist d-flex align-items-center gap-2"
+                    [appCopyClipboard]="'@' + post.Username"
+                  >
+                    <fa-icon [icon]="['fas', 'copy']" />
+                  </a>
+                </button>
+              </div>
+
               <div
                 class="d-flex"
                 *ngIf="
@@ -140,7 +140,7 @@
                     <span>Stop See First</span>
                   </a>
                 </button>
-                
+
               </div>
               <div
                 class="d-flex mt-2"
@@ -157,19 +157,19 @@
                     <span>Messaging</span>
                   </a>
                 </button>
-                <!-- <span class="me-2 ms-2">|</span>
+                <span class="me-2 ms-2">|</span>
                 <button *ngIf="!seeFirstList.includes(post.profileid)">
                   <a
                     class="droplist d-flex align-items-center gap-2"
-                    routerLink="/platforms" target="_blank"
-                    
+                    routerLink="/platforms"
+                    target="_blank"
                   >
                     <fa-icon [icon]="['fas', 'table-list']" />
                     <span>Platforms</span>
                   </a>
-                </button>  -->
+                </button>
               </div>
-              
+
               <!-- <div
                 class="d-flex"
                 *ngIf="
@@ -215,7 +215,8 @@
               <button ngbDropdownItem *ngIf="post.streamname">
                 <a
                   class="droplist d-flex align-items-center gap-2"
-                  [href]="tubeUrl + '/video/' + post.id" target="_blank"
+                  [href]="tubeUrl + '/video/' + post.id"
+                  target="_blank"
                 >
                   <fa-icon [icon]="['fas', 'play']" />
                   <span>Large Player</span>
@@ -368,16 +369,46 @@
     </ng-container>
     <p
       class="post-description mdtxt m-0 mt-4 pb-3"
-      [innerHTML]="post.postdescription | noSanitize"
+      [innerHTML]="
+        post?.postdescription
+          | stripHtml
+          | truncate : (showFullDesc ? -1 : 600)
+          | noSanitize" hoverDropdown
     ></p>
+
+    <ng-container *ngIf="(post?.postdescription | stripHtml).length > 600">
+      <button (click)="showFullDescription()" class="text-danger">
+        {{ showFullDesc ? "Read Less" : "Read More" }}
+      </button>
+    </ng-container>
     <ng-container *ngIf="descriptionimageUrl">
-      <app-img-preview [src]="descriptionimageUrl" class="mb-2" classes="w-100" />
+      <app-img-preview
+        [src]="descriptionimageUrl"
+        class="mb-2"
+        classes="w-100"
+      />
     </ng-container>
     <ng-container *ngIf="post.parentPostId">
       <app-re-post-card [id]="post.parentPostId" />
     </ng-container>
-    <ng-container *ngIf="post?.pdfUrl">
+    <ng-container *ngFor="let media of post?.imagesList">
       <!-- <app-pdf-preview [src]="post?.pdfUrl" classes="w-100" /> -->
+      <ng-container *ngIf="media?.pdfUrl">
+        <div (click)="pdfView(media?.pdfUrl)">
+          <div class="d-flex align-items-center">
+            <fa-icon
+              [icon]="['fas', 'file-pdf']"
+              class="c-pointer close-icon font-60-px"
+            />
+            <span class="pdf-name c-pointer">
+              {{ media?.pdfUrl?.split("/")[3]?.replaceAll("%", " ") }}
+            </span>
+          </div>
+        </div>
+        <div class="mb-10"></div>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngIf="post?.pdfUrl">
       <div (click)="pdfView(post?.pdfUrl)">
         <div class="d-flex align-items-center">
           <fa-icon
@@ -385,15 +416,16 @@
             class="c-pointer close-icon font-60-px"
           />
           <span class="pdf-name c-pointer">
-            {{ post.pdfUrl.split("/")[3].replaceAll("%", " ") }}
+            {{ post?.pdfUrl?.split("/")[3]?.replaceAll("%", " ") }}
           </span>
         </div>
       </div>
-      <div class="mb-10"></div>
     </ng-container>
 
     <app-post-meta-data-card [post]="post" />
-
+    <ng-container *ngIf="post?.imagesList">
+      <app-img-layout [post]="post" />
+    </ng-container>
     <ng-container *ngIf="post?.imageUrl">
       <app-img-preview [src]="post?.imageUrl" classes="w-100" />
     </ng-container>
@@ -433,28 +465,27 @@
         {{ post?.likescount > 0 ? post?.likescount : 0 }}
         <p class="d-lg-block d-none m-0">Likes</p>
       </button>
-      <!-- <div>
-        <div ngbDropdown placement="top-start" class="d-inline-block">
+      <div>
+        <div ngbDropdown class="d-inline-block z-2">
           <button type="button" id="emojiModel" ngbDropdownToggle>
-            <img src="https://s3.us-east-1.wasabisys.com/freedom-social/freedom-emojies/Nerd.gif" width="60" height="60" alt="Emoji">
-            Emojis</button>
+            <img src="https://s3.us-east-1.wasabisys.com/freedom-social/freedom-emojies/Nerd.gif" width="60" height="60" alt="Emoji">Reaction</button>
           <div ngbDropdownMenu aria-labelledby="emojiModel" class="emojiModelStyle">
             <div>
-              <button (click)="selectedEmoji(emoji)" *ngFor="let emoji of emojiPaths">
+              <button (click)="selectedEmoji(emoji, post?.id)" *ngFor="let emoji of emojiPaths">
                 <img data-src="{{ emoji }}" loading="eager" class="emoji-style" alt="Emoji" draggable="false">
               </button>
             </div>
           </div>
         </div>
-      </div> -->
-      <button
+      </div>
+      <!-- <button
         class="d-center gap-1 gap-sm-2 mdtxt align-items-center"
         ngbTooltip="Coming Soon!"
         placement="bottom"
       >
         <fa-icon [icon]="['fas', 'message']" class="font-20-px" />
         Video reply
-      </button>
+      </button> -->
       <button
         class="d-center gap-1 gap-sm-2 mdtxt align-items-center"
         data-toggle="tooltip"
@@ -474,13 +505,13 @@
         <img
           loading="lazy"
           data-src="{{ sharedService?.userData?.ProfilePicName }}"
-          class="w-40-px h-40-px rounded-3"
+          class="w-40-px h-40-px rounded-3 d-none d-sm-flex"
           alt="icon"
         />
 
-        <div class="px-3 gap-2 align-items-center w-100">
+        <div class="px-sm-3 gap-2 align-items-center w-100">
           <div [attr.id]="'comment-' + post.id"
-            class="d-flex align-items-baseline custom-width-comment position-relative gap-sm-0 gap-3"
+            class="d-flex align-items-center custom-width-comment position-relative"
           >
             <!-- <div
               #parentPostCommentElement
@@ -497,7 +528,7 @@
               (onDataChange)="onTagUserInputChangeEvent($event, post.id)"
             />
 
-            <div class="d-flex gap-7 gap-sm-2 lign-items-center flex-column-reverse flex-sm-row position-relative">
+            <div class="d-flex gap-2 lign-items-center align-items-center">
               <!-- Emojis -->
               <!-- <div ngbDropdown placement="top-end" class="d-inline-block">
                 <button type="button" id="emojiModel" ngbDropdownToggle title="Emojis">
@@ -586,7 +617,7 @@
                   <div
                     class="d-flex justify-content-between align-items-center w-100"
                   >
-                    <h6 class="m-0">
+                    <h6 class="m-0 text-transform">
                       {{
                         (comment.Username || comment.FirstName)
                           .split(" ")
@@ -613,7 +644,10 @@
                         />
 
                         <div ngbDropdownMenu class="dropdown-menu">
-                          <button ngbDropdownItem *ngIf="comment.profileId == profileId">
+                          <button
+                            ngbDropdownItem
+                            *ngIf="comment.profileId == profileId"
+                          >
                             <a
                               class="droplist d-flex align-items-center gap-2"
                               (click)="editComment(comment)"
@@ -637,10 +671,10 @@
                   </div>
 
                   <ng-container *ngIf="comment?.comment">
-                    <p
-                      class="mdtxt mb-0 comment-description"
-                      [innerHTML]="comment.comment | noSanitize"
-                    ></p>
+                      <p
+                        class="mdtxt mb-0 comment-description"
+                        [innerHTML]="comment.comment | noSanitize" hoverDropdown
+                      ></p>
                     <ng-container *ngIf="comment.descImg">
                       <app-img-preview
                         [src]="comment.descImg"
@@ -661,7 +695,7 @@
                 <ul class="friends-list d-flex gap-6 py-2 px-4 m-0">
                   <li class="d-center">
                     <button
-                      class="d-center gap-1 gap-sm-2 font-12-px"
+                      class="d-center gap-1 gap-sm-2 smtxt"
                       [disabled]="!tokenService.getCredentials()"
                       (click)="
                         comment.react == 'L'
@@ -680,11 +714,11 @@
 
                   <li class="d-center">
                     <button
-                      class="d-center gap-1 gap-sm-2 font-12-px"
+                      class="d-center gap-1 gap-sm-2 smtxt"
                       [disabled]="!tokenService.getCredentials()"
-                      (click)="showReplySection(comment.id)"
+                      (click)="showReplySection('reply', comment)"
                     >
-                      <fa-icon [icon]="['fas', 'message']" class="font-16-px" />
+                      <fa-icon [icon]="['fas', 'message']" class="smtxt" />
                       Reply
                     </button>
                   </li>
@@ -696,9 +730,12 @@
                     post.id === comment.postId &&
                     commentId === comment.id
                   "
-                  class="py-2 px-3 align-items-center w-100 mb-5"
+                  class="py-2 px-sm-3 align-items-center w-100 mb-5"
                 >
-                  <div [attr.id]="'replaycomment-' + post.id" class="d-flex align-items-baseline position-relative custom-width-comment gap-sm-0 gap-2">
+                  <div
+                    [attr.id]="'replaycomment-' + post.id"
+                    class="d-flex align-items-center position-relative custom-width-comment"
+                  >
                     <!-- <div
                       #childPostCommentElement
                       contenteditable
@@ -711,15 +748,19 @@
                       [value]="replaycommentMessageInputValue"
                       [isShowMetaLoader]="true"
                       [isShowEmojis]="true"
-                      (onDataChange)="onTagUserReplayInputChangeEvent($event, post.id)"
+                      (onDataChange)="
+                        onTagUserReplayInputChangeEvent($event, post.id)
+                      "
                     />
-                    <div class="file-input d-flex gap-7 gap-sm-2 align-items-center flex-column-reverse flex-sm-row">
+                    <div class="file-input d-flex align-items-center gap-2">
                       <div class="file-upload d-flex">
                         <label class="file">
                           <input
                             type="file"
                             accept="image/*"
-                            (change)="onPostFileSelect($event, 'child', post.id)"
+                            (change)="
+                              onPostFileSelect($event, 'child', post.id)
+                            "
                           />
                           <span
                             class="file-custom border-0 d-grid text-center"
@@ -761,7 +802,7 @@
 
                 <ng-container *ngIf="comment?.replyCommnetsList?.length">
                   <div
-                    *ngFor="let reply of comment?.replyCommnetsList"
+                    *ngFor="let reply of comment?.replyCommnetsList; let last = last"
                     class="single-comment-area comment-item-nested"
                   >
                     <div
@@ -786,7 +827,7 @@
                           <div
                             class="d-flex justify-content-between align-items-center w-100"
                           >
-                            <h6 class="m-0 align-items-center">
+                            <h6 class="m-0 align-items-center text-transform">
                               {{
                                 (reply.Username || reply.FirstName)
                                   .split(" ")
@@ -816,7 +857,10 @@
                                 />
 
                                 <div ngbDropdownMenu class="dropdown-menu">
-                                  <button ngbDropdownItem *ngIf="reply.profileId == profileId">
+                                  <button
+                                    ngbDropdownItem
+                                    *ngIf="reply.profileId == profileId"
+                                  >
                                     <a
                                       class="droplist d-flex align-items-center gap-2"
                                       (click)="editComment(reply)"
@@ -844,7 +888,7 @@
                           <ng-container *ngIf="reply?.comment">
                             <p
                               class="mdtxt mb-0 comment-description"
-                              [innerHTML]="reply?.comment | noSanitize"
+                              [innerHTML]="reply?.comment | noSanitize" hoverDropdown
                             ></p>
                             <ng-container *ngIf="reply.descImg">
                               <app-img-preview
@@ -866,7 +910,7 @@
                         <ul class="friends-list d-flex gap-6 py-2 px-4 m-0">
                           <li class="d-center">
                             <button
-                              class="d-center gap-1 gap-sm-2 font-12-px"
+                              class="d-center gap-1 gap-sm-2 smtxt"
                               [disabled]="!tokenService.getCredentials()"
                               (click)="
                                 reply.react == 'L'
@@ -882,9 +926,88 @@
                               Likes
                             </button>
                           </li>
+                          <li class="d-center">
+                            <button
+                              class="d-center gap-1 gap-sm-2 smtxt"
+                              [disabled]="!tokenService.getCredentials()"
+                              (click)="showReplySection('parentReplay', reply)"
+                            >
+                              <fa-icon [icon]="['fas', 'message']" class="smtxt" />
+                              Reply
+                            </button>
+                          </li>
                         </ul>
                       </div>
                     </div>
+                    <div
+                    *ngIf="
+                      parentReplayComment &&
+                      post.id === comment.postId &&
+                      commentparentReplayId === reply.id
+                    "
+                    class="py-2 px-sm-3 align-items-center w-100 mb-5"
+                  >
+                    <div
+                      [attr.id]="'replaycomment-' + post.id"
+                      class="d-flex align-items-center position-relative custom-width-comment"
+                    >
+                      <app-tag-user-input
+                        class="comment-emoji"
+                        placeholder="Reply comment"
+                        [value]="replaycommentMessageInputValue"
+                        [isShowMetaLoader]="true"
+                        [isShowEmojis]="true"
+                        (onDataChange)="
+                          onTagUserReplayInputChangeEvent($event, post.id)
+                        "
+                      />
+                      <div class="file-input d-flex align-items-center gap-2">
+                        <div class="file-upload d-flex">
+                          <label class="file">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              (change)="
+                                onPostFileSelect($event, 'child', post.id)
+                              "
+                            />
+                            <span
+                              class="file-custom border-0 d-grid text-center"
+                              role="button"
+                            >
+                              <fa-icon
+                                [icon]="['fas', 'image']"
+                                class="m-0 font-20-px text-primary"
+                              />
+                            </span>
+                          </label>
+                        </div>
+  
+                        <fa-icon
+                          [icon]="['fas', 'paper-plane']"
+                          class="m-0 font-20-px text-primary"
+                          role="button"
+                          (click)="commentOnPost(post.id, comment.id)"
+                        />
+                      </div>
+                    </div>
+                    <ng-container *ngIf="!isParent && commentData?.imageUrl">
+                      <div class="position-relative w-52-px h-52-px mb-2 mt-2">
+                        <img
+                          loading="lazy"
+                          data-src="{{ commentData?.imageUrl }}"
+                          class="w-100 h-100 rounded-4"
+                          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                          alt="icon"
+                        />
+                        <fa-icon
+                          [icon]="['fas', 'xmark']"
+                          class="position-absolute top-0 start-100 translate-middle badge bg-danger p-1 font-12-px c-pointer text-white"
+                          (click)="removePostSelectedFile()"
+                        />
+                      </div>
+                    </ng-container>
+                  </div>
                   </div>
                 </ng-container>
               </div>

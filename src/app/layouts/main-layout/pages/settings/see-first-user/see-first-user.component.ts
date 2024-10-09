@@ -20,14 +20,13 @@ export class SeeFirstUserComponent implements OnInit {
   ) {
     const data = {
       title: 'HinduSocial See First User',
-      url: `${window.location.href}`,
+      url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
   }
 
   ngOnInit(): void {
-    console.log(isPlatformBrowser(this.platformId))
     if (isPlatformBrowser(this.platformId)) {
       this.getSeeFirstUsers();
     }

@@ -44,6 +44,17 @@
             color: var(--para-3rd-color);
           }
         }
+        .ongoing-call {
+          width: 42px;
+          height: 42px;
+          background: var(--ongoing-call);
+          border-radius: 12px;
+          cursor: pointer;
+
+          i {
+            color: var(--para-3rd-color);
+          }
+        }
       }
     }
 
@@ -53,6 +64,29 @@
         overflow: auto;
         top: 30px;
         left: -240px;
+      }
+
+      .ongoing-call {
+        width: 38px;
+        height: 38px;
+        background: var(--ongoing-call);
+        border-radius: 12px;
+        cursor: pointer;
+
+        i {
+          color: var(--para-3rd-color);
+        }
+      }
+
+      .input-area {
+        border: 1px solid var(--font-icon-color) !important;
+        &:focus-within {
+          outline: unset !important;
+        }
+        &::before {
+          content: attr(placeholder);
+          color: var(--font-icon-color);
+        }
       }
     }
   }
@@ -67,7 +101,7 @@
       }
     }
   }
-
+  
 }
 .mobile-view{
   display: flex;

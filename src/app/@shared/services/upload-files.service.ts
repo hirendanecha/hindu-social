@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpEvent, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -36,15 +36,21 @@ export class UploadFilesService {
 
   uploadFile(
     files: File,
+    params?: any
   ): Observable<HttpEvent<any>> {
-    const url = environment.serverUrl
+    const url = `${environment.serverUrl}utils/image-upload`;
     const formData: FormData = new FormData();
     formData.append('file', files);
-    console.log(formData);
+    let queryParams = new HttpParams();
+    if (params) { Object.keys(params).forEach(key => {
+      if (params[key]) {queryParams = queryParams.append(key, params[key])}
+    });
+  }
+  const reqUrl = queryParams.toString() ? `${url}?${queryParams.toString()}` : url;
     const req =
       new HttpRequest(
         'POST',
-        `${url}utils/image-upload`,
+        reqUrl,
         formData,
         {
           reportProgress: true,

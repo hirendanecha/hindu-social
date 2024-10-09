@@ -23,10 +23,10 @@ export class NotificationsComponent {
     private toastService: ToastService,
     private seoService: SeoService,
     private socketService: SocketService
-  ) { 
+  ) {
     const data = {
-      title: 'HinduSocial Notification',
-      url: `${window.location.href}`,
+      title: 'Hindu.social Notification',
+      url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
@@ -70,18 +70,26 @@ export class NotificationsComponent {
         this.toastService.success(
           res.message || 'Notification delete successfully'
         );
-        this.getNotificationList();
+        this.notificationList = this.notificationList.filter(
+          (notification) => notification.id !== id
+        );
+        if (this.notificationList.length <= 6 && this.hasMoreData) {
+          this.notificationList = [];
+          this.loadMoreNotification();
+        }
       },
     });
   }
 
   readUnreadNotification(notification, isRead): void {
-    this.customerService.readUnreadNotification(notification.id, isRead).subscribe({
-      next: (res) => {
-        this.toastService.success(res.message); 
-        notification.isRead = isRead;
-      },    
-    });
+    this.customerService
+      .readUnreadNotification(notification.id, isRead)
+      .subscribe({
+        next: (res) => {
+          this.toastService.success(res.message);
+          notification.isRead = isRead;
+        },
+      });
   }
   loadMoreNotification(): void {
     this.activePage = this.activePage + 1;

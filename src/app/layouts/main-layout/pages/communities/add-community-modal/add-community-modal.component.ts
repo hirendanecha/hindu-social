@@ -1,11 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { debounceTime, forkJoin, fromEvent } from 'rxjs';
@@ -27,7 +20,7 @@ import { PaymentService } from 'src/app/@shared/services/payment.service';
   styleUrls: ['./add-community-modal.component.scss'],
 })
 export class AddCommunityModalComponent implements OnInit, AfterViewInit {
-  @Input() title: string | undefined = 'Apply to be Community';
+  @Input() title: string | undefined = 'Create Community';
   @Input() cancelButtonLabel: string | undefined = 'Cancel';
   @Input() confirmButtonLabel: string | undefined = 'Create';
   @Input() closeIcon: boolean | undefined;
@@ -71,7 +64,6 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
     isApprove: new FormControl('N', [Validators.required]),
     Country: new FormControl('US', [Validators.required]),
     Zip: new FormControl('', Validators.required),
-    address: new FormControl('', Validators.required),
     State: new FormControl('', Validators.required),
     City: new FormControl('', Validators.required),
     County: new FormControl('', Validators.required),
@@ -100,9 +92,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.getAllCountries();
-    this.getCategories();
-    this.getAppointmentCards();
+    this.getAllCountries()
 
     if (this.data.Id) {
       this.communityForm.patchValue({
@@ -116,7 +106,6 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
         Zip: this.data?.Zip,
         State: this.data?.State,
         City: this.data?.City,
-        address: this.data?.City,
         County: this.data?.County,
         logoImg: this.data?.logoImg,
         coverImg: this.data?.coverImg,
@@ -159,9 +148,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
     }
 
     if (this.coverImg?.file?.name) {
-      uploadObs['coverImg'] = this.uploadService.uploadFile(
-        this.coverImg?.file
-      );
+      uploadObs['coverImg'] = this.uploadService.uploadFile(this.coverImg?.file);
     }
 
     if (Object.keys(uploadObs)?.length > 0) {
@@ -172,15 +159,13 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
           if (res?.logoImg?.body?.url) {
             this.logoImg['file'] = null;
             this.logoImg['url'] = res?.logoImg?.body?.url;
-            this.communityForm.get('logoImg').setValue(res?.logoImg?.body?.url);
+            this.communityForm.get('logoImg').setValue(res?.logoImg?.body?.url)
           }
 
           if (res?.coverImg?.body?.url) {
             this.coverImg['file'] = null;
             this.coverImg['url'] = res?.coverImg?.body?.url;
-            this.communityForm
-              .get('coverImg')
-              .setValue(res?.coverImg?.body?.url);
+            this.communityForm.get('coverImg').setValue(res?.coverImg?.body?.url)
           }
 
           this.spinner.hide();
@@ -488,7 +473,7 @@ export class AddCommunityModalComponent implements OnInit, AfterViewInit {
 
   convertToUppercase(event: any) {
     const inputElement = event.target as HTMLInputElement;
-    let inputValue = inputElement.value;   
+    let inputValue = inputElement.value;
     inputValue = inputValue.replace(/\s/g, '');
     inputElement.value = inputValue.toUpperCase();
   }

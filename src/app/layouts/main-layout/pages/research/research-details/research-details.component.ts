@@ -11,7 +11,6 @@ import { TokenStorageService } from 'src/app/@shared/services/token-storage.serv
   styleUrls: ['./research-details.component.scss']
 })
 export class ResearchDetailsComponent {
-
   groupDetails: any = {};
   posts: any = [];
   resources: any = [];
@@ -19,8 +18,9 @@ export class ResearchDetailsComponent {
   pagination: any = {
     page: 1,
     limit: 12,
-  }
-
+  };
+  profileId: number;
+  membersIds = [];
   constructor(
     private profileService: ProfileService,
     private spinner: NgxSpinnerService,
@@ -29,48 +29,64 @@ export class ResearchDetailsComponent {
     public tokenService: TokenStorageService
   ) {
     this.GetGroupBasicDetails();
+    this.profileId = +localStorage.getItem('profileId');
   }
 
   GetGroupBasicDetails(): void {
     this.spinner.show();
-    const uniqueLink = this.route.snapshot.paramMap.get('uniqueLink');
-
-    this.profileService.getGroupBasicDetails(uniqueLink).subscribe({
-      next: (res: any) => {
-        if (res?.ID) {
-          this.groupDetails = res;
-          const data = {
-            title: `HinduSocial Research ${this.groupDetails?.PageTitle}`,
-            url: `${window.location.href}`,
-            description: this.groupDetails?.PageDescription,
-            image: this.groupDetails?.CoverPicName || this.groupDetails?.ProfilePicName
-          };
-          this.seoService.updateSeoMetaData(data);
-          this.GetGroupPostById();
-        }
-        this.spinner.hide();
-      },
-      error: () => {
-        this.spinner.hide();
-      }
+    this.route.paramMap.subscribe((param: any) => {
+      const uniqueLink = param.get('uniqueLink');
+      this.profileService.getGroupBasicDetails(uniqueLink).subscribe({
+        next: (res: any) => {
+          if (res?.ID) {
+            this.groupDetails = res;
+            if (this.groupDetails?.groupMembersList?.length >= 0) {
+              this.membersIds = this.groupDetails?.groupMembersList?.map(
+                (member: any) => member?.profileId
+              );
+            }
+            const data = {
+              title: `Hindu.social Research ${this.groupDetails?.PageTitle}`,
+              url: `${location.href}`,
+              description: this.groupDetails?.PageDescription,
+              image:
+                this.groupDetails?.CoverPicName ||
+                this.groupDetails?.ProfilePicName,
+            };
+            this.seoService.updateSeoMetaData(data);
+            console.log(this.groupDetails);
+            this.GetGroupPostById();
+          }
+          this.spinner.hide();
+        },
+        error: () => {
+          this.spinner.hide();
+        },
+      });
     });
   }
 
   GetGroupPostById(): void {
     this.spinner.show();
 
-    this.profileService.getGroupPostById(this.groupDetails?.ID, this.pagination?.page, this.pagination?.limit).subscribe({
-      next: (res: any) => {
-        if (res?.length > 0) {
-          this.posts = [...this.posts, ...res];
-          this.isLoadMorePosts = res?.length === this.pagination?.limit;
-        }
-        this.spinner.hide();
-      },
-      error: () => {
-        this.spinner.hide();
-      }
-    });
+    this.profileService
+      .getGroupPostById(
+        this.groupDetails?.ID,
+        this.pagination?.page,
+        this.pagination?.limit
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res?.length > 0) {
+            this.posts = [...this.posts, ...res];
+            this.isLoadMorePosts = res?.length === this.pagination?.limit;
+          }
+          this.spinner.hide();
+        },
+        error: () => {
+          this.spinner.hide();
+        },
+      });
   }
 
   GetGroupFileResourcesById(id: string): void {
@@ -85,12 +101,54 @@ export class ResearchDetailsComponent {
       },
       error: () => {
         this.spinner.hide();
-      }
+      },
     });
   }
 
   loadMorePosts(): void {
     this.pagination.page += 1;
     this.GetGroupPostById();
+  }
+
+  joinResearchGroup(): void {
+    this.spinner.show();
+    const data = {
+      researchProfileId: this.groupDetails?.ID,
+      profileId: this.profileId,
+    };
+
+    this.profileService.joinGroup(data).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.spinner.hide();
+          this.GetGroupBasicDetails();
+        }
+      },
+      error: (err) => {
+        console.log(err);
+        this.spinner.hide();
+      },
+    });
+  }
+
+  leaveResearchGroup(): void {
+    this.spinner.show();
+    const data = {
+      researchProfileId: this.groupDetails?.ID,
+      profileId: this.profileId,
+    };
+
+    this.profileService.leaveGroup(data).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.spinner.hide();
+          this.GetGroupBasicDetails();
+        }
+      },
+      error: (err) => {
+        console.log(err);
+        this.spinner.hide();
+      },
+    });
   }
 }

@@ -4,7 +4,7 @@ export default class Utils {
   }
 
   static saveLastLoc() {
-    let str = window.window.location.href;
+    let str = window.location?.href;
     window.sessionStorage.lastloc = str.substring(Utils.getPosition(str, '/', 3));
   }
 

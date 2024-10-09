@@ -46,7 +46,6 @@ export class DeleteAccountComponent implements OnInit {
         error:
           (error) => {
             this.spinner.hide();
-            console.log(error);
           }
       });
   }

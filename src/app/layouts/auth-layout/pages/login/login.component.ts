@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -35,7 +41,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
   captchaToken = '';
   passwordHidden: boolean = true;
   @ViewChild('captcha', { static: false }) captchaElement: ElementRef;
-
   constructor(
     private modalService: NgbModal,
     private router: Router,
@@ -56,17 +61,17 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.msg =
         'Please check your email and click the activation link to activate your account.';
       this.type = 'success';
-      // this.toastService.success(this.msg);
     } else if (isVerify === 'true') {
       this.msg = 'Account activated';
       this.type = 'success';
     }
     const data = {
-      title: 'HinduSocial login',
+      title: 'Hindu.social login',
       url: `${environment.webUrl}login`,
       description: 'login page',
       image: `${environment.webUrl}assets/images/landingpage/HinduSocial-Logo.jpg`,
     };
+    this.theme = localStorage.getItem('theme');
     // this.seoService.updateSeoMetaData(data);
   }
 
@@ -91,7 +96,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
       theme: this.theme === 'dark' ? 'light' : 'dark',
       callback: function (token) {
         localStorage.setItem('captcha-token', token);
-        this.captchaToken=token;
         console.log(`Challenge Success ${token}`);
         if (!token) {
           this.msg = 'invalid captcha kindly try again!';
@@ -100,56 +104,65 @@ export class LoginComponent implements OnInit, AfterViewInit {
       },
     });
   }
-  
+
   togglePasswordVisibility(passwordInput: HTMLInputElement) {
-    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type =
+      passwordInput.type === 'password' ? 'text' : 'password';
     this.passwordHidden = !this.passwordHidden;
   }
 
   onSubmit(): void {
-    this.spinner.show();
-    const token = localStorage.getItem('captcha-token');
+    // const token = localStorage.getItem('captcha-token');
     // if (!token) {
-    //   this.spinner.hide();
     //   this.msg = 'Invalid captcha kindly try again!';
     //   this.type = 'danger';
     //   return;
     // }
-    this.authService.customerlogin(this.loginForm.value).subscribe({
-      next: (data: any) => {
-        this.spinner.hide();
-        if (!data.error) {
-          this.tokenStorage.saveToken(data?.accessToken);
-          this.tokenStorage.saveUser(data.user);
-          localStorage.setItem('profileId', data.user.profileId);
-          localStorage.setItem('communityId', data.user.communityId);
-          localStorage.setItem('channelId', data.user?.channelId);
-          localStorage.setItem('email', data.user?.Email);
-          window.localStorage.user_id = data.user.Id;
-          this.sharedService.getUserDetails();
-          this.isLoginFailed = false;
-          this.isLoggedIn = true;
-          this.socketService.connect();
-          this.toastService.success('Logged in successfully');
-          this.router.navigate([`/home`]);
-        } else {
-          this.loginMessage = data.mesaage;
+    if (this.loginForm.valid) {
+      this.spinner.show();
+      this.authService.customerlogin(this.loginForm.value).subscribe({
+        next: (data: any) => {
           this.spinner.hide();
-          this.errorMessage =
-            'Invalid Email and Password. Kindly try again !!!!';
-          this.isLoginFailed = true;
+          if (!data.error) {
+            this.tokenStorage.saveToken(data?.accessToken);
+            this.tokenStorage.saveUser(data.user);
+            localStorage.setItem('profileId', data.user.profileId);
+            localStorage.setItem('communityId', data.user.communityId);
+            localStorage.setItem('channelId', data.user?.channelId);
+            this.sharedService.getUserDetails();
+            this.isLoginFailed = false;
+            this.isLoggedIn = true;
+            this.socketService.connect();
+            this.socketService.socket?.emit('online-users');
+            this.socketService?.socket?.on('get-users', (data) => {
+              data.map((ele) => {
+                if (!this.sharedService.onlineUserList.includes(ele.userId)) {
+                  this.sharedService.onlineUserList.push(ele.userId);
+                }
+              });
+            });
+            this.toastService.success('Logged in successfully');
+            location.reload();
+            this.router.navigate([`/home`]);
+          } else {
+            this.loginMessage = data.mesaage;
+            this.spinner.hide();
+            this.errorMessage =
+              'Invalid Email and Password. Kindly try again !!!!';
+            this.isLoginFailed = true;
+            // this.toastService.danger(this.errorMessage);
+          }
+        },
+        error: (err) => {
+          this.spinner.hide();
+          console.log(err.error);
+          this.errorMessage = err.error.message; //err.error.message;
           // this.toastService.danger(this.errorMessage);
-        }
-      },
-      error: (err) => {
-        this.spinner.hide();
-        console.log(err.error);
-        this.errorMessage = err.error.message; //err.error.message;
-        // this.toastService.danger(this.errorMessage);
-        this.isLoginFailed = true;
-        this.errorCode = err.error.errorCode;
-      },
-    });
+          this.isLoginFailed = true;
+          this.errorCode = err.error.errorCode;
+        },
+      });
+    }
   }
 
   resend() {
@@ -158,12 +171,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: (result: any) => {
           this.msg = result.message;
-          // this.toastService.success(this.msg);
           this.type = 'success';
         },
         error: (error) => {
           this.msg = error.message;
-          // this.toastService.danger(this.msg);
           this.type = 'danger';
         },
       });

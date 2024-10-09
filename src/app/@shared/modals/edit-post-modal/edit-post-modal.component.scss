@@ -1,16 +1,68 @@
-h5 {
-  text-transform: none;
-}
-
-::ng-deep {
-  mention-list {
-    top: 70px !important;
+:host {
+  h5 {
+    text-transform: none;
   }
 
-  .edit-comment-emoji {
-    .select-emaojies {
-      right: 28px !important;
-      top: 10px !important;
+  .c-pdf-show {
+    overflow: hidden;
+    display: -webkit-inline-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    text-overflow: ellipsis;
+  }
+
+  .select-media-post{
+    height: 220px;
+  }
+
+  .edit-post ::ng-deep {
+    app-tag-user-input .tag-input-div {
+      max-height: 300px;
+      overflow-y: auto;
+      div,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      a,
+      span,
+      p {
+        white-space: normal;
+      }
+    }
+  }
+
+  ::ng-deep {
+    mention-list {
+      top: 70px !important;
+    }
+
+    .edit-comment-emoji {
+      .select-emaojies {
+        right: 28px !important;
+        top: 10px !important;
+      }
+    }
+
+    .carousel-item {
+      transition: none;
+    }
+    .carousel-inner .active {
+      display: flex;
+      justify-content: center;
+      transition: none;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+      background-color: gray;
+      top: 65px;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
     }
   }
 }

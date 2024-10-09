@@ -46,8 +46,8 @@
     type="button"
     class="btn btn-sm btn-secondary"
     (click)="submit()"
-    [disabled]="!sharePostData.parentPostId"
-    >
+    [disabled]="!sharePostData?.parentPostId"
+  >
     {{ confirmButtonLabel }}
   </button>
 </div>

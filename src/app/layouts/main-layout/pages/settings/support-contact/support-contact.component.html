@@ -1,0 +1,98 @@
+<div class="single-box p-3 p-lg-5" [formGroup]="reportForm">
+  <h5 class="text-start mt-4">
+    Please report any errors, bugs, issues or suggestions, our team will address
+    ASAP and reply to you.
+  </h5>
+
+  <div class="d-flex flex-column gap-5">
+    <div class="d-flex align-items-center gap-3">
+      <label class="d-flex device" for="Device"
+        >Name<strong class="text-danger">*</strong></label
+      >
+      <input
+        type="text"
+        class="input-area"
+        placeholder="Enter Name"
+        formControlName="name"
+      />
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <label for="Browser">Email<strong class="text-danger">*</strong></label>
+      <input
+        type="email"
+        class="input-area"
+        placeholder="Enter Email"
+        formControlName="email"
+      />
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <div class="d-flex flex-column gap-2">
+      <h6 class="text-start h5">Exact details of how the issue occurred<strong class="text-danger">*</strong></h6>
+      <textarea
+        type="text"
+        class="input-area"
+        rows="3"
+        placeholder="Exact details of how the issue occurred"
+        formControlName="description"
+      ></textarea>
+    </div>
+
+    <div class="col form-group mt-5">
+      <label for="textpostdesc" class="form-label"
+        >Attach Video or Image</label
+      >
+      <div class="d-flex custom-input-area" *ngIf="!selectedFile">
+        <fa-icon
+          [icon]="['fas', 'photo-film']"
+          class="text-primary cursor font-24-px"
+          (click)="uploadImage.click()"
+        ></fa-icon>
+        <input
+          #uploadImage
+          class="d-none"
+          type="file"
+          id="fileInput"
+          accept="image/*,video/*"
+          (change)="onPostFileSelect($event)"
+        />
+      </div>
+      <ng-container *ngIf="selectedFile">
+        <div class="position-relative">
+          <video
+            *ngIf="viewVideoUrl"
+            class="w-100 h-200-px message-media"
+            [src]="viewVideoUrl"
+            controls
+          ></video>
+          <img
+            *ngIf="!viewVideoUrl"
+            loading="lazy"
+            [src]="viewUrl"
+            class="w-200-px h-200-px rounded-4"
+            alt="icon"
+            onerror="this.onerror=null;"
+          />
+          <fa-icon
+            [icon]="['fas', 'xmark']"
+            class="position-absolute top-0 start-100 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
+            role="button"
+            (click)="removeSelectedFile()"
+          ></fa-icon>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <app-inline-loader *ngIf="isFileUploadInProgress" />
+    <button
+      class="btn btn-primary w-100-px"
+      *ngIf="!isFileUploadInProgress"
+      (click)="uploadAttachment()"
+    >
+      Submit
+    </button>
+  </div>
+</div>

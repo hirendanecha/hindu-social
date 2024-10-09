@@ -1,0 +1,27 @@
+.terms-container{
+  padding: 20px;
+  background: var(--section-1st-color);
+  box-shadow: var(--box-shadow);
+  border-radius: 10px;
+
+  b{
+    font-weight: bold;
+  }
+
+  h1{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  h2{
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  ul{
+    li{
+      margin-bottom: 8px;
+    }
+  }
+}

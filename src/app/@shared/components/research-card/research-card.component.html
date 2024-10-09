@@ -41,19 +41,19 @@
     </div>
 
     <div
-      class="d-flex flex-wrap justify-content-start align-items-start mt-2 pt-2 border-top"
+      class="d-flex flex-wrap justify-content-between align-items-center mt-2 pt-2 border-top"
     >
       <a
-        class="link-primary font-12-px w-50 text-start c-pointer"
+        class="link-primary font-14-px text-start c-pointer"
         [appCopyClipboard]="
           webUrl + 'research/post/' + (post?.postID || post?.id)
         "
-        >copy link url</a
+        >copy link</a
       >
       <a
         href="/research/post/{{ post?.id }}"
         target="_blank"
-        class="link-primary font-12-px w-50 text-start c-pointer"
+        class="link-primary font-14-px text-start c-pointer"
         >larger view</a
       >
       <!-- <a href="#" class="link-primary font-12-px w-50 text-start"

@@ -13,7 +13,6 @@ import { RightSidebarComponent } from './components/right-sidebar/right-sidebar.
   styleUrls: ['./main-layout.component.scss'],
 })
 export class MainLayoutComponent {
-
   showButton = false;
   sidebar: any = {
     isShowLeftSideBar: true,
@@ -26,35 +25,47 @@ export class MainLayoutComponent {
     private router: Router,
     private route: ActivatedRoute,
     private offcanvasService: NgbOffcanvas,
-    public breakpointService: BreakpointService,
+    public breakpointService: BreakpointService
   ) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd || event instanceof Scroll),
-      map(() => {
-        let child = this.route.firstChild;
+    this.router.events
+      .pipe(
+        filter(
+          (event) => event instanceof NavigationEnd || event instanceof Scroll
+        ),
+        map(() => {
+          let child = this.route.firstChild;
 
-        while (child) {
-          if (child.firstChild) {
-            child = child.firstChild;
-          } else if (Object.keys(child?.snapshot?.data)?.length > 0) {
-            return child.snapshot.data;
-          } else {
-            return {};
+          while (child) {
+            if (child.firstChild) {
+              child = child.firstChild;
+            } else if (Object.keys(child?.snapshot?.data)?.length > 0) {
+              return child.snapshot.data;
+            } else {
+              return {};
+            }
           }
-        }
 
-        return {};
-      }),
-    ).subscribe((data: any) => {
-      this.sidebar = data;
-    });
+          return {};
+        })
+      )
+      .subscribe((data: any) => {
+        this.sidebar = data;
+      });
   }
 
   openLeftSidebar() {
-		this.offcanvasService.open(this.sidebar?.isShowResearchLeftSideBar ? ResearchSidebarComponent : LeftSidebarComponent, { position: 'start', panelClass: 'w-300-px' });
-	}
+    this.offcanvasService.open(
+      this.sidebar?.isShowResearchLeftSideBar
+        ? ResearchSidebarComponent
+        : LeftSidebarComponent,
+      { position: 'start', panelClass: 'w-300-px' }
+    );
+  }
 
   openRightSidebar() {
-		this.offcanvasService.open(RightSidebarComponent, { position: 'end', panelClass: 'w-300-px' });
-	}
+    this.offcanvasService.open(RightSidebarComponent, {
+      position: 'end',
+      panelClass: 'w-300-px',
+    });
+  }
 }

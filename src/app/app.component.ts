@@ -39,6 +39,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   originalFavicon: HTMLLinkElement;
   currentURL = [];
   isOnCall = false;
+  tagNotificationSound: boolean;
+  messageNotificationSound: boolean;
+  soundEnabled: boolean;
   constructor(
     private sharedService: SharedService,
     private spinner: NgxSpinnerService,
@@ -96,45 +99,54 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.socketService.socket?.on('notification', (data: any) => {
         if (data) {
+          if (data.actionType === 'S') {
+            this.toasterService.danger(data?.notificationDesc);
+            this.logout();
+          }
+          if (
+            data.actionType === 'EC' &&
+            data.notificationByProfileId !== this.profileId &&
+            sessionStorage.getItem('callId')
+          ) {
+            this.sharedService.callId = null;
+            sessionStorage.removeItem('callId');
+            const endCall = {
+              profileId: this.profileId,
+              roomId: data.roomId,
+            };
+            this.socketService?.endCall(endCall);
+          }
+          const userData = this.tokenService.getUser();
+          this.sharedService.getLoginUserDetails(userData);
+          this.sharedService.loginUserInfo.subscribe((user) => {
+            this.tagNotificationSound =
+              user.tagNotificationSound === 'Y' || false;
+            this.messageNotificationSound =
+              user.messageNotificationSound === 'Y' || false;
+          });
           if (data?.notificationByProfileId !== this.profileId) {
             this.sharedService.isNotify = true;
             this.originalFavicon.href = '/assets/images/icon-unread.jpg';
           }
+          this.soundControlService.soundEnabled$.subscribe((soundEnabled) => {
+            this.soundEnabled = soundEnabled;
+          });
           this.notificationId = data.id;
           if (data?.actionType === 'T') {
-            var sound = new Howl({
-              src: [
-                'https://s3.us-east-1.wasabisys.com/freedom-social/freedom-notification.mp3',
-              ],
-            });
             // const notificationSoundOct = JSON.parse(
             //   localStorage.getItem('soundPreferences')
             // )?.notificationSoundEnabled;
-            // if (notificationSoundOct !== 'N') {
-            //   if (sound) {
-            //     sound?.play();
-            //   }
-            // }
-            this.sharedService.loginUserInfo.subscribe((user) => {
-              const tagNotificationSound = user.tagNotificationSound;
-              if (tagNotificationSound === 'Y') {
-                if (sound) {
-                  sound?.play();
-                }
-              }
-            });
+            if (this.tagNotificationSound && this.soundEnabled) {
+              const url =
+                'https://s3.us-east-1.wasabisys.com/freedom-social/freedom-notification.mp3';
+              this.soundIntegration(url);
+            }
           }
           if (
             data?.actionType === 'M' &&
             data?.notificationByProfileId !== this.profileId
           ) {
             this.newRoomCreated.emit(true);
-            var sound = new Howl({
-              src: [
-                'https://s3.us-east-1.wasabisys.com/freedom-social/messageTone.mp3',
-              ],
-              volume: 0.5,
-            });
             // const messageSoundOct = JSON.parse(
             //   localStorage.getItem('soundPreferences')
             // )?.messageSoundEnabled;
@@ -143,14 +155,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             //     sound?.play();
             //   }
             // }
-            this.sharedService.loginUserInfo.subscribe((user) => {
-              const messageNotificationSound = user.messageNotificationSound;
-              if (messageNotificationSound === 'Y') {
-                if (sound) {
-                  sound?.play();
-                }
-              }
-            });
+            if (this.messageNotificationSound && this.soundEnabled) {
+              const url =
+                'https://s3.us-east-1.wasabisys.com/freedom-social/messageTone.mp3';
+              this.soundIntegration(url);
+            }
             this.toasterService.success(data?.notificationDesc);
             return this.sharedService.updateIsRoomCreated(true);
           }
@@ -190,13 +199,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 roomId: data.roomId || null,
                 groupId: data.groupId || null,
               };
-              if (!window.document.hidden) {
+              if (
+                !window.document.hidden &&
+                this.sharedService.isCorrectBrowserSession()
+              ) {
                 const callIdMatch = data.link.match(/callId-\d+/);
                 const callId = callIdMatch ? callIdMatch[0] : data.link;
-                this.router.navigate([`/buzz-call/${callId}`], {
+                this.router.navigate([`/facetime/${callId}`], {
                   state: { chatDataPass },
                 });
-                // this.router.navigate([`/buzz-call/${data.link}`]);
+                // this.router.navigate([`/facetime/${data.link}`]);
               }
               // window.open(`appointment-call/${data.link}`, '_blank');
               // window?.open(data?.link, '_blank');
@@ -260,6 +272,44 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 3000);
     }
   }
+
+  soundIntegration(soundUrl: string): void {
+    var sound = new Howl({
+      src: [soundUrl],
+      volume: 0.5,
+    });
+    if (sound) {
+      sound?.play();
+    }
+  }
+
+  logout(): void {
+    // this.isCollapsed = true;
+    this.socketService?.socket?.emit('offline', (data) => {
+      return;
+    });
+    this.socketService?.socket?.on('get-users', (data) => {
+      data.map((ele) => {
+        if (!this.sharedService.onlineUserList.includes(ele.userId)) {
+          this.sharedService.onlineUserList.push(ele.userId);
+        }
+      });
+      // this.onlineUserList = data;
+    });
+    this.customerService.logout().subscribe({
+      next: (res) => {
+        this.tokenService.clearLoginSession(this.profileId);
+        this.tokenService.signOut();
+        return;
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.tokenService.signOut();
+        }
+      },
+    });
+  }
+
   ngOnDestroy(): void {
     this.currentURL = [];
   }

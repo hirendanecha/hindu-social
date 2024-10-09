@@ -8,6 +8,7 @@ import {
 import { CookieService } from 'ngx-cookie-service';
 import { CustomerService } from 'src/app/@shared/services/customer.service';
 import { SharedService } from 'src/app/@shared/services/shared.service';
+import { SocketService } from 'src/app/@shared/services/socket.service';
 import { ToastService } from 'src/app/@shared/services/toast.service';
 import { TokenStorageService } from 'src/app/@shared/services/token-storage.service';
 import { ForgotPasswordComponent } from 'src/app/layouts/auth-layout/pages/forgot-password/forgot-password.component';
@@ -30,10 +31,13 @@ export class ProfileMenusModalComponent {
     private tokenStorageService: TokenStorageService,
     private router: Router,
     private customerService: CustomerService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private socketService: SocketService
   ) {
-    this.userId = +this.tokenStorageService.getUser().Id as any;
-    this.profileId = +localStorage.getItem('profileId');
+    this.sharedService.loggedInUser$.subscribe((data) => {
+      this.userId = data?.UserID;
+      this.profileId = data?.profileId;
+    });
   }
 
   closeMenu(e: MouseEvent, type: string) {
@@ -50,6 +54,9 @@ export class ProfileMenusModalComponent {
         case 'setting':
           this.goToSetting();
           break;
+        case 'support':
+          this.goToSupport();
+          break;
         case 'change-password':
           this.forgotPasswordOpen();
           break;
@@ -64,12 +71,23 @@ export class ProfileMenusModalComponent {
 
   logout(): void {
     // this.isCollapsed = true;
+    this.socketService?.socket?.emit('offline', (data) => {
+      return;
+    });
+    this.socketService?.socket?.on('get-users', (data) => {
+      data.map((ele) => {
+        if (!this.sharedService.onlineUserList.includes(ele.userId)) {
+          this.sharedService.onlineUserList.push(ele.userId);
+        }
+      });
+    });
     this.customerService.logout().subscribe({
       next: (res) => {
+        this.tokenStorageService.clearLoginSession(this.profileId);
         this.tokenStorageService.signOut();
-        console.log(res);
+        return;
       },
-      error(err) {
+      error: (err) => {
         if (err.status === 401) {
           this.tokenStorageService.signOut();
         }
@@ -88,6 +106,9 @@ export class ProfileMenusModalComponent {
   goToViewProfile() {
     // window.open(`settings/view-profile/${profileId}`, '_blank')
     this.router.navigate([`settings/view-profile/${this.profileId}`]);
+  }
+  goToSupport() {
+    this.router.navigate([`/report-bugs`]);
   }
 
   forgotPasswordOpen() {

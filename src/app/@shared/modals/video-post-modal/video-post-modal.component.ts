@@ -11,10 +11,10 @@ import {
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../services/toast.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { PostService } from '../../services/post.service';
 import { forkJoin } from 'rxjs';
 import { SocketService } from '../../services/socket.service';
 import { HttpEventType } from '@angular/common/http';
+import { UploadFilesService } from '../../services/upload-files.service';
 
 @Component({
   selector: 'app-video-post-modal',
@@ -57,15 +57,13 @@ export class VideoPostModalComponent implements AfterViewInit {
     public activeModal: NgbActiveModal,
     private toastService: ToastService,
     private spinner: NgxSpinnerService,
-    private postService: PostService,
     private socketService: SocketService,
+    private uploadFilesService: UploadFilesService,
     private cdr: ChangeDetectorRef
   ) {
     this.postData.profileid = localStorage.getItem('profileId');
-    // console.log('profileId', this.postData.profileid);
   }
   ngAfterViewInit(): void {
-    // console.log('editPreview', this.post);
     if (this.post) {
       this.postData.id = this.post.id;
       this.postData.profileid = this.post.profileid;
@@ -152,14 +150,13 @@ export class VideoPostModalComponent implements AfterViewInit {
             if (this.postData?.file1?.name || this.postData?.file2?.name) {
               if (this.postData?.file1?.name) {
                 this.isProgress = true;
-                this.postService.uploadFile(this.postData?.file1).subscribe((event) => {
+                this.uploadFilesService.uploadFile(this.postData?.file1).subscribe((event) => {
                   if (event.type === HttpEventType.UploadProgress) {
                     this.streamnameProgress = Math.round(
                       (100 * event.loaded) / event.total
                     );
                     this.cdr.markForCheck();
                     this.progressValue = this.streamnameProgress;
-                    // console.log(`Streamname Progress: ${this.streamnameProgress}%`);
                   } else if (event.type === HttpEventType.Response) {
                     if (event.body?.url) {
                       this.postData['file1'] = null;
@@ -177,14 +174,11 @@ export class VideoPostModalComponent implements AfterViewInit {
                 if (this.postData.id) {
                   this.spinner.show();
                 }
-                this.postService.uploadFile(this.postData?.file2).subscribe((event) => {
+                this.uploadFilesService.uploadFile(this.postData?.file2).subscribe((event) => {
                   if (event.type === HttpEventType.UploadProgress) {
                     this.thumbfilenameProgress = Math.round(
                       (100 * event.loaded) / event.total
                     );
-                    // console.log(
-                    //   `Thumbfilename Progress: ${this.thumbfilenameProgress}%`
-                    // );
                   } else if (event.type === HttpEventType.Response) {
                     if (event.body?.url) {
                       this.postData['file2'] = null;
@@ -257,36 +251,16 @@ export class VideoPostModalComponent implements AfterViewInit {
       this.postData.keywords &&
       this.postData.albumname
     ) {
-      console.log('post-data', this.postData);
       this.spinner.hide();
       this.activeModal.close();
-      this.socketService.createOrEditPost(this.postData
-      //   , (data) => {
-      //   this.spinner.hide();
-      //   this.toastService.success('Post created successfully.');
-      //   this.postData = null;
-      //   return data;
-      // }
-      );
-      // this.postService.createVideoPost(this.postData).subscribe({
-      //   next: (res: any) => {
-      // this.spinner.hide()
-      //   }, error: (error) => {
-      //     this.spinner.hide()
-      //     console.log(error);
-      //   }
-      // })
-    } else {
-      // this.toastService.danger('Please enter mandatory fields(*) data.');
-    }
+      this.socketService.createOrEditPost(this.postData);
+    } 
   }
 
   onSelectedVideo(event: any) {
     if (event.target?.files?.[0].type.includes('video/mp4')) {
       this.postData.file1 = event.target?.files?.[0];
       this.selectedVideoFile = URL.createObjectURL(event.target.files[0]);
-    } else {
-      // this.toastService.warring('please upload only mp4 files');
     }
   }
   onFileSelected(event: any) {
@@ -303,15 +277,13 @@ export class VideoPostModalComponent implements AfterViewInit {
 
   onvideoPlay(e: any): void {
     this.postData.videoduration = e?.target?.duration;
-    // console.log('videoduration', e?.target?.duration);
   }
 
   onChangeTag(event) {
-    this.postData.keywords = event.target.value.replaceAll(' ', ',').replaceAll(/\s*,+\s*/g, ',').replaceAll(/\s*,+\s*/g, ',');
+    this.postData.keywords = event.target.value.replaceAll(' ', ',').replaceAll(/\s*,+\s*/g, ',');
   }
 
   stopUploadVideo(){
-    // this.postData = null
     this.activeModal.close()
     location.reload();
   }

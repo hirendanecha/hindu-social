@@ -1,4 +1,6 @@
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SafePipe } from './safe.pipe';
 import { GetImageUrlPipe } from './get-image-url.pipe';
 import { CommaSeperatePipe } from './comma-seperate.pipe';
 import { DateDayPipe } from './date-day.pipe';
@@ -8,8 +10,7 @@ import { MessageDatePipe } from './message-date.pipe';
 import { SearchFilterPipe } from './search-filter.pipe';
 import { HighlightPipe } from './hightlight-text.pipe';
 import { RandomAdvertisementUrlPipe } from './random-advertisement.pipe';
-import { NgModule } from "@angular/core";
-import { SafePipe } from "./safe.pipe";
+import { StripHtmlPipe, TruncatePipe } from './post-description.pipe';
 
 @NgModule({
   declarations: [
@@ -22,9 +23,13 @@ import { SafePipe } from "./safe.pipe";
     MessageDatePipe,
     SearchFilterPipe,
     HighlightPipe,
-    RandomAdvertisementUrlPipe],
+    RandomAdvertisementUrlPipe,
+    TruncatePipe,
+    StripHtmlPipe
+  ],
   imports: [CommonModule],
-  exports: [ SafePipe,
+  exports: [
+    SafePipe,
     GetImageUrlPipe,
     CommaSeperatePipe,
     DateDayPipe,
@@ -33,6 +38,9 @@ import { SafePipe } from "./safe.pipe";
     MessageDatePipe,
     SearchFilterPipe,
     HighlightPipe,
-    RandomAdvertisementUrlPipe],
+    RandomAdvertisementUrlPipe,
+    TruncatePipe,
+    StripHtmlPipe
+  ],
 })
-export class PipeModule { }
+export class PipeModule {}

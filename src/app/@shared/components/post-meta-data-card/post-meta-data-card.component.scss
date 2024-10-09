@@ -5,11 +5,21 @@
   .post-description {
     max-width: 630px;
     // line-break: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
     .post-img {
       max-width: 630px;
     }
   }
   .post-meta-description{
     line-break: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }

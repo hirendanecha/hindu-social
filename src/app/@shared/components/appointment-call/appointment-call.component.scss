@@ -6,6 +6,10 @@
 .iframe-model {
   height: calc(89vh - 8px);
   // width: 100vw;
+  @media (max-width: 991px) {
+    height: calc(84vh - 38px);
+    overflow-y: hidden;
+  }
 }
 
 .isLeftSidebarOpen {

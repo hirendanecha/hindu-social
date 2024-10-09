@@ -15,12 +15,11 @@ export class ResearchCardComponent implements AfterViewInit {
   constructor(
     private router: Router
   ) { }
-
+  
   ngAfterViewInit(): void {
   }
 
   openResearchPost(): void {
-    console.log(this.post)
     // this.router.navigate(['/', 'research', 'post', this.post?.postID]);
     const id = this.post?.postID || this.post?.id
     this.router.navigate([`research/post/${id}`]);

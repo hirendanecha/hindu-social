@@ -39,7 +39,7 @@
           <button
             class="btn btn-outline-danger alt third w-80-px"
             (click)="deleteOrLeaveCommunity($event, community.profileId === profileId ? 'my' : 'Leave')"
-          >
+            >
             {{ type === "my" ? "Delete" : "Leave" }}
           </button>
         </ng-container>

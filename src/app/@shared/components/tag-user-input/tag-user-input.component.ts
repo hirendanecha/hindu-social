@@ -14,7 +14,7 @@ import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { CustomerService } from '../../services/customer.service';
 import { PostService } from '../../services/post.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { SocketService } from '../../services/socket.service';
+import { SharedService } from '../../services/shared.service';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { MessageService } from '../../services/message.service';
 import { EmojiPaths } from '../../constant/emoji';
@@ -50,18 +50,22 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
   copyImage: any;
 
   emojiPaths = EmojiPaths;
+  profileId: number;
 
   constructor(
     private renderer: Renderer2,
     private customerService: CustomerService,
     private postService: PostService,
     private spinner: NgxSpinnerService,
-    private socketService: SocketService,
+    private sharedService: SharedService,
     private messageService: MessageService
   ) {
     this.metaDataSubject.pipe(debounceTime(5)).subscribe(() => {
       this.getMetaDataFromUrlStr();
       this.checkUserTagFlag();
+    });
+    this.sharedService.loggedInUser$.subscribe((data) => {
+      this.profileId = data?.profileId;
     });
   }
 
@@ -112,14 +116,15 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
     this.userList = [];
     if (this.isAllowTagUser) {
       let htmlText = this.tagInputDiv?.nativeElement?.innerHTML || '';
-      htmlText = htmlText.replace(/<[^>]*>/g, ' ');
+      htmlText = htmlText.replace(/<[^>]*>/g, '');
 
       const atSymbolIndex = htmlText.lastIndexOf('@');
       const validUserName = /^[A-Za-z0-9_]+$/.test('');
       if (atSymbolIndex !== -1) {
         this.userNameSearch = htmlText.substring(atSymbolIndex + 1);
-        if (this.isCustomeSearch && this.userNameSearch.length > 0 && !validUserName) {
-          this.getUserList(this.userNameSearch);
+        // if (this.isCustomeSearch && this.userNameSearch.length > 0 && !validUserName) {
+        if (this.isCustomeSearch && !validUserName) {
+          this.getUserList('');
         } else {
           if (this.userNameSearch.length > 2 && !validUserName) {
             this.getUserList(this.userNameSearch);
@@ -140,14 +145,16 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
       this.onClearFile();
     }
 
-    const text = htmlText.replace(/<br\s*\/?>|<[^>]*>/g, '');
+    const text = htmlText.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
+    const extractedLinks = [...htmlText.matchAll(/<a\s+(?![^>]*\bdata-id=["'][^"']*["'])[^>]*?href=["']([^"']*)["']/gi)]
+    .map(match => match[1]);
     // const matches = text?.match(/(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/);
     const matches = text.match(/(?:https?:\/\/|www\.)[^\s<&]+(?:\.[^\s<&]+)+(?:\.[^\s<]+)?/g);
-    const url = matches?.[0];
+    const url = matches?.[0] || extractedLinks?.[0];
     if (url) {
       if (url !== this.metaData?.url) {
         // this.isMetaLoader = true;
-        this.spinner.show();
+        // this.spinner.show();
         const unsubscribe$ = new Subject<void>();
         this.postService
           .getMetaData({ url })
@@ -233,9 +240,11 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
       const doc = parser.parseFromString(html, 'text/html');
       const walk = (node: Node) => {
         if (node.nodeType === Node.TEXT_NODE) {
-          const regex = new RegExp(`@${userName}`, 'g');
+          const regex = /@(\w*)/g;
           const replacement = `<a href="/settings/view-profile/${userId}" class="text-danger" data-id="${userId}">@${displayName}</a>`;
-          const replacedText = node.nodeValue?.replace(regex, replacement);
+          let replacedText = node.nodeValue?.replace(regex, replacement);
+          const textRegex = new RegExp(`(?<=<\/a>)${userName}`, 'g');
+          replacedText = replacedText?.replace(textRegex, '');
           if (replacedText !== node.nodeValue) {
             const span = document.createElement('span');
             span.innerHTML = replacedText!;
@@ -271,7 +280,7 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
         .subscribe({
           next: (res: any) => {
             if (res?.data?.length > 0) {
-              this.userList = res.data.map((e) => e);
+              this.userList = res.data.filter((user) => user.Id !== this.profileId);                    
             } else {
               this.clearUserSearchData();
             }
@@ -324,7 +333,7 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
       this.value = `${htmlText}`.replace(
         /(?:<div><br><\/div>\s*)+/gi,
         '<div><br></div>'
-      );
+      ).replace( /<a\s+(?![^>]*\bdata-id=["'][^"']*["'])[^>]*>(.*?)<\/a>/gi,'$1');
       this.onDataChange?.emit({
         html: this.value,
         tags: this.tagInputDiv?.nativeElement?.children,

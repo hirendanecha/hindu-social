@@ -31,6 +31,8 @@ export class LeftSidebarComponent implements OnInit {
     isShowResearchLeftSideBar: false,
   };
   profileId: number
+  linkMetaData: {}
+  communitySlug = ''
   originalFavicon: HTMLLinkElement;
   constructor(
     private modalService: NgbModal,
@@ -95,7 +97,6 @@ export class LeftSidebarComponent implements OnInit {
 
   notificationNavigation() {
     this.closeSidebar();
-    this.originalFavicon.href = '/assets/images/default-profile.jpg';
     if (this.isRead === 'N') {
       localStorage.setItem('isRead', 'Y');
       this.sharedService.isNotify = false;

@@ -34,63 +34,48 @@
               class="btn btn-sm btn-primary me-2"
               (click)="editCommunity(communityDetails)"
             >
-              Edit
-              {{
-                communityDetails?.pageType === "community"
-                  ? "Helth-practitioner"
-                  : "page"
-              }}
+              Edit {{ communityDetails?.pageType }}
             </button>
           </ng-container>
           <!-- {{ communityDetails?.pageType }} -->
           <ng-container *ngIf="communityDetails?.pageType === 'page'">
-            <ng-container
-              *ngIf="
-                communityDetails?.memberIds?.includes(+profileId);
-                else elseJoinCommunity
-              "
-            >
-              <!-- <ng-container
-              *ngIf="
-                communityDetails?.profileId === +profileId;
-                else elseLeaveCommunity
-              "
-            >
-              <button class="btn btn-sm btn-danger" (click)="deleteCommunity()">
-                Delete {{ communityDetails?.pageType }}
-              </button>
-            </ng-container> -->
+          <ng-container
+            *ngIf="
+              communityDetails?.memberIds?.includes(+profileId);
+              else elseJoinCommunity
+            "
+          >
+            <!-- <ng-container
+            *ngIf="
+              communityDetails?.profileId === +profileId;
+              else elseLeaveCommunity
+            "
+          >
+            <button class="btn btn-sm btn-danger" (click)="deleteCommunity()">
+              Delete {{ communityDetails?.pageType }}
+            </button>
+          </ng-container> -->
 
-              <ng-template #elseLeaveCommunity>
-                <button
-                  class="btn btn-sm btn-danger"
-                  (click)="removeFromCommunity()"
-                >
-                  Leave
-                  {{
-                    communityDetails?.pageType === "community"
-                      ? "Helth-practitioner"
-                      : "page"
-                  }}
-                </button>
-              </ng-template>
-            </ng-container>
-
-            <ng-template #elseJoinCommunity>
+            <ng-template #elseLeaveCommunity>
               <button
-                class="btn btn-sm btn-success"
-                (click)="joinCommunity()"
-                [disabled]="buttonClicked"
+                class="btn btn-sm btn-danger"
+                (click)="removeFromCommunity()"
               >
-                Join
-                {{
-                  communityDetails?.pageType === "community"
-                    ? "Helth-practitioner"
-                    : "page"
-                }}
+                Leave {{ communityDetails?.pageType }}
               </button>
-            </ng-template>
+            </ng-template>  
           </ng-container>
+
+          <ng-template #elseJoinCommunity>
+            <button
+              class="btn btn-sm btn-success"
+              (click)="joinCommunity()"
+              [disabled]="buttonClicked"
+            >
+              Join {{ communityDetails?.pageType }}
+            </button>
+          </ng-template>
+        </ng-container>
         </div>
       </div>
     </div>
@@ -124,47 +109,47 @@
           >
         </li>
         <ng-container
-          *ngIf="
-            communityDetails.profileId === +profileId &&
-            communityDetails.pageType === 'community'
+        *ngIf="
+          communityDetails.profileId === +profileId &&
+          communityDetails.pageType === 'community'
+        "
+      >
+        <li
+          class="nav-item"
+          role="presentation"
+          (click)="
+            activeCommunityTab = 3; getAppoinments(communityDetails.profileId)
           "
         >
-          <li
-            class="nav-item"
-            role="presentation"
-            (click)="
-              activeCommunityTab = 3; getAppoinments(communityDetails.profileId)
-            "
+          <a
+            class="nav-link d-center"
+            [ngClass]="activeCommunityTab === 3 ? 'active' : ''"
+            >Appointments</a
           >
-            <a
-              class="nav-link d-center"
-              [ngClass]="activeCommunityTab === 3 ? 'active' : ''"
-              >Appointments</a
-            >
-          </li>
-          <li
-            class="nav-item"
-            role="presentation"
-            (click)="activeCommunityTab = 4"
+        </li>
+        <li
+          class="nav-item"
+          role="presentation"
+          (click)="activeCommunityTab = 4"
+        >
+          <a
+            class="nav-link d-center"
+            [ngClass]="activeCommunityTab === 4 ? 'active' : ''"
+            >Invoices</a
           >
-            <a
-              class="nav-link d-center"
-              [ngClass]="activeCommunityTab === 4 ? 'active' : ''"
-              >Invoices</a
-            >
-          </li>
-          <li
-            class="nav-item"
-            role="presentation"
-            (click)="activeCommunityTab = 5"
+        </li>
+        <li
+          class="nav-item"
+          role="presentation"
+          (click)="activeCommunityTab = 5"
+        >
+          <a
+            class="nav-link d-center"
+            [ngClass]="activeCommunityTab === 5 ? 'active' : ''"
+            >Change plan</a
           >
-            <a
-              class="nav-link d-center"
-              [ngClass]="activeCommunityTab === 5 ? 'active' : ''"
-              >Change plan</a
-            >
-          </li>
-        </ng-container>
+        </li>
+      </ng-container>
       </ul>
     </div>
   </div>
@@ -235,7 +220,7 @@
   <ng-container
     *ngIf="
       (!communitySlug || communityDetails?.memberIds?.includes(+profileId)) &&
-      tokenService.getToken()
+      tokenService.getCredentials()
     "
   >
     <div class="share-post d-flex gap-3 gap-sm-5 p-3 p-sm-5 mb-5">
@@ -243,24 +228,25 @@
         loading="lazy"
         data-src="{{ sharedService?.userData?.ProfilePicName }}"
         onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
-        class="w-56-px h-56-px rounded-4"
+        class="w-56-px h-56-px d-none d-sm-flex rounded-4"
         alt="icon"
       />
 
       <!-- placeholder="Write something to post.." -->
-      <div class="w-100">
-        <div class="d-flex align-items-center position-relative">
+      <div class="w-100 position-relative">
+        <div class="d-flex align-items-center home-input">
           <app-tag-user-input
             placeholder="Post a link or image or file or let's just talk!"
             [value]="postMessageInputValue"
             [isShowMetaLoader]="true"
+            [isCopyImagePreview]="false"
             [isShowEmojis]="true"
             (onDataChange)="onTagUserInputChangeEvent($event)"
           />
           <button
             class="d-sm-none btn btn-sm btn-primary px-3 py-1 d-flex justify-content-center align-items-center gap-2 float-end ms-1 h-40-px"
             [disabled]="
-              !(postData?.postdescription || postData?.file?.name) ||
+              !(postData?.postdescription || postMediaData?.[0]?.file?.name) ||
               buttonClicked
             "
             (click)="uploadPostFileAndCreatePost()"
@@ -270,136 +256,146 @@
             <fa-icon class="c-icon-color" [icon]="['fas', 'paper-plane']" />
           </button>
         </div>
-        <ng-container *ngIf="postData?.imageUrl">
-          <div class="position-relative w-100-px h-100-px mt-5">
-            <img
-              loading="lazy"
-              data-src="{{ postData?.imageUrl }}"
-              class="w-100 h-100 rounded-4"
-              alt="icon"
-              onerror="this.onerror=null;"
-            />
-            <fa-icon
-              [icon]="['fas', 'xmark']"
-              class="position-absolute top-0 start-100 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
-              role="button"
-              (click)="removePostSelectedFile()"
-            />
-          </div>
+        <ng-container *ngIf="postMediaData[0]">
+            <ngb-carousel [showNavigationIndicators]="false" [interval]="0"
+              [showNavigationArrows]="postMediaData.length > 1">
+            <ng-container *ngFor="let media of postMediaData; let i = index">
+              <ng-template ngbSlide>
+                <div class="d-flex select-media-post align-items-center">
+                  <ng-container *ngIf="media?.imageUrl">
+                    <div class="position-relative mt-5">
+                      <app-img-preview
+                      [src]="media?.imageUrl"
+                      classes="w-300-px h-300-px"
+                    ></app-img-preview>
+                      <fa-icon
+                        [icon]="['fas', 'xmark']"
+                        class="position-absolute top-0 start-100 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
+                        role="button"
+                        (click)="removePostSelectedFile(i)"
+                      />
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="media?.pdfName">
+                    <div class="position-relative mt-5">
+                      <fa-icon
+                        [icon]="['fas', 'file-pdf']"
+                        class="c-pointer close-icon font-40-px"
+                      />
+                      <span class="c-pdf-show">{{ media?.pdfName?.replaceAll('%', ' ') }}</span>
+                      <fa-icon
+                        [icon]="['fas', 'xmark']"
+                        class="position-absolute top-0 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
+                        role="button"
+                        (click)="removePostSelectedFile(i)"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-template>
+            </ng-container>
+          </ngb-carousel>
         </ng-container>
-        <ng-container *ngIf="pdfName">
-          <div class="position-relative w-100-px mt-5">
-            <fa-icon
-              [icon]="['fas', 'file-pdf']"
-              class="c-pointer close-icon font-40-px"
-            />
-            <span class="c-pdf-show">{{ pdfName.replaceAll("%", " ") }}</span>
-            <fa-icon
-              [icon]="['fas', 'xmark']"
-              class="position-absolute top-0 translate-middle badge bg-danger p-1 font-12-px c-pointer c-icon-color"
-              role="button"
-              (click)="removePostSelectedFile()"
-            />
-          </div>
-        </ng-container>
-
-        <ul
-          class="d-flex justify-content-between justify-content-lg-between flex-wrap ps-0 mb-0 gap-1 gap-sm-5 pt-3 pt-sm-5"
-        >
-          <li
-            class="d-flex gap-2 align-items-center"
-            ngbTooltip="Comming Soon!"
-            placement="bottom"
+        <div class="custom-input-area">
+          <ul
+            class="d-flex justify-content-between justify-content-lg-between flex-wrap ps-0 mb-0 gap-1 gap-sm-5 pt-5"
           >
-            <!-- <li
-            class="d-flex gap-2 align-items-center"
-            data-toggle="tooltip"
-            data-placement="bottom"
-            title="Comming Soon!"
-          > -->
-            <fa-icon [icon]="['fas', 'satellite-dish']" class="font-20-px" />
-            <span>Live</span>
-          </li>
-
-          <li
-            class="d-flex align-items-center gap-2 pointer-events"
-            cursor
-            (click)="postImage.click()"
-          >
+            <li
+              class="d-flex gap-2 align-items-center"
+              ngbTooltip="Comming Soon!"
+              placement="bottom"
+            >
+              <!-- <li
+              class="d-flex gap-2 align-items-center"
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Comming Soon!"
+            > -->
+              <fa-icon [icon]="['fas', 'satellite-dish']" class="font-20-px" />
+              <span>Live</span>
+            </li>
+  
+            <li
+              class="d-flex align-items-center gap-2 pointer-events"
+              cursor
+              (click)="openAlertMessageImg(postImage)"
+              >
+              <fa-icon [icon]="['fas', 'image']" class="font-20-px" />
+              <span>Image</span>
+            </li>
             <input
               type="file"
               #postImage
               hidden
+              multiple
               class="d-none"
               accept="image/*"
               (change)="onPostFileSelect($event)"
               [disabled]="postData?.meta?.metaimage"
             />
-            <fa-icon [icon]="['fas', 'image']" class="font-20-px" />
-            <span>Image</span>
-          </li>
-          <li class="d-flex gap-2 align-items-center" (click)="pdfFile.click()">
-            <!-- ngbTooltip="Comming Soon!"
-            placement="bottom" -->
-            <input
-              type="file"
-              #pdfFile
-              hidden
-              class="d-none"
-              accept="application/pdf"
-              (change)="onPostFileSelect($event)"
-              [disabled]="postData?.meta?.metaimage"
-            />
-            <fa-icon [icon]="['fas', 'file']" class="font-20-px" />
-            <span>File</span>
-          </li>
-          <li
-            class="d-flex gap-2 align-items-center"
-            (click)="openAlertMessage()"
-          >
-            <!-- ngbTooltip="Comming Soon!"
-            placement="bottom" -->
-            <fa-icon [icon]="['fas', 'video']" class="font-20-px" />
-            <span>Video</span>
-          </li>
-          <!-- <li class="d-flex align-items-center gap-2" (click)="createPost()">
-            <img
-              src="assets/images/icon/emoji-laughing.png"
-              class="max-un"
-              alt="icon"
-            />
-            <span>Fallings/Activity</span>
-          </li> -->
-          <div
-            class="d-none d-sm-flex btn-area gap-3 w-100 d-flex justify-content-end"
-          >
-            <button
-              class="btn btn-sm btn-secondary px-3 py-1 d-flex justify-content-center align-items-center gap-2"
-              *ngIf="
-                postData?.postdescription ||
-                postData?.file?.name ||
-                postData.imageUrl
-              "
-              (click)="resetPost()"
+            <li class="d-flex gap-2 align-items-center" (click)="pdfFile.click()">
+              <!-- ngbTooltip="Comming Soon!"
+              placement="bottom" -->
+              <input
+                type="file"
+                #pdfFile
+                hidden
+                class="d-none"
+                accept="application/pdf"
+                (change)="onPostFileSelect($event)"
+                [disabled]="postData?.meta?.metaimage"
+              />
+              <fa-icon [icon]="['fas', 'file']" class="font-20-px" />
+              <span>File</span>
+            </li>
+            <li
+              class="d-flex gap-2 align-items-center"
+              (click)="openAlertMessage()"
             >
-              Cancel
-              <fa-icon class="c-icon-color" [icon]="['fas', 'xmark']" />
-            </button>
-
-            <button
-              class="btn btn-sm btn-primary px-3 py-1 d-flex justify-content-center align-items-center gap-2 float-end"
-              [disabled]="
-                !(postData?.postdescription || postData?.file?.name) ||
-                buttonClicked
-              "
-              (click)="uploadPostFileAndCreatePost()"
+              <!-- ngbTooltip="Comming Soon!"
+              placement="bottom" -->
+              <fa-icon [icon]="['fas', 'video']" class="font-20-px" />
+              <span>Video</span>
+            </li>
+            <!-- <li class="d-flex align-items-center gap-2" (click)="createPost()">
+              <img
+                src="assets/images/icon/emoji-laughing.png"
+                class="max-un"
+                alt="icon"
+              />
+              <span>Fallings/Activity</span>
+            </li> -->
+            <div
+              class="d-none d-sm-flex btn-area gap-3 w-100 d-flex justify-content-end"
             >
-              {{ "Post" }}
-
-              <fa-icon class="c-icon-color" [icon]="['fas', 'paper-plane']" />
-            </button>
-          </div>
-        </ul>
+              <button
+                class="btn btn-sm btn-secondary px-3 py-1 d-flex justify-content-center align-items-center gap-2"
+                *ngIf="
+                  postData?.postdescription ||
+                  postMediaData?.[0] ||
+                  postData.imageUrl
+                "
+                (click)="resetPost()"
+              >
+                Cancel
+                <fa-icon class="c-icon-color" [icon]="['fas', 'xmark']" />
+              </button>
+  
+              <button
+                class="btn btn-sm btn-primary px-3 py-1 d-flex justify-content-center align-items-center gap-2 float-end"
+                [disabled]="
+                  !(postData?.postdescription || postMediaData?.[0]) ||
+                  buttonClicked
+                "
+                (click)="uploadPostFileAndCreatePost()"
+              >
+                {{ "Post" }}
+  
+                <fa-icon class="c-icon-color" [icon]="['fas', 'paper-plane']" />
+              </button>
+            </div>
+          </ul>
+        </div>
       </div>
     </div>
   </ng-container>
@@ -425,12 +421,7 @@
 <ng-container
   *ngIf="activeCommunityTab === 2 && communityDetails?.memberList?.length > 0"
 >
-  <ng-container
-    *ngIf="
-      communityDetails?.adminIds?.includes(+profileId) &&
-      communityDetails.pageType === 'page'
-    "
-  >
+  <ng-container *ngIf="communityDetails?.adminIds.includes(+profileId)">
     <span> Add new admin: </span>
     <div class="input-area h-48-px d-flex align-items-center mb-3">
       <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
@@ -550,7 +541,7 @@
               >
                 <a
                   class="droplist d-flex align-items-center gap-2"
-                  (click)="deleteCommunity()"
+                  (click)="deleteOrLeaveCommunity('delete')"
                 >
                   <fa-icon [icon]="['fas', 'trash-can']" />
                   <span>Delete Community</span>
@@ -566,24 +557,17 @@
     <ng-container *ngIf="communityDetails?.profileId === +profileId">
       <button
         class="btn btn-sm btn-danger w-152-px float-end"
-        (click)="deleteCommunity()"
+        (click)="deleteOrLeaveCommunity('delete')"
       >
-        Delete
-        {{
-          communityDetails?.pageType === "community"
-            ? "Helth-practitioner"
-            : "page"
-        }}
+        Delete {{ communityDetails?.pageType }}
       </button>
     </ng-container>
     <ng-container *ngIf="communityDetails?.profileId !== +profileId && communityDetails?.memberIds.includes(+profileId)">
       <button
         class="btn btn-sm btn-danger w-152-px float-end"
-        (click)="removeFromCommunity()"
+        (click)="deleteOrLeaveCommunity('leave')"
       >
-        Leave {{ communityDetails?.pageType === "community"
-        ? "Pages"
-        : "page" }}
+        Leave {{ communityDetails?.pageType }}
       </button>
     </ng-container>
   </div>

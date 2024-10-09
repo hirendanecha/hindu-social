@@ -33,6 +33,8 @@
   --scroll-color: #e41e1d;
   --input-field: #ffff;
   --post-border-color: #2b3b58;
+  --input-text: #000000;
+  --ongoing-call: #5cb85c;
 }
 
 .dark-ui {
@@ -64,6 +66,8 @@
   --scroll-color: #e41e1d;
   --input-field: #ffff;
   --post-border-color: #f3f3f3;
+  --input-text: #000000;
+  --ongoing-call: #5cb85c;
 }
 .cursor {
   cursor: pointer;
@@ -339,7 +343,7 @@ option {
   font-family: var(--body-font) !important;
   color: var(--para-2nd-color);
   font-size: 16px;
-  font-weight: 300;
+  font-weight: 400;
   overflow-wrap: anywhere;
 }
 option {
@@ -447,11 +451,11 @@ li {
   margin-top: -7px;
 }
 .mdtxt {
-  font-size: 16px;
+  font-size: 18px;
   line-height: 22px;
 }
 .smtxt {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 21px;
 }
 
@@ -1028,8 +1032,8 @@ li {
     color: var(--heading-1st-color) !important;
 
     &::placeholder {
-      opacity: 0.5;
-      color: #a6acd1;
+      opacity: 0.8;
+      color: var(--para-2nd-color);
     }
   }
 }
@@ -1098,6 +1102,14 @@ li {
   100% {
     transform: translate(0px, 0px);
   }
+}
+
+.jw-state-idle .jw-controls {
+  background: unset !important;
+}
+
+.jw-controls-backdrop {
+  background: unset !important;
 }
 
 ::-webkit-scrollbar {

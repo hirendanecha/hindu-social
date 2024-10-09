@@ -19,7 +19,9 @@
                 <label class="d-flex form-label">Sound Preferences</label>
                 <div class="d-flex align-items-baseline">
                   <p class="m-1">
-                    Sound for new message<strong>{{isMessageSoundEnabled ? "On" : "Off"}}</strong>
+                    Sound for new message<strong>{{
+                      isMessageSoundEnabled ? "On" : "Off"
+                    }}</strong>
                   </p>
                   <div class="form-switch">
                     <input
@@ -28,7 +30,12 @@
                       type="checkbox"
                       role="switch"
                       id="flexSwitchCheckChecked"
-                      (change)="toggleSoundPreference('messageNotificationSound',isMessageSoundEnabled)"
+                      (change)="
+                        toggleSoundPreference(
+                          'messageNotificationSound',
+                          isMessageSoundEnabled
+                        )
+                      "
                     />
                   </div>
                 </div>
@@ -46,7 +53,12 @@
                       type="checkbox"
                       role="switch"
                       id="flexSwitchCheckChecked"
-                      (change)="toggleSoundPreference('callNotificationSound',isCallSoundEnabled)"
+                      (change)="
+                        toggleSoundPreference(
+                          'callNotificationSound',
+                          isCallSoundEnabled
+                        )
+                      "
                     />
                   </div>
                 </div>
@@ -55,16 +67,19 @@
                 class="c-pointer d-flex align-items-baseline mt-3"
                 (click)="appQrmodal()"
               >
-              <fa-icon [icon]="['fas', 'mobile']" class="font-20-px me-2"/>
+                <fa-icon [icon]="['fas', 'mobile']" class="font-20-px me-2" />
                 <h6 class="d-flex">Buzz Ring App</h6>
               </div>
               <div
-              class="c-pointer d-flex align-items-baseline mt-3"
-              (click)="uniqueLink()"
-            >
-            <fa-icon [icon]="['fas', 'square-plus']" class="font-20-px me-2"/>
-              <h6 class="d-flex">Create Unique Link</h6>
-            </div>
+                class="c-pointer d-flex align-items-baseline mt-3"
+                (click)="uniqueLink()"
+              >
+                <fa-icon
+                  [icon]="['fas', 'square-plus']"
+                  class="font-20-px me-2"
+                />
+                <h6 class="d-flex">Create Unique Link</h6>
+              </div>
             </div>
           </div>
         </div>
@@ -85,12 +100,12 @@
   <div
     class="col-xxl-9 col-11 m-auto col-xl-8 col-lg-8 m-lg-0 p-lg-0 mx-md-0 px-md-0 px-sm-3 bg-color"
   >
-  <ng-container *ngIf="userChat">
-    <app-profile-chats-list
-      [userChat]="userChat"
-      (newRoomCreated)="onNewChatRoom($event)"
-      (selectedChat)="onSelectChat($event)"
-    ></app-profile-chats-list>
-  </ng-container>
+    <ng-container *ngIf="userChat">
+      <app-profile-chats-list
+        [userChat]="userChat"
+        (newRoomCreated)="onNewChatRoom($event)"
+        (selectedChat)="onSelectChat($event)"
+      ></app-profile-chats-list>
+    </ng-container>
   </div>
 </div>

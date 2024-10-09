@@ -52,7 +52,7 @@ export class ForwardChatModalComponent implements OnInit {
     //   next: (res: any) => {
     //     if (res?.data?.length > 0) {
     //       const userList = res.data.filter((user: any) => {
-    //         return user.Id !== this.sharedService?.userData?.Id;
+    //         return user.Id !== this.sharedService?.userData?.profileId;
     //       });
     //       this.userList = userList.filter((user) => {
     //         return !this.addedInvitesList.some(

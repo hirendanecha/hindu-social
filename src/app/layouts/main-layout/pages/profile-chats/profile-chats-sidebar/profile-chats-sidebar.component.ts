@@ -22,7 +22,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { ToastService } from 'src/app/@shared/services/toast.service';
 import { ConferenceLinkComponent } from 'src/app/@shared/modals/create-conference-link/conference-link-modal.component';
-import { UserService } from 'src/app/@shared/services/user.service';
 import { MessageService } from 'src/app/@shared/services/message.service';
 import { EncryptDecryptService } from 'src/app/@shared/services/encrypt-decrypt.service';
 import { CreateGroupModalComponent } from 'src/app/@shared/modals/create-group-modal/create-group-modal.component';
@@ -49,8 +48,8 @@ export class ProfileChatsSidebarComponent
   selectedChatUser: any;
   showUserProfile: boolean = false;
 
-  isMessageSoundEnabled: boolean = true;
-  isCallSoundEnabled: boolean = true;
+  isMessageSoundEnabled: boolean;
+  isCallSoundEnabled: boolean;
   backCanvas: boolean = true;
   isChatLoader = false;
   selectedButton: string = 'chats';
@@ -117,7 +116,7 @@ export class ProfileChatsSidebarComponent
     this.getChatList();
     this.getGroupList();
     this.backCanvas = this.activeCanvas.hasOpenOffcanvas();
-    if (this.chatData) {
+    if (this.chatData && !this.backCanvas) {
       this.checkRoom();
     }
   }
@@ -141,7 +140,7 @@ export class ProfileChatsSidebarComponent
       next: (res: any) => {
         if (res?.data?.length > 0) {
           this.userList = res.data.filter(
-            (user: any) => user.Id !== this.sharedService?.userData?.Id
+            (user: any) => user.Id !== this.sharedService?.userData?.profileId
           );
           this.userList = this.userList.filter(
             (user: any) =>

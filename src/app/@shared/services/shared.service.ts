@@ -15,20 +15,21 @@ export class SharedService {
   userData: any = {};
   notificationList: any = [];
   isNotify = false;
+  linkMetaData: {};
   advertizementLink: any = [];
   onlineUserList: any = [];
   private isRoomCreatedSubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   loginUserInfo = new BehaviorSubject<any>(null);
   loggedInUser$ = this.loginUserInfo.asObservable();
-
+  callId: string;
   constructor(
     public modalService: NgbModal,
     private spinner: NgxSpinnerService,
     private customerService: CustomerService,
-    private route: ActivatedRoute,
     private communityService: CommunityService,
-    private postService: PostService
+    private postService: PostService,
+    private route: ActivatedRoute
   ) {
     this.route.paramMap.subscribe((paramMap) => {
       const name = paramMap.get('name');
@@ -45,14 +46,14 @@ export class SharedService {
 
   changeDarkUi() {
     this.isDark = true;
-    document.body.classList.remove('dark-ui');
+    document?.body.classList.remove('dark-ui');
     // document.body.classList.add('dark-ui');
     localStorage.setItem('theme', 'dark');
   }
 
   changeLightUi() {
     this.isDark = false;
-    document.body.classList.add('dark-ui');
+    document?.body.classList.add('dark-ui');
     // document.body.classList.remove('dark-ui');
     localStorage.setItem('theme', 'light');
   }
@@ -68,22 +69,15 @@ export class SharedService {
   getUserDetails() {
     const profileId = localStorage.getItem('profileId');
     if (profileId) {
-      // const localUserData = JSON.parse(localStorage.getItem('userData'));
-      // if (localUserData?.Id) {
-      //   this.userData = localUserData;
-      // }
-
       this.spinner.show();
-
-      this.customerService.getProfile(profileId).subscribe({
+      this.customerService.getProfile(+profileId).subscribe({
         next: (res: any) => {
           this.spinner.hide();
           const data = res?.data?.[0];
-
           if (data) {
             this.userData = data;
             localStorage.setItem('userData', JSON.stringify(this.userData));
-            this.getLoginUserDetails(this.userData);
+            this.getLoginUserDetails(data);
           }
         },
         error: (error) => {
@@ -107,7 +101,10 @@ export class SharedService {
     this.customerService.getNotificationList(Number(id), data).subscribe({
       next: (res: any) => {
         this.isNotify = false;
-        this.notificationList = res?.data;
+        this.notificationList = res.data.filter((ele) => {
+          ele.notificationToProfileId === id;
+          return ele;
+        });
       },
       error: (error) => {
         console.log(error);
@@ -143,18 +140,17 @@ export class SharedService {
   getMetaDataFromUrlStr(url): void {
     this.postService.getMetaData({ url }).subscribe({
       next: (res: any) => {
-        if (res?.meta?.image) {
-          const urls = res.meta?.image?.url;
-          const imgUrl = Array.isArray(urls) ? urls?.[0] : urls;
-          const linkMetaData = {
-            title: res?.meta?.title,
-            metadescription: res?.meta?.description,
-            metaimage: imgUrl,
-            metalink: res?.meta?.url || url,
-            url: url,
-          };
-          this.advertizementLink?.push(linkMetaData);
-        }
+        const meta = res?.meta;
+        const urls = meta?.image?.url;
+        const imgUrl = Array.isArray(urls) ? urls?.[0] : urls;
+        const linkMetaData = {
+          title: meta?.title,
+          metadescription: meta?.description,
+          metaimage: imgUrl,
+          metalink: meta?.url || url,
+          url: url,
+        };
+        this.advertizementLink.push(linkMetaData);
       },
       error: (err) => {
         console.log(err);
@@ -171,5 +167,19 @@ export class SharedService {
 
   getLoginUserDetails(userData: any = {}) {
     this.loginUserInfo.next(userData);
+  }
+
+  generateSessionKey(): void {
+    const sessionKey = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    sessionStorage.setItem('uniqueSessionKey', sessionKey);
+  }
+
+  isCorrectBrowserSession(): boolean {
+    const sessionKey = sessionStorage.getItem('uniqueSessionKey');
+    if (sessionKey) {
+      sessionStorage.removeItem('uniqueSessionKey');
+      return true;
+    }
+    return false;
   }
 }

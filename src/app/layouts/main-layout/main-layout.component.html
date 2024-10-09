@@ -1,10 +1,12 @@
 <app-header />
 
-<div class="main-content d-flex justify-content-start align-items-start">
+<div class="main-content d-flex justify-content-start align-items-start p-0">
   <div [ngClass]="!sidebar?.isShowChatModule ? 'container' : 'w-100'">
-    <div class="d-lg-flex d-block w-100 gap-5 main-layout"
-      [ngClass]="!sidebar?.isShowChatModule ? 'pt-5' : 'pt-0'">
-      <ng-container *ngIf="sidebar?.isShowLeftSideBar && (breakpointService?.screen | async).lg.gatherThen">
+    <div class="d-lg-flex d-block w-100 gap-5 main-layout" [ngClass]="!sidebar?.isShowChatModule ? 'pt-5' : 'pt-0'">
+      <ng-container *ngIf="
+          sidebar?.isShowLeftSideBar &&
+          (breakpointService?.screen | async).lg.gatherThen
+        ">
         <div class="my-profile-sidebar min-vh-100">
           <ng-container *ngIf="!sidebar?.isShowResearchLeftSideBar">
             <app-left-sidebar />
@@ -20,7 +22,10 @@
         <router-outlet />
       </div>
 
-      <ng-container *ngIf="sidebar?.isShowRightSideBar && (breakpointService?.screen | async).xl.gatherThen">
+      <ng-container *ngIf="
+          sidebar?.isShowRightSideBar &&
+          (breakpointService?.screen | async).xxl.gatherThen
+        ">
         <div class="my-list-sidebar min-vh-100">
           <app-right-sidebar />
         </div>
@@ -30,3 +35,4 @@
 </div>
 
 <!-- <app-footer /> -->
+ 

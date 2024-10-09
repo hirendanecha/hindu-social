@@ -1,35 +1,37 @@
-<div class="d-flex flex-column flex-lg-row w-100 gap-5 edit-profile">
-  <app-img-picker
-    classes="w-300-px h-300-px"
-    [url]="customer.ProfilePicName"
-    (onFileChange)="onProfileImgChange($event)"
-  />
-
-  <div class="d-flex flex-column mb-5 w-100">
+<div class="d-flex flex-column gap-5 edit-profile">
+  <div class="d-flex flex-column flex-md-row gap-5">
     <app-img-picker
-      classes="w-100 h-300-px"
-      defaultImg="/assets/images/profile-cover.png"
-      [url]="customer.CoverPicName"
-      (onFileChange)="onProfileCoverImgChange($event)"
-    />
+      classes="w-300-px h-300-px"
+      [url]="editForm.get('ProfilePicName')?.value"
+      (onFileChange)="onProfileImgChange($event)"
+    ></app-img-picker>
 
-    <div class="single-box p-5 mt-5">
+    <app-img-picker
+      class="w-100"
+      classes="h-300-px"
+      defaultImg="/assets/images/profile-cover.png"
+      [url]="editForm.get('CoverPicName')?.value"
+      (onFileChange)="onProfileCoverImgChange($event)"
+    ></app-img-picker>
+  </div>
+
+  <div class="d-flex flex-column flex-md-row gap-md-5">
+    <div class="single-box p-5 w-100">
       <form
-        id="loginForm"
+        [formGroup]="editForm"
+        id="editForm"
         class="form-dark"
         ngNativeValidate
         autocomplete="off"
       >
-        <!-- (ngSubmit)="confirmAndUpdateCustomer()" -->
         <div class="row">
           <div class="col-12 col-md-6 mb-3">
             <label class="d-flex form-label">First Name</label>
             <input
               type="text"
               class="input-area"
-              name="fname"
+              formControlName="FirstName"
               placeholder="Enter Your Name"
-              [(ngModel)]="customer.FirstName"
             />
           </div>
           <div class="col-12 col-md-6 mb-3">
@@ -37,9 +39,8 @@
             <input
               type="text"
               class="input-area"
-              name="lname"
+              formControlName="LastName"
               placeholder="Enter Your Name"
-              [(ngModel)]="customer.LastName"
             />
           </div>
         </div>
@@ -50,25 +51,21 @@
             >
             <input
               type="text"
-              name="uname"
               class="input-area"
+              formControlName="Username"
               placeholder="Enter your Username"
-              [(ngModel)]="customer.Username"
               (keyup)="onChangeTag($event)"
             />
           </div>
           <div class="col-12 col-md-6 mb-3">
-            <label class="d-flex form-label align-items-center"
-              >Email<span class="font-12-px ms-2">(not editable)</span></label
-            >
-
+            <label class="d-flex form-label align-items-center">
+              Email<span class="font-12-px ms-2">(not editable)</span>
+            </label>
             <input
               type="text"
-              name="email"
               class="input-area"
+              formControlName="Email"
               placeholder="Enter your email"
-              [(ngModel)]="userMail"
-              disabled
             />
           </div>
         </div>
@@ -77,11 +74,9 @@
             <label class="d-flex form-label">Country</label>
             <select
               id="country"
-              name="country"
               class="input-area w-100"
-              [(ngModel)]="customer.Country"
+              formControlName="Country"
             >
-              <option value="">Select Country</option>
               <option
                 [value]="item.country_code"
                 *ngFor="let item of allCountryData"
@@ -95,10 +90,8 @@
             <input
               type="text"
               class="input-area"
+              formControlName="Zip"
               placeholder="Enter your zip code"
-              [(ngModel)]="customer.Zip"
-              name="zip"
-              #zipCode
               (input)="convertToUppercase($event)"
             />
           </div>
@@ -109,82 +102,128 @@
             <input
               type="text"
               class="input-area"
+              formControlName="State"
               placeholder="Enter your state"
-              name="state"
-              [(ngModel)]="customer.State"
             />
           </div>
           <div class="col-12 col-md-6 mb-3">
             <label class="d-flex form-label">City</label>
-            <!-- <input
-              type="text"
-              class="input-area"
-              name="city"
-              placeholder="Enter your city"
-              disabled
-              [(ngModel)]="customer.City"
-            /> -->
-
             <input
               type="text"
               class="input-area"
-              name="County"
+              formControlName="City"
               placeholder="Enter your city"
-              [(ngModel)]="customer.County"
             />
           </div>
         </div>
+
         <div class="row">
           <div class="col-6 col-md-6 mb-3">
             <label class="d-flex form-label">County</label>
-            <!-- <input
-              type="text"
-              class="input-area"
-              name="County"
-              placeholder="Enter your county"
-              disabled
-              [(ngModel)]="customer.County"
-            /> -->
             <input
               type="text"
               class="input-area"
-              name="city"
+              formControlName="County"
               placeholder="Enter your county"
-              [(ngModel)]="customer.City"
             />
           </div>
           <div class="col-6 col-md-6 mb-3">
             <label class="d-flex form-label">Mobile</label>
             <input
-              type="text"
+              type="number"
               class="input-area"
-              name="mobile"
+              formControlName="MobileNo"
               placeholder="Enter your mobile number"
-              [(ngModel)]="customer.MobileNo"
             />
           </div>
-          <!-- <div
-            class="justify-content-end align-items-end d-flex"
-          >
-        </div> -->
         </div>
       </form>
-      <div class="d-flex flex-column">
-        <label class="d-flex form-label">Preferences</label>
-        <div class="d-flex">
-          <p class="m-2">
-            Notification Sound when you are tagged
-            <strong>{{ isNotificationSoundEnabled ? "On" : "Off" }}</strong>
-          </p>
-          <div class="form-switch">
-            <input
-              [(ngModel)]="isNotificationSoundEnabled"
-              class="form-check-input"
-              type="checkbox"
-              role="switch" 
-              id="flexSwitchCheckChecked"
-              (change)="notificationSound()"
-            />
+
+      <div class="d-lg-flex col-12 mt-lg-6">
+        <div class="d-flex flex-column col-6">
+          <label class="d-flex form-label">Sound Preferences</label>
+          <div class="d-flex set-btns">
+            <p class="m-2">
+              Call ring tone
+              <strong>{{ isCallSoundEnabled ? "On" : "Off" }}</strong>
+            </p>
+            <div class="form-switch">
+              <input
+                [(ngModel)]="isCallSoundEnabled"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckChecked"
+                (change)="toggleSoundPreference('callNotificationSound', isCallSoundEnabled)"
+              />
+            </div>
+          </div>
+          <div class="d-flex set-btns">
+            <p class="m-2">
+              Sound for new message
+              <strong>{{ isMessageSoundEnabled ? "On" : "Off" }}</strong>
+            </p>
+            <div class="form-switch">
+              <input
+                [(ngModel)]="isMessageSoundEnabled"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckChecked"
+                (change)="toggleSoundPreference('messageNotificationSound', isMessageSoundEnabled)"
+              />
+            </div>
+          </div>
+          <div class="d-flex set-btns">
+            <p class="m-2">
+              Notification when you are tagged
+              <strong>{{ isNotificationSoundEnabled ? "On" : "Off" }}</strong>
+            </p>
+            <div class="form-switch">
+              <input
+                [(ngModel)]="isNotificationSoundEnabled"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckChecked"
+                (change)="toggleSoundPreference('tagNotificationSound', isNotificationSoundEnabled)"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="d-flex flex-column col-6 ms-lg-4 mt-5 mt-lg-0">
+          <label class="d-flex form-label">Email Preferences</label>
+          <div class="d-flex set-btns">
+            <p class="m-2">
+              Message email
+              <strong>{{ isMessageEmailEnabled ? "On" : "Off" }}</strong>
+            </p>
+            <div class="form-switch">
+              <input
+                [(ngModel)]="isMessageEmailEnabled"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckChecked"
+                (change)="toggleSoundPreference('messageNotificationEmail', isMessageEmailEnabled)"
+              />
+            </div>
+          </div>
+          <div class="d-flex set-btns">
+            <p class="m-2">
+              Tagged in comment email
+              <strong>{{ isTagEmailEnabled ? "On" : "Off" }}</strong>
+            </p>
+            <div class="form-switch">
+              <input
+                [(ngModel)]="isTagEmailEnabled"
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckChecked"
+                (change)="toggleSoundPreference('postNotificationEmail', isTagEmailEnabled)"
+              />
+            </div>
           </div>
         </div>
       </div>

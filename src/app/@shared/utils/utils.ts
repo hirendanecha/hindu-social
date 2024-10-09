@@ -12,7 +12,7 @@ export const  isFormSubmittedAndError = (formGroup: FormGroup, isFormSubmitted: 
   const otherError: any = formGroup.controls[controlName].errors;
 
   if (isFormSubmitted && otherError) {
-      return errorName == '' ? true : (otherError ? !Object.keys(otherError).some(err => notError.includes(err)) : true) ? formGroup.controls[controlName].hasError(errorName) : false;
+    return errorName == '' ? true : (otherError ? !Object.keys(otherError).some(err => notError.includes(err)) : true) ? formGroup.controls[controlName].hasError(errorName) : false;
   }
   return false;
 }

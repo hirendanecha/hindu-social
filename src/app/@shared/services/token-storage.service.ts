@@ -5,6 +5,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { ToastService } from './toast.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { SocketService } from './socket.service';
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'userData';
@@ -13,16 +14,17 @@ const USER_KEY = 'userData';
   providedIn: 'root',
 })
 export class TokenStorageService {
-  isUserAuthenticated: Subject<boolean> = new BehaviorSubject<boolean>(false);  
+  isUserAuthenticated: Subject<boolean> = new BehaviorSubject<boolean>(false);
   public _credentials: any = {};
 
-  constructor(private cookieService: CookieService,
+  constructor(
+    private cookieService: CookieService,
+    private socketService: SocketService,
     private router: Router,
     private toastService: ToastService,
   ) { }
 
   signOut(): void {
-    sessionStorage.clear();
     const theme = localStorage.getItem('theme');
     localStorage.clear();
     this.cookieService.delete('userData', '/', environment.domain);
@@ -30,6 +32,12 @@ export class TokenStorageService {
     localStorage.setItem('theme', theme);
     this.toastService.success('Logout successfully');
     this.router.navigate(['/']);
+  }
+
+  clearLoginSession(profileId): void {
+    this.socketService.logout({profileId: profileId, token: this.getToken()}, (data) => {
+      return;
+    });
   }
 
   public saveToken(token: string): void {

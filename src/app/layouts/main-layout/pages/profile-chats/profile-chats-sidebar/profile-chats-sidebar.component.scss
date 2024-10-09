@@ -71,14 +71,20 @@
   .cus-scrollbar {
     height: 48vh;
     // height: 39vh;
-    @media (max-width: 992px) {
+    @media (min-width: 576px) and (max-width: 991px) {
       height: 42vh;
+    }
+    @media (max-width: 575px) {
+      height: 38vh;
     }
   }
   .cus-scrollbar-pending {
     height: 17vh;
-    @media (max-width: 992px) {
+    @media (min-width: 576px) and (max-width: 992px) {
       height: 26vh;
+    }
+    @media (max-width: 575px) {
+      height: 17vh;
     }
   }
 
