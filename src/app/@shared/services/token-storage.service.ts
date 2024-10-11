@@ -36,8 +36,8 @@ export class TokenStorageService {
 
   clearLoginSession(profileId): void {
     this.socketService.logout({profileId: profileId, token: this.getToken()}, (data) => {
-      return;
-    });
+        return;
+      });
   }
 
   public saveToken(token: string): void {
@@ -66,8 +66,8 @@ export class TokenStorageService {
   }
 
   getCredentials(): any {
-    this._credentials = this.getUser();
-    const isAuthenticate = Object.keys(this._credentials || {}).length > 0;
+    const token = this.getToken();
+    const isAuthenticate = token ? true : false;
     this.changeIsUserAuthenticated(isAuthenticate);
     return isAuthenticate;
   }

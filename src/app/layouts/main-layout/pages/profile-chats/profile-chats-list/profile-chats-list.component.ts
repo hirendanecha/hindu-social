@@ -1337,11 +1337,12 @@ export class ProfileChatsListComponent
       status: status,
       id: this.profileId,
     };
-    const localUserData = JSON.parse(localStorage.getItem('userData'));
+    // const localUserData = JSON.parse(localStorage.getItem('userData'));
     this.socketService.switchOnlineStatus(data, (res) => {
       this.sharedService.userData.userStatus = res.status;
-      localUserData.userStatus = res.status;
-      localStorage.setItem('userData', JSON.stringify(localUserData));
+      this.sharedService.getLoginUserDetails(this.sharedService.userData);
+      // localUserData.userStatus = res.status;
+      // localStorage.setItem('userData', JSON.stringify(localUserData));
     });
   }
 

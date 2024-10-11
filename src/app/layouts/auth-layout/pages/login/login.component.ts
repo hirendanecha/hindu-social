@@ -125,7 +125,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
           this.spinner.hide();
           if (!data.error) {
             this.tokenStorage.saveToken(data?.accessToken);
-            this.tokenStorage.saveUser(data.user);
+            // this.tokenStorage.saveUser(data.user);
             localStorage.setItem('profileId', data.user.profileId);
             localStorage.setItem('communityId', data.user.communityId);
             localStorage.setItem('channelId', data.user?.channelId);

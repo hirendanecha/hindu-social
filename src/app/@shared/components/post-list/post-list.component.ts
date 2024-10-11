@@ -200,7 +200,7 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
     this.isPostLoader = true;
     this.isLoading = true;
 
-    if (!this.communityId && this.activePage === 0) {
+    if (!this.communityId && this.activePage === 0 && this.profileId) {
       this.getSeeFirstIdByProfileId(+this.profileId);
     }
 

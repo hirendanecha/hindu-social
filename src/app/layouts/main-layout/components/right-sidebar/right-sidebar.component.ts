@@ -7,6 +7,7 @@ import { BreakpointService } from 'src/app/@shared/services/breakpoint.service';
 import { NgbActiveOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { UserRewardDetailsService } from 'src/app/@shared/services/user-reward-details.service';
 import { TokenStorageService } from 'src/app/@shared/services/token-storage.service';
+import { SharedService } from 'src/app/@shared/services/shared.service';
 
 @Component({
   selector: 'app-right-sidebar',
@@ -27,7 +28,8 @@ export class RightSidebarComponent implements OnInit {
     private activeOffcanvas: NgbActiveOffcanvas,
     public breakpointService: BreakpointService,
     private userRewardDetailsService: UserRewardDetailsService,
-    public tokenService: TokenStorageService
+    public tokenService: TokenStorageService,
+    private sharedService: SharedService
   ) {
     // this.breakpointService.screen.subscribe((res) => {
     //   if (res.xl.gatherThen) {
@@ -67,6 +69,9 @@ export class RightSidebarComponent implements OnInit {
       },
       error: (error) => {
         console.log(error);
+        if (error.status === 401) {
+          this.sharedService.logOut();
+        }
       },
       complete: () => {
         this.isCommunitiesLoader = false;
