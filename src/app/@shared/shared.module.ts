@@ -153,6 +153,7 @@ import { GalleryImgPreviewComponent } from './components/gallery-img-preview/gal
 import { HoverDropdownDirective } from './directives/hover-dropdown.directive';
 import { QRCodeModule } from 'angularx-qrcode';
 import { ImgLayoutComponent } from './components/img-layout/img-layout.component';
+import { UserGuideModalComponent } from './modals/userguide-modal/userguide-modal.component';
 
 const sharedComponents = [
   ConfirmationModalComponent,
@@ -193,6 +194,7 @@ const sharedComponents = [
   AppointmentModalComponent,
   OpenStripeComponent,
   AppointmentCallComponent,
+  UserGuideModalComponent
 ];
 
 const sharedModules = [

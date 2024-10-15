@@ -330,9 +330,9 @@ export class TagUserInputComponent implements OnChanges, OnDestroy {
   emitChangeEvent(): void {
     if (this.tagInputDiv) {
       const htmlText = this.tagInputDiv?.nativeElement?.innerHTML;
-      this.value = `${htmlText}`.replace(
-        /(?:<div><br><\/div>\s*)+/gi,
-        '<div><br></div>'
+      this.value = `${htmlText}`.replace(/<br[^>]*>\s*/gi, '<br>')
+      .replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+      .replace(/(?:<div><br><\/div>\s*)+/gi,'<div><br></div>'
       ).replace( /<a\s+(?![^>]*\bdata-id=["'][^"']*["'])[^>]*>(.*?)<\/a>/gi,'$1');
       this.onDataChange?.emit({
         html: this.value,

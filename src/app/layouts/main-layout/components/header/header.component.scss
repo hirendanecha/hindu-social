@@ -90,6 +90,12 @@
       }
     }
   }
+
+  .userguidebtn {
+    border: 2px solid var(--font-icon-color);
+    color: var(--font-icon-color);
+    opacity: 0.8;
+  }
 }
 
 @media (max-width: 768px) {

@@ -181,6 +181,7 @@
         class="right-area d-lg-flex d-none justify-content-end align-items-center gap-6 cus-z p-0"
         *ngIf="tokenService.getCredentials()"
       >
+      <button class="btn btn-sm font-20-px p-0 rounded-circle h-36-px w-36-px fw-bold userguidebtn" *ngIf="showUserGuideBtn" (click)="openUserGuide()">?</button>
         <div
           class="single-item"
           *ngIf="sharedService.callId && !hideOngoingCallButton"
