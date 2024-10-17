@@ -116,8 +116,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             };
             this.socketService?.endCall(endCall);
           }
-          const userData = this.tokenService.getUser();
-          this.sharedService.getLoginUserDetails(userData);
+          // const userData = this.tokenService.getUser();
+          // this.sharedService.getLoginUserDetails(userData);
           this.sharedService.loginUserInfo.subscribe((user) => {
             this.tagNotificationSound =
               user.tagNotificationSound === 'Y' || false;

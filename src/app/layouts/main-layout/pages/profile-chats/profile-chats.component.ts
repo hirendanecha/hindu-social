@@ -70,8 +70,8 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     if (this.sharedService.isNotify) {
       this.sharedService.isNotify = false;
     }
-    const data = this.tokenStorageService.getUser();
-    this.sharedService.getLoginUserDetails(data);
+    // const data = this.tokenStorageService.getUser();
+    // this.sharedService.getLoginUserDetails(data);
   }
   ngOnInit(): void {
     this.socketService.connect();
