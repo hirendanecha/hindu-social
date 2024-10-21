@@ -14,13 +14,13 @@
     <div class="landing-btn d-none d-md-block d-lg-block">
       <button
         class="btn btn-primary alt third w-80-px"
-        (click)="openLoginPage()"
+        routerLink="/login"
       >
         Login
       </button>
       <button
         class="btn btn-outline alt third w-80-px ms-2"
-        (click)="openSignPage()"
+        routerLink="/register"
       >
         Signup
       </button>
@@ -162,10 +162,10 @@
     </div>
     <ul class="ps-0">
       <li>
-        <a class="mdtxt text-black" (click)="openLoginPage()"> Login </a>
+        <a class="mdtxt text-black"  routerLink="/login" (click)="closeMenu()"> Login </a>
       </li>
       <li>
-        <a class="mdtxt text-black" (click)="openSignPage()"> Sign up </a>
+        <a class="mdtxt text-black" routerLink="/register" (click)="closeMenu()"> Sign up </a>
       </li>
     </ul>
   </div>
