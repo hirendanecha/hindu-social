@@ -3,8 +3,8 @@
     <!-- <ng-container *ngFor="let post of postList;let i = index">
       <app-post-card [post]="post" [seeFirstList]="seeFirstList" (onEditPost)="onEditPostData(post, i)" (getPostList)="getPostList()" />
     </ng-container> -->
-    <ng-container *ngFor="let post of postList; let i = index">
-      <app-post-card [post]="post" (onEditPost)="onEditPostData(post, i)" (getPostList)="getPostList()"></app-post-card>
+    <ng-container *ngFor="let post of postList; let i = index; trackBy: trackByPostId">
+      <app-post-card [post]="post"  [seeFirstList]="seeFirstList" (onEditPost)="onEditPostData(post, i)" (getPostList)="getPostList()"></app-post-card>
       <ng-container *ngIf="(i + 1) % 5 === 0 && advertisementDataList?.length">
         <ng-container *ngFor="let ad of advertisementDataList | randomAdvertisementUrl: i">
           <a class="img-preview rounded-3 w-100 advertisement-section" [attr.href]="ad.link ? ad.link : null" [attr.target]="ad.link ? '_blank' : null"
@@ -20,6 +20,7 @@
         </ng-container>        
       </ng-container>
     </ng-container>
+    
     <!-- <div
       class="col-12 my-5 text-center"
       *ngIf="parentComponent === 'HomeComponent' && postList.length > 9"

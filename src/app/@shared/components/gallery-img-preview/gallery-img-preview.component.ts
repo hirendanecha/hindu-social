@@ -1,7 +1,10 @@
 import { Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from '../../services/message.service';
-import { FILE_EXTENSIONS, FILE_EXTENSIONS_Video } from '../../constant/file-extensions';
+import {
+  FILE_EXTENSIONS,
+  FILE_EXTENSIONS_Video,
+} from '../../constant/file-extensions';
 
 @Component({
   selector: 'app-gallery-img-preview',
@@ -53,7 +56,9 @@ export class GalleryImgPreviewComponent implements OnInit {
     this.messageService.getMessageMedia(data).subscribe({
       next: (res) => {
         this.pagination = res.pagination;
-        this.mediaList = [...this.mediaList, ...res.data];
+        const mediaList = [...this.mediaList, ...res.data];
+        this.mediaList = mediaList.filter((e) => !this.isFile(e.messageMedia));
+
         if (this.currentPage === this.activePage) {
           this.currentIndex = this.mediaList?.findIndex((ele) => {
             return ele.messageMedia === this.src;
@@ -67,7 +72,6 @@ export class GalleryImgPreviewComponent implements OnInit {
         } else {
           this.hasMoreData = false;
         }
-        // console.log(this.mediaList, this.currentIndex);
       },
       error: (error) => {
         console.log(error);

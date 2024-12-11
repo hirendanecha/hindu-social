@@ -13,7 +13,7 @@
       <fa-icon [icon]="['fas', 'camera']" class="eye-icon" ></fa-icon>
     </ng-container>
 
-    <ng-container *ngIf="fileData?.url">
+    <ng-container *ngIf="showClearIcon && fileData?.url">
       <fa-icon [icon]="['fas', 'xmark']" class="position-absolute top-0 start-100 translate-middle badge bg-danger py-1 font-16-px c-pointer c-icon-color" (click)="onClearFile($event)" />
     </ng-container>
 

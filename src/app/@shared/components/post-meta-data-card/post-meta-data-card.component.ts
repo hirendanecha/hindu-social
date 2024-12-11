@@ -8,4 +8,9 @@ import { Component, Input } from '@angular/core';
 export class PostMetaDataCardComponent {
 
   @Input('post') post: any = {};
+
+  validateImageUrl(url: string) {
+    const urlPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+    return urlPattern.test(url);
+  }
 }

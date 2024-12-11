@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import {
   NgbDropdown,
   NgbModal,
@@ -17,6 +17,10 @@ import { environment } from 'src/environments/environment';
 import { TokenStorageService } from 'src/app/@shared/services/token-storage.service';
 import { SocketService } from 'src/app/@shared/services/socket.service';
 import { UserGuideModalComponent } from 'src/app/@shared/modals/userguide-modal/userguide-modal.component';
+import { IncomingcallModalComponent } from 'src/app/@shared/modals/incoming-call-modal/incoming-call-modal.component';
+import { SoundControlService } from 'src/app/@shared/services/sound-control.service';
+import { Howl } from 'howler';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -50,7 +54,7 @@ export class HeaderComponent {
   hideOngoingCallButton: boolean = false;
   authToken = localStorage.getItem('auth-token');
   showUserGuideBtn: boolean = false;
-
+  private subscription: Subscription;
   constructor(
     private modalService: NgbModal,
     public sharedService: SharedService,
@@ -59,32 +63,97 @@ export class HeaderComponent {
     public breakpointService: BreakpointService,
     private offcanvasService: NgbOffcanvas,
     public tokenService: TokenStorageService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private soundControlService: SoundControlService
   ) {
     this.originalFavicon = document.querySelector('link[rel="icon"]');
+    this.subscription = this.sharedService.isNotify$.subscribe(
+      (value) => (this.sharedService.isNotify = value)
+    );
     this.socketService?.socket?.on('isReadNotification_ack', (data) => {
       if (data?.profileId) {
-        this.sharedService.isNotify = false;
+        // this.sharedService.isNotify = false;
+        this.sharedService.setNotify(false);
         localStorage.setItem('isRead', data?.isRead);
         this.originalFavicon.href = '/assets/images/default-profile.jpg';
       }
     });
     const isRead = localStorage.getItem('isRead');
     if (isRead === 'N') {
-      this.sharedService.isNotify = true;
+      // this.sharedService.isNotify = true;
+      this.sharedService.setNotify(true);
     } else {
-      this.sharedService.isNotify = false;
+      // this.sharedService.isNotify = false;
+      this.sharedService.setNotify(false);
     }
     this.channelId = +localStorage.getItem('channelId');
 
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.hideSubHeader = this.router.url.includes('profile-chats');
-        this.showUserGuideBtn = this.router.url.includes('home');
-        this.hideOngoingCallButton = this.router.url.includes('facetime');
-        console.log(this.hideSubHeader);
-        this.sharedService.callId = sessionStorage.getItem('callId') || null;
-        console.log(this.sharedService.callId);
+        const currentUrl = this.router.url;
+        const profileId = +localStorage.getItem('profileId') || null;
+
+        this.hideSubHeader =
+          currentUrl.includes('profile-chats') ||
+          currentUrl.includes('facetime');
+        this.showUserGuideBtn = currentUrl.includes('home');
+        this.hideOngoingCallButton = currentUrl.includes('facetime');
+        this.sharedService.callId = localStorage.getItem('callId') || null;
+
+        if (!profileId) return;
+
+        const reqObj = { profileId };
+        this.socketService?.checkCall(reqObj, (data: any) => {
+          const isOnCall = data?.isOnCall === 'Y';
+          const hasCallLink = data?.callLink;
+
+          if (isOnCall && hasCallLink && !this.sharedService.callId) {
+            if (!this.hideOngoingCallButton) {
+              const callSound = new Howl({
+                src: [
+                  'https://s3.us-east-1.wasabisys.com/freedom-social/famous_ringtone.mp3',
+                ],
+                loop: true,
+              });
+              this.soundControlService.initTabId();
+
+              const modalRef = this.modalService.open(
+                IncomingcallModalComponent,
+                {
+                  centered: true,
+                  size: 'sm',
+                  backdrop: 'static',
+                }
+              );
+
+              const callData = {
+                Username: '',
+                link: data.callLink,
+                roomId: data.roomId,
+                groupId: data.groupId,
+                ProfilePicName: this.sharedService?.userData?.ProfilePicName,
+              };
+
+              modalRef.componentInstance.calldata = callData;
+              modalRef.componentInstance.sound = callSound;
+              modalRef.componentInstance.showCloseButton = true;
+              modalRef.componentInstance.title = 'Join existing call...';
+
+              modalRef.result.then((res) => {
+                if (res === 'cancel') {
+                  const callLogData = {
+                    profileId,
+                    roomId: callData?.roomId,
+                    groupId: callData?.groupId,
+                  };
+                  this.socketService?.endCall(callLogData);
+                }
+              });
+            }
+          } else {
+            this.hideOngoingCallButton = true;
+          }
+        });
       }
     });
   }
@@ -185,6 +254,11 @@ export class HeaderComponent {
 
   redirectToTube(): void {
     const channelId = +localStorage.getItem('channelId');
+    // if (channelId) {
+    //   window.open(`${environment.tubeUrl}?channelId=${channelId}`, '_blank');
+    // } else {
+    //   window.open(`${environment.tubeUrl}`, '_blank');
+    // }
     let redirectUrl = `${environment.tubeUrl}`;
     if (channelId) {
       redirectUrl += `?channelId=${channelId}`;
@@ -197,10 +271,14 @@ export class HeaderComponent {
     window.open(redirectUrl, '_blank');
   }
 
-  openUserGuide(){
+  openUserGuide() {
     this.modalService.open(UserGuideModalComponent, {
       centered: true,
       size: 'lg',
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

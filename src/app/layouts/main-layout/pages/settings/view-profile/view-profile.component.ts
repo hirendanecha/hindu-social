@@ -1,16 +1,16 @@
 import {
   AfterViewInit,
   Component,
+  EventEmitter,
   OnDestroy,
   OnInit,
+  Output,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import * as moment from 'moment';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Customer } from 'src/app/@shared/constant/customer';
 import { ConfirmationModalComponent } from 'src/app/@shared/modals/confirmation-modal/confirmation-modal.component';
-import { AppointmentsService } from 'src/app/@shared/services/appointment.service';
 import { BreakpointService } from 'src/app/@shared/services/breakpoint.service';
 import { CommunityService } from 'src/app/@shared/services/community.service';
 import { CustomerService } from 'src/app/@shared/services/customer.service';
@@ -33,7 +33,6 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   profilePic: any = {};
   coverPic: any = {};
   profileId: number;
-  routeProfileId: number;
   activeTab = 1;
   communityList = [];
   communityId = '';
@@ -41,8 +40,6 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   pdfList: any = [];
   searchText: string = '';
   hasShownWarning: boolean = false;
-  appointmentList = [];
-
   constructor(
     private modalService: NgbActiveModal,
     private modal: NgbModal,
@@ -55,14 +52,12 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     public breakpointService: BreakpointService,
     private postService: PostService,
     private seoService: SeoService,
-    private appointmentService: AppointmentsService,
     private toastService: ToastService
   ) {
     this.router.events.subscribe((event: any) => {
       if (event?.routerEvent?.url.includes('/settings/view-profile')) {
         const id = event?.routerEvent?.url.split('/')[3];
         this.profileId = id;
-        this.routeProfileId = id;
         if (id) {
           this.getProfile(id);
         }
@@ -70,6 +65,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       this.profileId = +localStorage.getItem('profileId');
     });
   }
+
   ngOnInit(): void {
     if (!this.tokenStorage.getToken()) {
       this.router.navigate([`/login`]);
@@ -89,6 +85,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           this.userId = res.data[0]?.UserID;
           const data = {
             title: this.customer?.Username,
+            // title: this.customer?.FirstName + ' ' + this.customer?.LastName,
             url: `${environment.webUrl}settings/view-profile/${this.customer?.profileId}`,
             description: '',
             image: this.customer?.ProfilePicName,
@@ -128,7 +125,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   goToCommunityDetails(community: any): void {
-    this.router.navigate([`community/details/${community?.slug}`]);
+    this.router.navigate(['communities', community?.slug]);
   }
 
   openDropDown(id) {
@@ -166,8 +163,7 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   viewUserPost(id) {
-    // this.router.navigate([`post/${id}`]);
-    window.open(`post/${id}`, '_blank');
+    this.router.navigate([`post/${id}`]);
   }
 
   downloadPdf(pdf): void {
@@ -176,62 +172,6 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     // window.open(pdf);
     // pdfLink.download = "TestFile.pdf";
     pdfLink.click();
-  }
-  
-  getUserAppoinments(id): void {
-    this.appointmentService.AppointmentViewProfile(id).subscribe({
-      next: (res) => {
-        this.appointmentList = res.data;
-      },
-      error: (err) => {},
-    });
-  }
-
-  getStatus(appointment: any): string {
-    const currentDate = new Date();
-    const appointmentDate = new Date(appointment.appointmentDateTime);
-    if (currentDate > appointmentDate) {
-      return 'Expired';
-    } else {
-      return appointment.isCancelled === 'N' ? 'Scheduled' : 'Cancelled';
-    }
-  }
-
-  appointmentCancelation(obj) {
-    const modalRef = this.modal.open(ConfirmationModalComponent, {
-      centered: true,
-    });
-    modalRef.componentInstance.title = `Cancel appointment`;
-    modalRef.componentInstance.confirmButtonLabel = 'Ok';
-    modalRef.componentInstance.cancelButtonLabel = 'Cancel';
-    modalRef.componentInstance.message = `Are you sure want to cancel this appointment?`;
-    modalRef.result.then((res) => {
-      if (res === 'success') {
-        const data = {
-          appointmentId: obj.id,
-          practitionerProfileId: obj.practitionerProfileId,
-          profileId: obj.profileId,
-          practitionerName: obj.practitionerName,
-        };
-        this.getCancelAppoinments(data);
-      }
-    });
-  }
-
-  getCancelAppoinments(obj): void {
-    this.appointmentService.changeAppointmentStatus(obj).subscribe({
-      next: (res) => {
-        // this.appointmentList = res.data;
-        this.toastService.success(res.message);
-        this.getUserAppoinments(this.profileId);
-      },
-      error: (err) => {},
-    });
-  }
-
-  displayLocalTime(utcDateTime: string): string {
-    const localTime = moment.utc(utcDateTime).local();
-    return localTime.format('h:mm A');
   }
 
   deletePost(postId): void {
@@ -264,7 +204,6 @@ export class ViewProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   searchPosts(event): void {
     if (event.target.value.length > 3) {
       this.searchText = event.target.value;
-      console.log(this.searchText);
       this.hasShownWarning = false;
     } else if (!event.target.value.length) {
       this.searchText = '';

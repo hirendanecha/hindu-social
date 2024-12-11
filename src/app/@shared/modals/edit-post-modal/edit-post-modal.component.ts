@@ -62,6 +62,24 @@ export class EditPostModalComponent implements AfterViewInit {
     }
   }
 
+  // onPostFileSelect(event: any): void {
+  //   const file = event.target?.files?.[0] || {};
+  //   if (file.type.includes('image/')) {
+  //     this.postData['file'] = file;
+  //     this.selectedImage = URL.createObjectURL(file);
+  //   } else if (file.type.includes('application/pdf')) {
+  //     this.postData['file'] = file;
+  //     this.pdfName = file?.name;
+  //   }
+  //   else {
+  //     this.toastService.danger(`sorry ${file.type} are not allowed!`)
+  //   }
+  //   // if (file?.size < 5120000) {
+  //   // } else {
+  //   //   this.toastService.warring('Image is too large!');
+  //   // }
+  // }
+
   onPostFileSelect(event: any): void {
     const files = event.target?.files;
     if (this.combinedMediaData.length > 3) {
@@ -78,7 +96,7 @@ export class EditPostModalComponent implements AfterViewInit {
     }
     let existingFileType = '';
     if (this.combinedMediaData.length > 0) {
-      existingFileType = this.combinedMediaData[0].file.type.split('/')[0];
+      existingFileType = this.combinedMediaData[0]?.file?.type.split('/')[0];
     }
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -106,10 +124,8 @@ export class EditPostModalComponent implements AfterViewInit {
         fileData.imageUrl = URL.createObjectURL(file);
       }
       this.selectedFiles.push(fileData);
-      // console.log(`File ${i + 1}:`, fileData);
     }
     this.editMediaData = (this.editMediaData || []).concat(this.selectedFiles);
-    // console.log('Selected files:', this.postMediaData);
   }
 
   removePostSelectedFile(media: any = {}, type: string): void {
@@ -125,15 +141,21 @@ export class EditPostModalComponent implements AfterViewInit {
         this.postMediaData = this.postMediaData.filter(
           (ele) => ele.id != media.id
         );
-        console.log(this.removeImagesList);
       } else {
         this.editMediaData = this.editMediaData.filter(
           (ele: any) => ele?.file?.name != media?.file?.name
         );
-        console.log(this.editMediaData);
       }
     }
   }
+
+  // removePostSelectedFile(): void {
+  //   this.postData['file'] = null;
+  //   this.postData['imageUrl'] = '';
+  //   this.postData['pdfUrl'] = '';
+  //   this.selectedImage = '';
+  //   this.pdfName = '';
+  // }
 
   onChangeComment(): void {
     this.postData.tags = getTagUsersFromAnchorTags(this.commentMessageTags);
@@ -162,28 +184,34 @@ export class EditPostModalComponent implements AfterViewInit {
         .endsWith('.gif');
       if (!imgTitle && !imgStyle && !imageGif) {
         const copyImage = imgTag.getAttribute('src');
-        // this.postData.comment = content.replace(copyImage, '');
-        let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">';
-        this.postData.postdescription = `<div>${content
-          .replace(copyImage, '')
-          .replace(/\<br\>/gi, '')
-          .replace(new RegExp(copyImageTag, 'g'), '')}</div>`;
-        const base64Image = copyImage
-          .trim()
-          .replace(/^data:image\/\w+;base64,/, '');
-        try {
-          const binaryString = window.atob(base64Image);
-          const uint8Array = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            uint8Array[i] = binaryString.charCodeAt(i);
+        // const bytes = copyImage.length;
+        // const megabytes = bytes / (1024 * 1024);
+        // if (megabytes > 1) {
+          // this.postData.comment = content.replace(copyImage, '');
+          let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">';
+          this.postData.postdescription = `<div>${content
+            .replace(copyImage, '')
+            .replace(/\<br\>/gi, '')
+            .replace(new RegExp(copyImageTag, 'g'), '')}</div>`;
+          const base64Image = copyImage
+            .trim()
+            .replace(/^data:image\/\w+;base64,/, '');
+          try {
+            const binaryString = window.atob(base64Image);
+            const uint8Array = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              uint8Array[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+            const fileName = `copyImage-${new Date().getTime()}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
+            this.postData['file'] = file;
+          } catch (error) {
+            console.error('Base64 decoding error:', error);
           }
-          const blob = new Blob([uint8Array], { type: 'image/jpeg' });
-          const fileName = `copyImage-${new Date().getTime()}.jpg`;
-          const file = new File([blob], fileName, { type: 'image/jpeg' });
-          this.postData['file'] = file;
-        } catch (error) {
-          console.error('Base64 decoding error:', error);
-        }
+        // } else {
+        //   this.postData.postdescription = content;
+        // }
       } else {
         this.postData.postdescription = content;
       }

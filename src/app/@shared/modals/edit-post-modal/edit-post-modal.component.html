@@ -34,6 +34,7 @@
           placeholder="Comment..."
           class="outline-0 w-100 comment-input c-text"
         ></div> -->
+        <!-- class="edit-comment-emoji" -->
         <app-tag-user-input
           [ngClass]="postMediaData?.length < 3 ? 'edit-comment-emoji' : ''"
           placeholder="Post a link or image or file or let's just talk!"
@@ -169,7 +170,7 @@
 
   <button
     type="button"
-    class="btn btn-sm btn-secondary"
+    class="btn btn-sm btn-success"
     (click)="onChangeComment()"
   >
     {{ confirmButtonLabel }}

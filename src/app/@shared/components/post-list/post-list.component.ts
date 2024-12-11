@@ -41,6 +41,7 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
   hasMoreData = false;
   userId: number = null;
   unSubscribeProfileIds: any = [];
+
   advertisementDataList: any[] = [];
 
   constructor(
@@ -50,8 +51,18 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
     private socketService: SocketService,
     private seeFirstUserService: SeeFirstUserService,
     private route: ActivatedRoute,
-    private unsubscribeProfileService: UnsubscribeProfileService
+    private unsubscribeProfileService: UnsubscribeProfileService,
+    private router: Router
   ) {
+    this.router.events.subscribe((event: any) => {
+      if (event?.routerEvent?.url.includes('/settings/view-profile')) {
+        const id = event?.routerEvent?.url.split('/')[3];
+        this.userId = id;
+        if (id) {
+          this.getPostList();
+        }
+      }
+    });
     this.userId = this.route.snapshot.params.id;
     this.profileId = localStorage.getItem('profileId');
     this.getUnsubscribeProfiles();
@@ -94,9 +105,14 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(error);
       }
     );
+    this.socketService.socket?.on('deleted-post', (res: any) => {
+      if (res) {
+        this.postList = this.postList.filter((post) => post.id !== res.id);
+      }
+    });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.getPostList();
@@ -129,7 +145,10 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
           this.isPostLoader = false;
           this.isLoading = false;
           if (res?.data.data.length > 0) {
-            this.postList = [...this.postList, ...res?.data.data];
+            this.postList = [...this.postList, ...res?.data.data]?.filter(
+              (post, index, self) =>
+                index === self?.findIndex((p) => p?.id === post?.id)
+            );
           } else {
             this.hasMoreData = true;
           }
@@ -152,7 +171,10 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
           this.isPostLoader = false;
           this.isLoading = false;
           if (res?.data.data.length > 0) {
-            this.postList = [...this.postList, ...res?.data.data];
+            this.postList = [...this.postList, ...res?.data.data]?.filter(
+              (post, index, self) =>
+                index === self?.findIndex((p) => p?.id === post?.id)
+            );
           } else {
             this.hasMoreData = true;
           }
@@ -217,7 +239,10 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
           this.isLoading = false;
           this.isPostLoader = false;
           if (res?.data?.length > 0) {
-            this.postList = [...this.postList, ...res?.data];
+            this.postList = [...this.postList, ...res?.data]?.filter(
+              (post, index, self) =>
+                index === self?.findIndex((p) => p?.id === post?.id)
+            );
           } else {
             this.hasMoreData = true;
           }
@@ -277,5 +302,9 @@ export class PostListComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(err);
       },
     });
+  }
+
+  trackByPostId(index: number, post: any): number | string {
+    return post.id;
   }
 }

@@ -7,7 +7,7 @@
 
     .single {
       flex: 1;
-
+      // max-height: 400px;
       .large-image {
         grid-column: span 2;
         img {
@@ -25,7 +25,14 @@
           max-height: 245px;
           width: 100%;
         }
+        .img-preview {
+          max-height: 250px;
+        }
       }
+
+    // ::ng-deep app-img-preview img{
+    //     object-fit: contain;
+    //   }
     }
 
     &.d-grid {

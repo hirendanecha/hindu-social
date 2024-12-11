@@ -76,6 +76,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   appointmentList = [];
   // invoiceList = [];
+  marketingSlug: string;
+
 
   invoiceList: any[] = [
     {
@@ -194,6 +196,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {
+      const navigationEndEvent = event as any;
+      const prepareSlug = navigationEndEvent?.routerEvent?.urlAfterRedirects;
+      this.marketingSlug = `${environment.webUrl.replace(/\/+$/, '')}/${prepareSlug?.replace(/^\/+/, '')}`;
       if (event instanceof NavigationEnd) {
         window.scrollTo(0, 0);
       }

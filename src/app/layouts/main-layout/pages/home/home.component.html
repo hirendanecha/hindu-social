@@ -13,7 +13,7 @@
 
     <div class="text-start d-flex align-items-center gap-3">
       <img
-        class="w-56-px h-56px rounded-3"
+        class="w-56-px h-56-px rounded-3"
         loading="lazy"
         data-src="{{ communityDetails?.logoImg }}"
         onerror="this.onerror=null;this.src='/assets/images/avtar/avtar.png';"
@@ -38,7 +38,7 @@
             </button>
           </ng-container>
           <!-- {{ communityDetails?.pageType }} -->
-          <ng-container *ngIf="communityDetails?.pageType === 'page'">
+
           <ng-container
             *ngIf="
               communityDetails?.memberIds?.includes(+profileId);
@@ -75,7 +75,6 @@
               Join {{ communityDetails?.pageType }}
             </button>
           </ng-template>
-        </ng-container>
         </div>
       </div>
     </div>
@@ -226,7 +225,7 @@
     <div class="share-post d-flex gap-3 gap-sm-5 p-3 p-sm-5 mb-5">
       <img
         loading="lazy"
-        data-src="{{ sharedService?.userData?.ProfilePicName }}"
+        data-src="{{ sharedService?.userData?.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
         onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
         class="w-56-px h-56-px d-none d-sm-flex rounded-4"
         alt="icon"
@@ -257,6 +256,7 @@
           </button>
         </div>
         <ng-container *ngIf="postMediaData[0]">
+          <!-- <ngb-carousel [showNavigationIndicators]="false" [interval]="0"> -->
             <ngb-carousel [showNavigationIndicators]="false" [interval]="0"
               [showNavigationArrows]="postMediaData.length > 1">
             <ng-container *ngFor="let media of postMediaData; let i = index">
@@ -320,6 +320,7 @@
               cursor
               (click)="openAlertMessageImg(postImage)"
               >
+              <!-- (click)="postImage.click()" -->
               <fa-icon [icon]="['fas', 'image']" class="font-20-px" />
               <span>Image</span>
             </li>
@@ -398,6 +399,21 @@
         </div>
       </div>
     </div>
+    <ng-container *ngIf="communitySlug && communityDetails?.Id">
+      <div class="single-box community-details px-2 marketing-link-box">
+        <div class="d-flex flex-column">
+          <h5 class="text-start text-nowrap mt-3 mb-0">Marketing Link</h5>
+          <span class="text-start">Copy this link and paste in Facebook and X and all other platforms or email or text messages to market this Page or Community:</span>
+        </div>
+        <div class="d-flex gap-2 mt-3 align-items-center">
+          <h5>Marketing Link:</h5>
+          <span class="d-flex gap-3 slug-text">{{ marketingSlug }}</span> 
+          <h6 [appCopyClipboard]="marketingSlug" class="c-pointer text-nowrap">
+            <fa-icon class="me-1" [icon]="['fas', 'copy']" />Copy
+          </h6>
+        </div>
+      </div>
+    </ng-container>
   </ng-container>
 
   <ng-container *ngIf="isNavigationEnd">
@@ -422,7 +438,7 @@
   *ngIf="activeCommunityTab === 2 && communityDetails?.memberList?.length > 0"
 >
   <ng-container *ngIf="communityDetails?.adminIds.includes(+profileId)">
-    <span> Add new admin: </span>
+    <span> Add new members: </span>
     <div class="input-area h-48-px d-flex align-items-center mb-3">
       <fa-icon [icon]="['fas', 'magnifying-glass']" class="me-1" />
       <input
@@ -451,7 +467,7 @@
                 <img
                   loading="lazy"
                   class="w-32-px h-32-px rounded"
-                  data-src="{{ user.ProfilePicName }}"
+                  data-src="{{ user.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
                   [alt]="user.Username"
                   onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                 />
@@ -692,12 +708,3 @@
 <ng-container *ngIf="activeCommunityTab === 5">
   <span> coming soon! </span>
 </ng-container>
-
-<ng-template #emojiMenu>
-  <emoji-mart
-    class="emoji-mart"
-    (emojiSelect)="addEmoji($event)"
-    title="Pick your emoji…"
-    set="google"
-  ></emoji-mart>
-</ng-template>

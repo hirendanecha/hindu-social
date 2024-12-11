@@ -19,6 +19,7 @@ export class RightSidebarComponent implements OnInit {
   communities = [];
   isCommunitiesLoader: boolean = false;
   counts: any = {};
+  isSettingMenuCollapse = false;
 
   constructor(
     private router: Router,
@@ -38,24 +39,27 @@ export class RightSidebarComponent implements OnInit {
     //     this.isCommunitiesLoader = false;
     //   }
     // });
-    this.getCommunityList()
+    if (this.tokenService.getToken()) {
+      this.getCommunityList();
+      this.getCountByProfileId();
+    }
   }
 
   ngOnInit(): void {
     this.customerService.customerObs.subscribe((res: any) => {
       this.user = res;
     });
-
-    this.getCountByProfileId();
   }
 
   getCountByProfileId(): void {
     const profileId = localStorage.getItem('profileId');
-    this.userRewardDetailsService.getCountByProfileId(+profileId).subscribe((res: any) => {
-      if (res?.data) {
-        this.counts = res?.data || {};
-      }
-    });
+    this.userRewardDetailsService
+      .getCountByProfileId(+profileId)
+      .subscribe((res: any) => {
+        if (res?.data) {
+          this.counts = res?.data || {};
+        }
+      });
   }
 
   getCommunityList(): void {
@@ -75,13 +79,13 @@ export class RightSidebarComponent implements OnInit {
       },
       complete: () => {
         this.isCommunitiesLoader = false;
-      }
+      },
     });
   }
 
   goToCommunityDetails(community: any): void {
     this.closeSidebar();
-    this.router.navigate(['community', community?.slug]);
+    this.router.navigate([community?.pageType, community?.slug]);
   }
 
   closeSidebar(): void {

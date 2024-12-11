@@ -54,8 +54,8 @@
           </button>
           <button
             *ngIf="
-              community.profileId !== profileId &&
-              community.memberList?.includes(profileId)
+              community?.profileId !== profileId &&
+              community?.memberList?.includes(profileId)
             "
             class="btn btn-outline-danger alt third w-80-px"
             (click)="deleteOrLeaveCommunity($event, 'local')"
@@ -64,7 +64,7 @@
           </button>
           <button
             *ngIf="
-              community.profileId !== profileId &&
+              community?.profileId !== profileId &&
               !community?.memberList?.includes(profileId)
             "
             class="btn btn-outline-success alt third w-80-px"

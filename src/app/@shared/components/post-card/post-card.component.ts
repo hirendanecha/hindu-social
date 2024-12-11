@@ -73,11 +73,13 @@ export class PostCardComponent implements OnInit {
   player: any;
   isExpand = false;
   showFullDesc: boolean = false;
+  showFullDescMap: { [commentId: number]: boolean } = {};
   commentCount = 0;
   commentMessageInputValue: string = '';
   replaycommentMessageInputValue: string = '';
   commentMessageTags: any[];
   showHoverBox = false;
+  showCommentHoverBox: number | null = null;
   unSubscribeProfileIds: any = [];
 
   descriptionimageUrl: string;
@@ -102,7 +104,7 @@ export class PostCardComponent implements OnInit {
     public tokenService: TokenStorageService,
     private seoService: SeoService,
     public breakpointService: BreakpointService,
-    public activeModal: NgbActiveModal,
+    public activeModal: NgbActiveModal
   ) {
     this.profileId = localStorage.getItem('profileId');
     afterNextRender(() => {
@@ -129,15 +131,15 @@ export class PostCardComponent implements OnInit {
   ngOnInit(): void {
     // this.socketListner();
     this.viewComments(this.post?.id);
+    this.descriptionimageUrl = this.extractImageUrlFromContent(
+      this.post.postdescription
+    );
   }
 
   ngAfterViewInit(): void {
     // if (this.post?.posttype === 'V') {
     //   this.playVideo(this.post?.id);
     // }
-    this.descriptionimageUrl = this.extractImageUrlFromContent(
-      this.post.postdescription
-    );
     const path = this.route.snapshot.routeConfig.path;
     if (path === 'view-profile/:id' || path === 'post/:id') {
       this.shareButton = true;
@@ -205,8 +207,14 @@ export class PostCardComponent implements OnInit {
       }
     });
   }
-  showFullDescription() {
-    this.showFullDesc = !this.showFullDesc;
+  showFullDescription(type?, commentId?): void {
+    if (type === 'comment') {
+      this.showFullDescMap[commentId] = !this.showFullDescMap[commentId];
+    } else if (type === 'reply') {
+      this.showFullDescMap[commentId] = !this.showFullDescMap[commentId];
+    } else {
+      this.showFullDesc = !this.showFullDesc;
+    }
   }
 
   unsubscribe(post: any): void {
@@ -230,16 +238,18 @@ export class PostCardComponent implements OnInit {
     const userData = {
       Id: data.profileid,
       ProfilePicName: data.ProfilePicName,
-      Username: data.Username
+      Username: data.Username,
     };
     // this.router.navigate(['/profile-chats'], {
     //   state: { chatUserData: userData}
     // });
     const encodedUserData = encodeURIComponent(JSON.stringify(userData));
-    const url = this.router.createUrlTree(['/profile-chats'], {
+    const url = this.router
+      .createUrlTree(['/profile-chats'], {
         queryParams: { chatUserData: encodedUserData },
-      }).toString();
-    window.open(url, '_blank');
+      })
+      .toString();
+    this.router.navigateByUrl(url);
   }
   goToViewProfile(id: any): void {
     this.router.navigate([`settings/view-profile/${id}`]);
@@ -320,17 +330,18 @@ export class PostCardComponent implements OnInit {
       'Are you sure want to delete this post?';
     modalRef.result.then((res) => {
       if (res === 'success') {
-        this.postService.deletePost(post.id).subscribe({
-          next: (res: any) => {
-            if (res) {
-              this.toastService.success(res.message);
-              this.getPostList?.emit();
-            }
-          },
-          error: (error) => {
-            console.log('error : ', error);
-          },
-        });
+        // this.socketService.delePosts(post.id).subscribe({
+        //   next: (res: any) => {
+        //     if (res) {
+        //       this.toastService.success(res.message);
+        //     }
+        //   },
+        //   error: (error) => {
+        //     console.log('error : ', error);
+        //   },
+        // });
+        this.socketService.delePosts({ id: post.id });
+        this.getPostList?.emit();
       }
     });
   }
@@ -450,8 +461,8 @@ export class PostCardComponent implements OnInit {
       } else {
         this.commentparentReplayId = null;
         setTimeout(() => {
-        this.focusTagInput(comment.id);
-      }, 10);
+          this.focusTagInput(comment.id);
+        }, 10);
       }
     } else if (commentType === 'parentReplay') {
       this.parentReplayComment =
@@ -462,8 +473,8 @@ export class PostCardComponent implements OnInit {
       } else {
         this.commentId = null;
         setTimeout(() => {
-        this.focusTagInput(comment.parentCommentId);
-      }, 10);
+          this.focusTagInput(comment.parentCommentId);
+        }, 10);
       }
     }
   }
@@ -582,7 +593,12 @@ export class PostCardComponent implements OnInit {
     // }
   }
 
-  onPostFileSelect(event: any, type: string, postId: number, commentId?: number): void {
+  onPostFileSelect(
+    event: any,
+    type: string,
+    postId: number,
+    commentId?: number
+  ): void {
     if (type === 'parent') {
       this.isParent = true;
     } else {
@@ -611,6 +627,7 @@ export class PostCardComponent implements OnInit {
     if (this.player) {
       this.player.remove();
     }
+
     const config = {
       file: this.post?.streamname,
       image: this.post?.thumbfilename,
@@ -630,10 +647,12 @@ export class PostCardComponent implements OnInit {
     };
     const elementId = 'jwVideo-' + id;
     const videoElement = document.getElementById(elementId);
+
     if (!videoElement) {
       console.error(`Element with id ${elementId} not found in the DOM`);
       return;
     }
+
     try {
       const jwPlayerInstance = jwplayer(elementId);
       if (jwPlayerInstance && typeof jwPlayerInstance.setup === 'function') {
@@ -791,6 +810,9 @@ export class PostCardComponent implements OnInit {
       if (!imgTitle && !imgStyle && !imageGif) {
         this.focusTagInput(commentId || postId);
         const copyImage = imgTag.getAttribute('src');
+        // const bytes = copyImage.length;
+        // const megabytes = bytes / (1024 * 1024);
+        // if (megabytes > 1) {
         // this.commentData.comment = content.replace(copyImage, '');
         let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">';
         this.commentData.comment = `<div>${content
@@ -813,6 +835,9 @@ export class PostCardComponent implements OnInit {
         } catch (error) {
           console.error('Base64 decoding error:', error);
         }
+        // } else {
+        //   this.commentData.comment = content;
+        // }
       } else {
         this.commentData.comment = content;
       }
@@ -845,5 +870,13 @@ export class PostCardComponent implements OnInit {
         }, 100);
       }
     }
+  }
+
+  opyData(post): string {
+    return `<a href="/settings/view-profile/${
+      post.profileid || post.profileId
+    }" class="text-danger" data-id="${post.profileid || post.profileId}">@${
+      post.Username
+    }</a>`;
   }
 }

@@ -96,7 +96,7 @@
               alt="avatar"
             />
           </div>
-          <div class="info-area" (click)="clearChatList()">
+          <div class="info-area">
             <h6 class="m-0">{{ sharedService?.userData?.Username }}</h6>
           </div>
         </div>
@@ -194,15 +194,22 @@
         </div>
       </div>
       <!-- <span class="m-1">Search for end users to message:</span> -->
-      <div class="input-area py-2 d-flex align-items-center">
-        <fa-icon [icon]="['fas', 'search']" class="font-20-px m-1" />
+      <div class="py-2 d-flex align-items-center justify-content-center">
+        <!-- <fa-icon [icon]="['fas', 'search']" class="font-20-px m-1" />
         <input
           type="text"
           placeholder="Search for end users"
           [(ngModel)]="searchText"
           autocomplete="off"
           (keyup)="getUserList()"
-        />
+        /> -->
+        <button
+          class="btn btn-success btn-sm d-flex align-items-center justify-content-center h-36-px"
+          (click)="invitePeople()"
+        >
+          <fa-icon [icon]="['fas', 'plus-circle']" class="font-20-px m-1" />
+          Invite people to chat
+        </button>
       </div>
       <ng-container *ngIf="searchText">
         <div #userSearchDropdownRef ngbDropdown>
@@ -388,13 +395,34 @@
                 </ng-container>
               </ng-container>
               <img
+                *ngIf="item?.roomId && item?.ProfilePicName"
                 class="avatar-img h-40-px w-40-px max-un"
-                src="{{
-                  item?.roomId ? item?.ProfilePicName : item?.profileImage
-                }}"
-                [alt]="item?.groupName || item?.Username"
-                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                src="{{ item?.ProfilePicName }}"
+                [alt]="item?.Username"
               />
+              <!-- onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';" -->
+              <img
+                *ngIf="item?.groupId && item?.profileImage"
+                class="avatar-img h-40-px w-40-px max-un"
+                src="{{ item?.profileImage }}"
+                [alt]="item?.groupName"
+              />
+              <!-- onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';" -->
+              <div
+                class="default_40"
+                *ngIf="
+                  !(
+                    (item.groupId && item?.profileImage) ||
+                    (item.roomId && item?.ProfilePicName)
+                  )
+                "
+              >
+                {{
+                  item?.roomId
+                    ? item?.Username?.substring(0, 2).toUpperCase()
+                    : item?.groupName?.substring(0, 2).toUpperCase()
+                }}
+              </div>
             </div>
             <div
               class="text-area d-flex justify-content-between sidebar-items align-items-center"
@@ -425,9 +453,12 @@
                   "
                   >{{ item?.unReadMessage }}</span
                 >
-                <span class="font-12-px">
+                <span class="font-12-px" *ngIf="item?.updatedDate; else whileAgo">
                   {{ item?.updatedDate | messageTime }}
                 </span>
+                <ng-template #whileAgo>
+                 <span class="font-12-px">while ago</span>
+                </ng-template>
               </div>
             </div>
           </div>

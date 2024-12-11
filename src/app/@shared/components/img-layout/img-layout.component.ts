@@ -31,7 +31,6 @@ export class ImgLayoutComponent {
 
   openImagePreview(index: number) {
     this.currentIndex = index.toString();
-    console.log(this.imageList, 'imageList');
 
     // this.modalService.open(this.carouselTemplate, {
     //   size: 'xl',

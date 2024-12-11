@@ -95,6 +95,18 @@
     border: 2px solid var(--font-icon-color);
     color: var(--font-icon-color);
     opacity: 0.8;
+    // position: absolute;
+    // left: 100%;
+
+    // @media (min-width: 1250px) {
+    //   left: calc(100% + 30px);
+    // }
+    // @media (min-width: 992px) and (max-width:1040px) {
+    //   display: none;
+    // }
+    // @media (max-width: 768px) {
+    //   display: none;
+    // }
   }
 }
 
@@ -107,14 +119,13 @@
       }
     }
   }
-  
 }
-.mobile-view{
+.mobile-view {
   display: flex;
   flex-direction: row;
   align-items: center;
 
-  .abs-area{
+  .abs-area {
     right: initial;
     top: 8px;
     left: 9px;

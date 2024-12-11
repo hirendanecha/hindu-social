@@ -1,6 +1,6 @@
-<div class="mt-2 border rounded">
-  <ng-container *ngIf="post; else noPost">
-    <div class="d-flex p-2" (click)="redirectToParentProfile(post)">
+<ng-container *ngIf="post; else noPost">
+  <div class="mt-2 border rounded" (click)="redirectToParentProfile(post)">
+    <div class="d-flex p-2 position-relative" (mouseout)="showHoverBox = false">
       <img
         class="w-24-px h-24-px rounded"
         loading="lazy"
@@ -15,7 +15,10 @@
         <div
           class="d-flex align-items-center cursor c-padding posted-wrap-text"
         >
-          <div class="d-flex align-items-center">
+          <div
+            class="d-flex align-items-center"
+            (mouseover)="showHoverBox = true"
+          >
             {{ post?.Username || post?.FirstName }}
             <div>
               <fa-icon
@@ -28,12 +31,87 @@
           </div>
         </div>
       </div>
+      <!-- hoverbox -->
+      <div
+        [class.show]="showHoverBox"
+        class="hover-box-container shadow"
+        (mouseover)="showHoverBox = true"
+        *ngIf="(breakpointService?.screen | async).lg.gatherThen"
+      >
+        <div class="d-flex flex-column">
+          <img
+            class="w-48-px h-48-px rounded-4"
+            loading="lazy"
+            data-src="{{
+              post?.ProfilePicName ||
+                '/assets/images/avtar/placeholder-user.png'
+            }}"
+            onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+            alt="avatar"
+          />
+          <div class="d-flex gap-3 align-items-baseline">
+            <a
+              class="h6 cursor mt-2"
+              [href]="webUrl + 'settings/view-profile/' + post.profileid"
+            >
+              &#64;{{
+                (post?.Username || post?.FirstName)?.split(" ")?.join("")
+              }}
+            </a>
+
+            <button>
+              <a
+                class="droplist d-flex align-items-center gap-2"
+                [appCopyClipboard]="opyData(post)"
+              >
+                <fa-icon [icon]="['fas', 'copy']" />
+              </a>
+            </button>
+          </div>
+          <div
+            class="d-flex mt-2"
+            *ngIf="profileId != post.profileid && tokenService.getCredentials()"
+          >
+            <button>
+              <a
+                class="droplist d-flex align-items-center gap-2"
+                (click)="selectMessaging(post)"
+              >
+                <fa-icon [icon]="['fas', 'envelope']" />
+                <span>Messaging</span>
+              </a>
+            </button>
+            <span class="me-2 ms-2">|</span>
+            <button>
+              <a
+                class="droplist d-flex align-items-center gap-2"
+                routerLink="/platforms"
+              >
+                <fa-icon [icon]="['fas', 'table-list']" />
+                <span>Platforms</span>
+              </a>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="p-2">
+
+    <div class="p-2 cursor">
       <p
         class="post-description mdtxt m-0"
-        [innerHTML]="post.postdescription | noSanitize"
+        [innerHTML]="
+          post.postdescription
+            | stripHtml
+            | truncate : (showFullDesc ? -1 : 1000)
+            | noSanitize
+        "
+        hoverDropdown
       ></p>
+      <ng-container *ngIf="(post?.postdescription | stripHtml).length > 500">
+        <button (click)="showFullDescription()" class="c-text-color fw-bold">
+          {{ showFullDesc ? "Read Less" : "Read More" }}
+        </button>
+      </ng-container>
       <ng-container *ngIf="descriptionimageUrl">
         <app-img-preview [src]="descriptionimageUrl" classes="w-100" />
       </ng-container>
@@ -54,31 +132,252 @@
         </div> -->
         <!-- <app-img-preview [src]="post?.thumbfilename" classes="w-100" /> -->
         <video
-        data-src="{{post.thumbfilename}}"
-        [src]="post?.streamname"
-        controls
-        class="w-100 mt-1 rounded"
-        [autoplay]="false"
-        poster="{{post.thumbfilename}}"
+          data-src="{{ post.thumbfilename }}"
+          [src]="post?.streamname"
+          controls
+          class="w-100 mt-1 rounded"
+          [autoplay]="false"
+          poster="{{ post.thumbfilename }}"
         ></video>
-    
       </ng-container>
 
-      <app-post-meta-data-card [post]="post" />
+      <app-post-meta-data-card [post]="post" (click)="$event.stopPropagation()" />
       <ng-container *ngIf="post?.imagesList">
-        <app-img-layout [post]="post" />
+        <app-img-layout [post]="post" (click)="$event.stopPropagation()" />
       </ng-container>
       <ng-container *ngIf="post?.imageUrl">
-        <app-img-preview [src]="post?.imageUrl" classes="w-100" />
+        <app-img-preview [src]="post?.imageUrl" classes="w-100" (click)="$event.stopPropagation()" />
       </ng-container>
       <!-- <ng-container *ngIf="post?.streamname">
         <app-img-preview [src]="post?.thumbfilename" classes="w-100" />
       </ng-container> -->
     </div>
-  </ng-container>
-  <ng-template #noPost>
-    <div class="d-flex justify-content-center p-2">
-      <span>This post is unavailable!</span>
+    <div
+      class="mt-1 friends-list like-comment-share p-3 d-center flex-lg-wrap gap-3 gap-md-0 justify-content-between"
+    >
+      <button
+        class="d-center gap-1 gap-sm-2 mdtxt align-items-center"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        title="Post Likes"
+      >
+        <fa-icon
+          [icon]="['fas', 'thumbs-up']"
+          class="font-20-px"
+          [ngClass]="post?.react === 'L' ? 'active' : ''"
+        />
+        {{ post?.likescount > 0 ? post?.likescount : 0 }}
+        <p class="d-lg-block d-none m-0">Likes</p>
+      </button>
+      <!-- <button
+      class="d-center gap-1 gap-sm-2 mdtxt align-items-center"
+      ngbTooltip="Coming Soon!"
+      placement="bottom"
+    >
+      <fa-icon [icon]="['fas', 'message']" class="font-20-px" />
+      Video reply
+    </button> -->
+      <button
+        class="d-center gap-1 gap-sm-2 mdtxt align-items-center"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        title="View Comments"
+        [disabled]="!tokenService.getCredentials()"
+        (click)="viewComments(post?.id)"
+      >
+        <fa-icon [icon]="['fas', 'comment']" class="font-20-px" />
+        {{ post.commentCount }}
+        <p class="d-lg-block d-none m-0">Comments</p>
+      </button>
     </div>
-  </ng-template>
-</div>
+
+    <ng-container *ngIf="isOpenCommentsPostId === post.id">
+      <ng-container *ngIf="commentList.length; else elseNoCommentsFound">
+        <div class="comments-area mt-5" (click)="$event.stopPropagation()">
+          <div
+            class="single-comment-area ms-xxl-15"
+            *ngFor="let comment of commentList"
+          >
+            <div
+              class="d-flex gap-3 justify-content-sm-end"
+              *ngIf="comment?.postId === post.id"
+            >
+              <div class="d-center align-items-baseline">
+                <img
+                  loading="lazy"
+                  class="w-40-px h-40-px rounded-3"
+                  data-src="{{
+                    comment?.ProfilePicName ||
+                      '/assets/images/avtar/placeholder-user.png'
+                  }}"
+                  onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                  alt="avatar"
+                />
+              </div>
+              <div class="info-item w-100 pb-3">
+                <div
+                  class="top-area px-4 py-3 d-flex flex-column gap-2 align-items-start justify-content-start"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center w-100 position-relative"
+                  >
+                    <h6 class="m-0 text-transform cursor">
+                      {{
+                        (comment.Username || comment.FirstName)
+                          .split(" ")
+                          .join("")
+                      }}
+                      <span class="font-12-px text-lowercase">
+                        <fa-icon class="ms-2" [icon]="['fas', 'clock']" />
+                        {{ comment.createdDate | dateDay }}</span
+                      >
+                    </h6>
+                  </div>
+                  <ng-container *ngIf="comment?.comment">
+                    <p
+                      class="mdtxt mb-0 comment-description"
+                      [innerHTML]="
+                        comment.comment
+                          | stripHtml
+                          | truncate : (showFullDesc ? -1 : 450)
+                          | linkify
+                          | noSanitize
+                      "
+                      hoverDropdown
+                    ></p>
+                    <ng-container *ngIf="comment.descImg">
+                      <app-img-preview
+                        [src]="comment.descImg"
+                        classes="w-100"
+                      />
+                    </ng-container>
+                  </ng-container>
+                  <app-post-meta-data-card [post]="comment" />
+
+                  <ng-container *ngIf="comment.imageUrl">
+                    <app-img-preview
+                      [src]="comment?.imageUrl"
+                      classes="h-100 w-100 rounded-2"
+                    />
+                  </ng-container>
+                </div>
+
+                <ul class="friends-list d-flex gap-6 py-2 px-4 m-0">
+                  <li class="d-center">
+                    <button class="d-center gap-1 gap-sm-2 smtxt">
+                      <fa-icon
+                        [icon]="['fas', 'thumbs-up']"
+                        class="font-16-px"
+                      />
+                      {{ comment?.likeCount > 0 ? comment?.likeCount : 0 }}
+                      Likes
+                    </button>
+                  </li>
+                </ul>
+
+                <ng-container *ngIf="comment?.replyCommnetsList?.length">
+                  <div
+                    *ngFor="
+                      let reply of comment?.replyCommnetsList;
+                      let last = last
+                    "
+                    class="single-comment-area comment-item-nested"
+                  >
+                    <div
+                      *ngIf="
+                        reply.parentCommentId === comment.id &&
+                        reply.postId === post.id
+                      "
+                      class="d-flex gap-3"
+                    >
+                      <img
+                        loading="lazy"
+                        data-src="{{
+                          reply.ProfilePicName ||
+                            '/assets/images/avtar/placeholder-user.png'
+                        }}"
+                        class="w-40-px h-40-px rounded-3"
+                        alt="icon"
+                        onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
+                      />
+
+                      <div class="info-item w-100">
+                        <div
+                          class="top-area px-4 py-3 d-flex flex-column gap-2 align-items-start justify-content-start position-relative"
+                        >
+                          <ng-container *ngIf="reply?.comment">
+                            <p
+                              class="mdtxt mb-0 comment-description"
+                              [innerHTML]="
+                                reply?.comment
+                                  | stripHtml
+                                  | truncate : (showFullDesc ? -1 : 450)
+                                  | linkify
+                                  | noSanitize
+                              "
+                              hoverDropdown
+                            ></p>
+                            <ng-container *ngIf="reply.descImg">
+                              <app-img-preview
+                                [src]="reply.descImg"
+                                classes="w-100"
+                              />
+                            </ng-container>
+                          </ng-container>
+                          <app-post-meta-data-card [post]="reply" />
+
+                          <ng-container *ngIf="reply.imageUrl">
+                            <app-img-preview
+                              [src]="reply?.imageUrl"
+                              classes="h-100 w-100 rounded-2"
+                            />
+                          </ng-container>
+                        </div>
+
+                        <ul class="friends-list d-flex gap-6 py-2 px-4 m-0">
+                          <li class="d-center">
+                            <button class="d-center gap-1 gap-sm-2 smtxt">
+                              <fa-icon
+                                [icon]="['fas', 'thumbs-up']"
+                                class="font-16-px"
+                              />
+                              {{ reply?.likeCount > 0 ? reply?.likeCount : 0 }}
+                              Likes
+                            </button>
+                          </li>
+                          <li class="d-center">
+                            <button class="d-center gap-1 gap-sm-2 smtxt">
+                              <fa-icon
+                                [icon]="['fas', 'message']"
+                                class="smtxt"
+                              />
+                              Reply
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <app-inline-loader *ngIf="editCommentsLoader" />
+      </ng-container>
+    </ng-container>
+  </div>
+</ng-container>
+<ng-template #noPost>
+  <div class="d-flex justify-content-center p-2">
+    <span>This post is unavailable!</span>
+  </div>
+</ng-template>
+
+<ng-template #elseNoCommentsFound>
+  <app-inline-loader *ngIf="isCommentsLoader" />
+
+  <ng-container *ngIf="!isCommentsLoader">
+    <span class="pt-5 m-0 text-start text-secondary">No comments yet!</span>
+  </ng-container>
+</ng-template>

@@ -28,6 +28,7 @@ export class IncomingcallModalComponent
 {
   @Input() cancelButtonLabel: string = 'Hangup';
   @Input() confirmButtonLabel: string = 'Join';
+  @Input() showCloseButton: boolean = false;
   @Input() title: string = 'Incoming call...';
   @Input() calldata: any;
   @Input() sound: any;
@@ -52,7 +53,6 @@ export class IncomingcallModalComponent
     this.profileId = +localStorage.getItem('profileId');
     // this.isOnCall = this.router.url.includes('/facetime/') || false;
   }
-  
   ngAfterViewInit(): void {
     this.isOnCall = this.calldata?.isOnCall === 'Y' || false;
     this.soundControlService.initStorageListener();
@@ -60,7 +60,6 @@ export class IncomingcallModalComponent
     this.soundEnabledSubscription =
       this.soundControlService.soundEnabled$.subscribe((soundEnabled) => {
         if (soundEnabled === false) {
-          // console.log(soundEnabled);
           this.sound?.stop();
         }
       });
@@ -73,7 +72,7 @@ export class IncomingcallModalComponent
     //   }
     // }
     this.sharedService.loginUserInfo.subscribe((user) => {
-     this.soundTrigger = user.callNotificationSound
+      this.soundTrigger = user.callNotificationSound;
     });
     if (this.soundTrigger === 'Y' && this.calldata.id) {
       if (this.sound) {
@@ -156,9 +155,7 @@ export class IncomingcallModalComponent
       domain: 'hindu.social',
     };
     this.customerService.startCallToBuzzRing(buzzRingData).subscribe({
-      next: (data: any) => {
-        console.log(data);
-      },
+      next: (data: any) => {},
       error: (err) => {
         console.log(err);
       },
@@ -169,7 +166,7 @@ export class IncomingcallModalComponent
     });
   }
 
-  hangUpCall(isCallCut, messageText): void {
+  hangUpCall(isCallCut: boolean, messageText: string): void {
     this.sound?.stop();
     clearTimeout(this.hangUpTimeout);
     const data = {
@@ -179,13 +176,11 @@ export class IncomingcallModalComponent
       groupId: this.calldata?.groupId,
       notificationByProfileId:
         this.calldata.notificationToProfileId || this.profileId,
-      message: isCallCut ? 'Call declined' : 'No Answer',
+      message: isCallCut ? 'Missed call' : 'No Answer',
     };
     this.socketService?.hangUpCall(data, (data: any) => {
       if (isCallCut && messageText) {
         this.sendMessage(messageText);
-      } else {
-        return;
       }
       this.activateModal.close('cancel');
     });

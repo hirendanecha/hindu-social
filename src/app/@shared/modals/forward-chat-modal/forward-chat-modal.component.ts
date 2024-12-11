@@ -115,8 +115,10 @@ export class ForwardChatModalComponent implements OnInit {
     } else {
       this.selectedItems.splice(index, 1);
     }
-    const lastSelectedItem = this.selectedItems[this.selectedItems.length - 1];
-    this.sendUserMessage(lastSelectedItem);
+    if (!this.textInput) {
+      const lastSelectedItem = this.selectedItems[this.selectedItems.length - 1];
+      this.sendUserMessage(lastSelectedItem);
+    }
   }
 
   sendUserMessage(message: any) {
@@ -133,5 +135,13 @@ export class ForwardChatModalComponent implements OnInit {
       parentMessageId: this.data.id || null,
     };
     this.socketService.sendMessage(data, async (data: any) => {});
+  }
+
+  forwardMessage() {
+    if (this.textInput) {
+      const lastSelectedItem = this.selectedItems[this.selectedItems.length - 1];
+      this.sendUserMessage(lastSelectedItem);
+    }
+    this.activateModal.close('success');
   }
 }

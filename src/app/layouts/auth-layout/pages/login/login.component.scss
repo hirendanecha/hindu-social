@@ -4,7 +4,7 @@
   width: 100%;
 
   .custom-input-area {
-    fa-icon{
+    fa-icon {
       top: 11px;
       right: 20px;
       background-color: var(--box-1st-color);
@@ -15,12 +15,14 @@
       align-content: center;
     }
   }
+  .custom-primary {
+    color: var(--link-color) !important;
+  }
 }
-.captcha-btn{
+.captcha-btn {
   display: flex;
 
-@media(max-width: 410px) {
-  flex-direction: column;
- 
-}
+  @media (max-width: 410px) {
+    flex-direction: column;
+  }
 }

@@ -12,6 +12,7 @@ export class ImgPickerComponent {
   @Input('defaultImg') defaultImg: string = '/assets/images/avtar/placeholder-user.png';
   @Input('classes') classes: string = 'w-156-px h-156-px';
   @Output('onFileChange') onFileChange: EventEmitter<any> = new EventEmitter<any>();
+  @Input() showClearIcon: boolean = true;
 
   fileData: any = {
     file: null,

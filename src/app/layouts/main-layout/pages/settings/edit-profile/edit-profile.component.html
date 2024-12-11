@@ -4,6 +4,7 @@
       classes="w-300-px h-300-px"
       [url]="editForm.get('ProfilePicName')?.value"
       (onFileChange)="onProfileImgChange($event)"
+      [showClearIcon]="resetImageClosebtn"
     ></app-img-picker>
 
     <app-img-picker
@@ -12,6 +13,7 @@
       defaultImg="/assets/images/profile-cover.png"
       [url]="editForm.get('CoverPicName')?.value"
       (onFileChange)="onProfileCoverImgChange($event)"
+      [showClearIcon]="resetImageClosebtn"
     ></app-img-picker>
   </div>
 
@@ -44,6 +46,7 @@
             />
           </div>
         </div>
+
         <div class="row">
           <div class="col-12 col-md-6 mb-3">
             <label class="d-flex form-label align-items-center"
@@ -69,6 +72,7 @@
             />
           </div>
         </div>
+
         <div class="row">
           <div class="col-12 col-md-6 mb-3">
             <label class="d-flex form-label">Country</label>
@@ -96,6 +100,7 @@
             />
           </div>
         </div>
+
         <div class="row">
           <div class="col-12 col-md-6 mb-3">
             <label class="d-flex form-label">State</label>
@@ -227,6 +232,7 @@
           </div>
         </div>
       </div>
+
       <button
         class="btn btn-primary mt-5 login-button float-end w-100-px"
         (click)="confirmAndUpdateCustomer()"

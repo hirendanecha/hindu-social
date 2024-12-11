@@ -14,7 +14,8 @@ export class ResearchCardComponent implements AfterViewInit {
 
   constructor(
     private router: Router
-  ) { }
+  ) { 
+  }
   
   ngAfterViewInit(): void {
   }

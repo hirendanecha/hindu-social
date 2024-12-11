@@ -1,5 +1,5 @@
 <header class="header-section w-100">
-  <div class="container p-3">
+  <div class="container p-3 position-relative">
     <nav class="navbar navbar-expand-lg justify-content-between w-100 p-0">
       <div class="left-area d-flex align-items-center gap-3">
         <ng-container
@@ -29,7 +29,7 @@
                   *ngIf="sharedService?.userData?.ProfilePicName"
                   class="w-48-px h-48-px rounded-3"
                   loading="lazy"
-                  data-src="{{ sharedService?.userData?.ProfilePicName }}"
+                  data-src="{{ sharedService?.userData?.ProfilePicName || '/assets/images/avtar/placeholder-user.png' }}"
                   onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                   alt="avatar"
                 />
@@ -58,6 +58,10 @@
                 [routerLink]="['/profile-chats']"
                 target="_blank"
               >
+                <!-- <span
+                  *ngIf="sharedService.isNotify"
+                  class="abs-area position-absolute d-center smtxt"
+                ></span> -->
                 <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
               </a>
             </div>
@@ -110,7 +114,7 @@
                   <img
                     loading="lazy"
                     class="w-32-px h-32-px rounded"
-                    data-src="{{ user.ProfilePicName }}"
+                    data-src="{{ user.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
                     [alt]="user.Username"
                     onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                   />
@@ -128,9 +132,10 @@
       >
         <li>
           <!-- (click)="scrollToTop()" -->
+          <!-- (dblclick)="reloadPage()" -->
+          <!-- (click)="reloadPage()" -->
           <a
             routerLink="/home"
-            (dblclick)="reloadPage()"
             routerLinkActive="active"
             class="nav-icon home cursor"
             data-toggle="tooltip"
@@ -178,8 +183,8 @@
       </ul>
 
       <div
-        class="right-area d-lg-flex d-none justify-content-end align-items-center gap-6 cus-z p-0"
-        *ngIf="tokenService.getCredentials()"
+      class="right-area d-lg-flex d-none justify-content-end align-items-center gap-6 cus-z p-0"
+      *ngIf="tokenService.getCredentials()"
       >
       <button class="btn btn-sm font-20-px p-0 rounded-circle h-36-px w-36-px fw-bold userguidebtn" *ngIf="showUserGuideBtn" (click)="openUserGuide()">?</button>
         <div
@@ -187,16 +192,22 @@
           *ngIf="sharedService.callId && !hideOngoingCallButton"
         >
           <div class="ongoing-call d-center position-relative">
+            <!-- [routerLink]="['/profile-chats']" -->
             <a
               routerLinkActive="active"
               [routerLink]="['/facetime/' + sharedService.callId]"
             >
               <fa-icon [icon]="['fas', 'phone-volume']" class="font-20-px" />
             </a>
+            <!-- <span
+            *ngIf="sharedService.isNotify"
+            class="abs-area position-absolute d-center smtxt"
+          ></span> -->
           </div>
         </div>
         <div class="single-item">
           <div class="icon-area d-center position-relative">
+            <!-- [routerLink]="['/profile-chats']" -->
             <a
               target="_blank"
               routerLinkActive="active"
@@ -204,8 +215,13 @@
             >
               <fa-icon [icon]="['fas', 'envelope']" class="font-20-px" />
             </a>
+            <!-- <span
+            *ngIf="sharedService.isNotify"
+            class="abs-area position-absolute d-center smtxt"
+          ></span> -->
           </div>
         </div>
+
         <div class="single-item">
           <div
             class="icon-area d-center position-relative"
@@ -227,7 +243,7 @@
             <img
               class="w-100 h-100 rounded-3"
               loading="lazy"
-              data-src="{{ sharedService?.userData?.ProfilePicName }}"
+              data-src="{{ sharedService?.userData?.ProfilePicName || '/assets/images/avtar/placeholder-user.png' }}"
               onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
               alt="avatar"
             />

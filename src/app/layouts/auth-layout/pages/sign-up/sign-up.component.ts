@@ -54,8 +54,8 @@ export class SignUpComponent implements OnInit, AfterViewInit {
     confirm_password: new FormControl('', [Validators.required]),
     MobileNo: new FormControl(''),
     Country: new FormControl('US', [Validators.required]),
-    Zip: new FormControl('', [Validators.required]),
-    State: new FormControl('', [Validators.required]),
+    Zip: new FormControl(''),
+    State: new FormControl(''),
     City: new FormControl(''),
     County: new FormControl(''),
     TermAndPolicy: new FormControl(false, Validators.required),
@@ -86,14 +86,14 @@ export class SignUpComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    fromEvent(this.zipCode.nativeElement, 'input')
-      .pipe(debounceTime(1000))
-      .subscribe((event) => {
-        const val = event['target'].value;
-        if (val.length > 3) {
-          // this.onZipChange(val);
-        }
-      });
+    // fromEvent(this.zipCode.nativeElement, 'input')
+    //   .pipe(debounceTime(1000))
+    //   .subscribe((event) => {
+    //     const val = event['target'].value;
+    //     if (val.length > 3) {
+    //        this.onZipChange(val);
+    //     }
+    //   });
     // this.loadCloudFlareWidget();
   }
 
@@ -103,7 +103,6 @@ export class SignUpComponent implements OnInit, AfterViewInit {
       theme: this.theme === 'dark' ? 'light' : 'dark',
       callback: function (token) {
         localStorage.setItem('captcha-token', token);
-        console.log(`Challenge Success ${token}`);
         if (!token) {
           this.msg = 'invalid captcha kindly try again!';
           this.type = 'danger';
@@ -192,11 +191,22 @@ export class SignUpComponent implements OnInit, AfterViewInit {
     }
   }
 
+  validateEmail() {
+    const emailControl = this.registerForm.get('Email');
+    const emailError = Validators.email(emailControl);
+    if (emailError) {
+      this.msg = 'Please enter a valid email address.';
+      this.scrollTop();
+      return false;
+    }
+    return true;
+  }
+
   validatepassword(): boolean {
-    const pattern = '[a-zA-Z0-9]{5,}';
+    // const pattern = '[a-zA-Z0-9]{5,}';
     // const pattern =
     //   '(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[a-z])(?=.*[0-9].*[0-9]).{8}';
-
+    const pattern = '.{5,}';
     if (!this.registerForm.get('Password').value.match(pattern)) {
       this.msg = 'Password must be a minimum of 5 characters';
       // this.msg =
@@ -225,11 +235,14 @@ export class SignUpComponent implements OnInit, AfterViewInit {
     // return false;
     // }
     // this.profileImg?.file?.name &&
+    // && this.registerForm.get('Anonymous').value === true
     if (
       this.registerForm.valid &&
       this.registerForm.get('TermAndPolicy').value === true 
-      // && this.registerForm.get('Anonymous').value === true
     ) {
+      if (!this.validateEmail()) {
+        return;
+      }
       if (!this.validatepassword()) {
         return;
       }
@@ -263,6 +276,7 @@ export class SignUpComponent implements OnInit, AfterViewInit {
       },
     });
   }
+
   onCountryChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.getAllState(target.value);
@@ -299,7 +313,8 @@ export class SignUpComponent implements OnInit, AfterViewInit {
   //             City: zipData.city,
   //             County: zipData.places,
   //           });
-  //         } else {
+  //         }
+  //          else {
   //           this.registerForm.get('State').disable();
   //           this.registerForm.get('City').disable();
   //           this.registerForm.get('County').disable();
@@ -371,7 +386,11 @@ export class SignUpComponent implements OnInit, AfterViewInit {
     });
   }
   onChangeTag(event) {
-    this.registerForm.get('Username').setValue(event.target.value.replaceAll(' ', ''));
+    this.registerForm
+      .get('Username')
+      .setValue(
+        event.target.value.replaceAll(' ', '').replaceAll(/\s*,+\s*/g, ',')
+      );
   }
 
   convertToUppercase(event: any) {
@@ -379,5 +398,18 @@ export class SignUpComponent implements OnInit, AfterViewInit {
     let inputValue = inputElement.value;
     inputValue = inputValue.replace(/\s/g, '');
     inputElement.value = inputValue.toUpperCase();
+  }
+
+  onClick(event: MouseEvent): void {
+    event.preventDefault();
+    let listener = (e: ClipboardEvent) => {
+      let clipboard = e.clipboardData || window["clipboardData"];
+      clipboard.setData("text", 'support@hindu.social');
+      e.preventDefault();
+      this.toastService.success('Email address copied');
+    };
+    document.addEventListener("copy", listener, false)
+    document.execCommand("copy");
+    document.removeEventListener("copy", listener, false);
   }
 }

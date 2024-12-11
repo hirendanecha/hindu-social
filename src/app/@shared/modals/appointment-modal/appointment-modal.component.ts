@@ -17,7 +17,7 @@ import {
 import { ToastService } from '../../services/toast.service';
 import { OpenStripeComponent } from '../open-stripe/open-stripe.component';
 import { CustomerService } from '../../services/customer.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { AppointmentsService } from '../../services/appointment.service';
 
 @Injectable()
@@ -212,7 +212,7 @@ export class AppointmentModalComponent implements AfterViewInit {
     // console.log(appointmentDateTime);
     // console.log(this.practitioner);
     const topics = [];
-    this.data.topics.map((e) => topics.push(e.name));
+    this.data?.topics?.map((e) => topics.push(e.name));
     const applicationObject = {
       appointment: {
         appointmentDateTime: appointmentDateTime,

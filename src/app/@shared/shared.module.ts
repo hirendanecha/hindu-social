@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, IMAGE_CONFIG } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationModalComponent } from './modals/confirmation-modal/confirmation-modal.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -106,11 +106,11 @@ import {
   faCircleChevronDown,
   faSignIn,
   faSignOut,
+  faHouseMedical,
   faArrowLeftLong,
   faArrowRightLong,
   faCircle,
   faGlobe,
-  faHouseMedical,
   faList,
   faStethoscope,
 } from '@fortawesome/free-solid-svg-icons';
@@ -135,25 +135,25 @@ import { PostDetailComponent } from '../layouts/main-layout/pages/home/post-deta
 import { EditResearchModalComponent } from './modals/edit-research-modal/edit-research-modal.component';
 import { SharePostModalComponent } from './modals/share-post-modal/share-post-modal.component';
 import { RePostCardComponent } from './components/re-post-card/re-post-card.component';
-import { HealthPraatitionerCardComponent } from './components/health-partitioner-card/health-partitioner-card.component';
 import { EditPostModalComponent } from './modals/edit-post-modal/edit-post-modal.component';
-import { AppointmentModalComponent } from './modals/appointment-modal/appointment-modal.component';
-import { OpenStripeComponent } from './modals/open-stripe/open-stripe.component';
-import { AppointmentCallComponent } from './modals/appointment-call/appointment-call.component';
 import { ConferenceLinkComponent } from './modals/create-conference-link/conference-link-modal.component';
+import { IncomingcallModalComponent } from './modals/incoming-call-modal/incoming-call-modal.component';
+import { OutGoingCallModalComponent } from './modals/outgoing-call-modal/outgoing-call-modal.component';
+import { CreateGroupModalComponent } from './modals/create-group-modal/create-group-modal.component';
+import { EditGroupModalComponent } from './modals/edit-group-modal/edit-group-modal.component';
+import { MediaGalleryComponent } from './components/media-gallery/media-gallery.component';
+import { GalleryImgPreviewComponent } from './components/gallery-img-preview/gallery-img-preview.component';
+import { QRCodeModule } from 'angularx-qrcode';
+import { QrScanModalComponent } from './modals/qrscan-modal/qrscan-modal.component';
 import { AppQrModalComponent } from './modals/app-qr-modal/app-qr-modal.component';
 import { ForwardChatModalComponent } from './modals/forward-chat-modal/forward-chat-modal.component';
-import { QrScanModalComponent } from './modals/qrscan-modal/qrscan-modal.component';
-import { OutGoingCallModalComponent } from './modals/outgoing-call-modal/outgoing-call-modal.component';
-import { EditGroupModalComponent } from './modals/edit-group-modal/edit-group-modal.component';
-import { CreateGroupModalComponent } from './modals/create-group-modal/create-group-modal.component';
-import { MediaGalleryComponent } from './components/media-gallery/media-gallery.component';
-import { IncomingcallModalComponent } from './modals/incoming-call-modal/incoming-call-modal.component';
-import { GalleryImgPreviewComponent } from './components/gallery-img-preview/gallery-img-preview.component';
-import { HoverDropdownDirective } from './directives/hover-dropdown.directive';
-import { QRCodeModule } from 'angularx-qrcode';
 import { ImgLayoutComponent } from './components/img-layout/img-layout.component';
+import { HoverDropdownDirective } from './directives/hover-dropdown.directive';
 import { UserGuideModalComponent } from './modals/userguide-modal/userguide-modal.component';
+import { InvitePeopleForChatModalComponent } from './modals/invite-people-for-chat/invite-people-for-chat-modal.component';
+import { HealthPraatitionerCardComponent } from './components/health-partitioner-card/health-partitioner-card.component';
+import { OpenStripeComponent } from './modals/open-stripe/open-stripe.component';
+import { AppointmentModalComponent } from './modals/appointment-modal/appointment-modal.component';
 
 const sharedComponents = [
   ConfirmationModalComponent,
@@ -193,8 +193,8 @@ const sharedComponents = [
   ImgLayoutComponent,
   AppointmentModalComponent,
   OpenStripeComponent,
-  AppointmentCallComponent,
-  UserGuideModalComponent
+  UserGuideModalComponent,
+  InvitePeopleForChatModalComponent,
 ];
 
 const sharedModules = [
@@ -215,13 +215,20 @@ const sharedModules = [
 ];
 
 @NgModule({
-  declarations: [sharedComponents],
   imports: [sharedModules],
+  declarations: [sharedComponents],
   exports: [...sharedModules, ...sharedComponents],
   providers: [
     NgbActiveModal,
     NgbActiveOffcanvas,
     { provide: LAZYLOAD_IMAGE_HOOKS, useClass: ScrollHooks },
+    {
+      provide: IMAGE_CONFIG,
+      useValue: {
+        disableImageSizeWarning: true, 
+        disableImageLazyLoadWarning: true
+      }
+    },
   ],
 })
 export class SharedModule {

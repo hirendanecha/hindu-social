@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import { EncryptDecryptService } from '../services/encrypt-decrypt.service';
 
 @Pipe({
@@ -42,7 +42,6 @@ export class MessageDatePipe implements PipeTransform {
         groupedMessages[groupedMessages.length - 1].messages.push(message);
       }
     });
-    // console.log(groupedMessages);
     return groupedMessages;
   }
 }

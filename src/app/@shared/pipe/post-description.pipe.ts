@@ -3,10 +3,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({name: 'truncate'})
 export class TruncatePipe implements PipeTransform {
   transform(value: string, limit: number): string {
-    if (limit === -1 || value.length <= limit) {
+    if (limit === -1 || value?.length <= limit) {
       return value;
     }
-    return value.substring(0, limit) + '...';
+    return value?.substring(0, limit) + '...';
   }
 }
 @Pipe({
@@ -20,8 +20,17 @@ export class StripHtmlPipe implements PipeTransform {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const element = node as HTMLElement;
         const tagName = element.tagName.toLowerCase();
+        if (tagName === 'br') {
+          return '<br>';
+        }
         if (tagName === 'a' && element.hasAttribute('data-id')) {
           return element.outerHTML;
+        }
+        if (tagName === 'img' && element.hasAttribute('src')) {
+          const src = element.getAttribute('src');
+          const width = element.getAttribute('width');
+          const height = element.getAttribute('height');
+          return `<img src="${src}"${width ? ` width="${width}"` : ''}${height ? ` height="${height}"` : ''}>`;
         }
         const childContent = Array.from(element.childNodes).map(processNode).join('');
         if (element.childNodes.length === 1 && element.firstChild?.nodeType === Node.ELEMENT_NODE) {

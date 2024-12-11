@@ -1,3 +1,6 @@
+<div class="d-flex justify-content-end me-2 btn btn-sm" *ngIf="title === 'Join existing call...'">
+  <fa-icon [icon]="['fas', 'xmark']" class="font-24-px" role="button" (click)="activateModal.close('cancel')" />
+</div>
 <div class="modal-body text-start" #focusElement>
   <div class="text-center">
     <img
@@ -20,7 +23,7 @@
       <button
         type="button"
         class="btn btn-sm btn-danger ms-2 font-20-px rounded-circle"
-        (click)="hangUpCall(true, 'Call declined')"
+        (click)="hangUpCall(true, 'Declined call')"
       >
         <fa-icon class="c-icon-color" [icon]="['fas', 'phone-slash']"></fa-icon>
       </button>
@@ -52,7 +55,7 @@
         <button
           type="button"
           class="btn btn-sm btn-danger ms-2 font-16-px rounded-circle"
-          (click)="hangUpCall(true, 'Call declined')"
+          (click)="hangUpCall(true, 'Declined call')"
         >
           <fa-icon
             class="c-icon-color"

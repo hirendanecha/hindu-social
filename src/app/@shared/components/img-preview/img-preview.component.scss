@@ -1,5 +1,5 @@
 :host {
-  .image-render{
+  .image-render {
     image-rendering: -webkit-optimize-contrast;
   }
   .img-preview {
@@ -70,7 +70,7 @@
       }
     }
 
-    .image-preview{
+    .image-preview {
       top: 0px;
       bottom: 0px;
       position: sticky;
@@ -93,7 +93,7 @@
   }
 }
 
-::ng-deep .c-icon-color{
+::ng-deep .c-icon-color {
   svg path {
     fill: var(--secondary-color) !important;
   }

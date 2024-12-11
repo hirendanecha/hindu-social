@@ -15,7 +15,7 @@ export class NotificationsComponent {
   notificationList: any[] = [];
   activePage = 1;
   hasMoreData = false;
-
+  profileId: number = +localStorage.getItem('profileId');
   constructor(
     private customerService: CustomerService,
     private spinner: NgxSpinnerService,
@@ -25,13 +25,15 @@ export class NotificationsComponent {
     private socketService: SocketService
   ) {
     const data = {
-      title: 'Hindu.social Notification',
+      title: 'Freedom.Buzz Notification',
       url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
-    const profileId = +localStorage.getItem('profileId');
-    this.socketService.readNotification({ profileId }, (data) => {});
+    this.socketService.readNotification(
+      { profileId: this.profileId },
+      (data) => {}
+    );
   }
 
   ngOnInit(): void {
@@ -60,9 +62,9 @@ export class NotificationsComponent {
     });
   }
 
-  viewUserPost(id) {
-    this.router.navigate([`post/${id}`]);
-  }
+  // viewUserPost(id) {
+  //   this.router.navigate([`post/${id}`]);
+  // }
 
   removeNotification(id: number): void {
     this.customerService.deleteNotification(id).subscribe({
@@ -91,8 +93,65 @@ export class NotificationsComponent {
         },
       });
   }
+
   loadMoreNotification(): void {
     this.activePage = this.activePage + 1;
     this.getNotificationList();
+  }
+
+  selectMessaging(data) {
+    if (!data?.postId) {
+      const userData = {
+        Id: data.notificationByProfileId,
+        ProfilePicName:
+          data.profileImage ||
+          data.ProfilePicName ||
+          '/assets/images/avtar/placeholder-user.png',
+        Username: data.Username,
+        GroupId: data.groupId,
+        GroupName: data.groupName,
+      };
+      const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+      const url = this.router
+        .createUrlTree(['/profile-chats'], {
+          queryParams: { chatUserData: encodedUserData },
+        })
+        .toString();
+      this.router.navigateByUrl(url);
+    }
+    //  else if (!data?.postId && data?.groupId) {
+    //   const url = this.router.serializeUrl(
+    //     this.router.createUrlTree([`/profile-chats`])
+    //   );
+    //   window.location.href = url;
+    // }
+  }
+
+  readAllNotifications(): void {
+    this.customerService.readAllNotification(this.profileId).subscribe({
+      next: (res) => {
+        this.toastService.success(res.message);
+        this.notificationList = [];
+        this.getNotificationList();
+      },
+      error: (error) => {
+        console.log(error);
+        this.toastService.danger(error.message);
+      },
+    });
+  }
+
+  deleteAllNotifications(): void {
+    this.customerService.deleteAllNotification(this.profileId).subscribe({
+      next: (res) => {
+        this.toastService.success(res.message);
+        this.notificationList = [];
+        this.getNotificationList();
+      },
+      error: (error) => {
+        console.log(error);
+        this.toastService.danger(error.message);
+      },
+    });
   }
 }

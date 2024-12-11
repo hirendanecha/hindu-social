@@ -20,7 +20,7 @@ export class ReplyCommentModalComponent implements AfterViewInit {
     file: null,
     url: '',
     tags: [],
-    meta: {}
+    meta: {},
   };
 
   commentMessageInputValue: string = ''
@@ -84,6 +84,7 @@ export class ReplyCommentModalComponent implements AfterViewInit {
     this.commentData.meta = data?.meta;
   }
 
+
   extractLargeImageFromContent(content: string): void {
     const contentContainer = document.createElement('div');
     contentContainer.innerHTML = content;
@@ -98,6 +99,9 @@ export class ReplyCommentModalComponent implements AfterViewInit {
         .endsWith('.gif');
       if (!imgTitle && !imgStyle && !imageGif) {
         const copyImage = imgTag.getAttribute('src');
+        // const bytes = copyImage.length;
+        // const megabytes = bytes / (1024 * 1024);
+        // if (megabytes > 1) {
           // this.commentData.comment = content.replace(copyImage, '');
           let copyImageTag = '<img\\s*src\\s*=\\s*""\\s*alt\\s*="">'
           this.commentData.comment = `<div>${content.replace(copyImage, '').replace(/\<br\>/ig, '').replace(new RegExp(copyImageTag, 'g'), '')}</div>`;
@@ -117,6 +121,9 @@ export class ReplyCommentModalComponent implements AfterViewInit {
           } catch (error) {
             console.error('Base64 decoding error:', error);
           }
+        // } else {
+        //   this.commentData.comment = content;
+        // }
       } else {
         this.commentData.comment = content;
       }

@@ -9,7 +9,7 @@
   //   .border-top {
   //     border-top: 1px solid var(--bs-border-color) !important;
   //   }
-  .image-render{
+  .image-render {
     image-rendering: -webkit-optimize-contrast;
   }
   .sidebar-head-text {
@@ -68,6 +68,17 @@
   .avatar-img {
     max-width: 40px;
   }
+  .default_40 {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--box-1st-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--font-icon-color);
+    font-size: 16px;
+  }
   .cus-scrollbar {
     height: 48vh;
     // height: 39vh;
@@ -120,7 +131,7 @@
     .abs-dnd {
       background: red;
     }
-    .abs-invisible{
+    .abs-invisible {
       background: rgb(156, 155, 155);
     }
   }
@@ -161,7 +172,7 @@
       line-height: 25px !important;
     }
     a {
-      color: var(--para-2nd-color)!important;
+      color: var(--para-2nd-color) !important;
       font-weight: 600 !important;
     }
   }

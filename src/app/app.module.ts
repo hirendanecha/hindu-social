@@ -4,7 +4,6 @@ import {
   Meta,
   provideClientHydration,
 } from '@angular/platform-browser';
-import { TransferHttpCacheModule } from '@nguniversal/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -25,7 +24,6 @@ import { AuthInterceptor } from './@shared/intersaptor/auth.interceptor';
     SharedModule,
     BrowserModule.withServerTransition({ appId: 'HinduSocial' }),
     BrowserAnimationsModule,
-    TransferHttpCacheModule,
   ],
   providers: [
     AuthenticationGuard,

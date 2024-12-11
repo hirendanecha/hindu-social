@@ -11,6 +11,7 @@ import { SearchFilterPipe } from './search-filter.pipe';
 import { HighlightPipe } from './hightlight-text.pipe';
 import { RandomAdvertisementUrlPipe } from './random-advertisement.pipe';
 import { StripHtmlPipe, TruncatePipe } from './post-description.pipe';
+import { LinkifyPipe } from './linkify.pipe';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { StripHtmlPipe, TruncatePipe } from './post-description.pipe';
     HighlightPipe,
     RandomAdvertisementUrlPipe,
     TruncatePipe,
-    StripHtmlPipe
+    StripHtmlPipe,
+    LinkifyPipe
   ],
   imports: [CommonModule],
   exports: [
@@ -40,7 +42,8 @@ import { StripHtmlPipe, TruncatePipe } from './post-description.pipe';
     HighlightPipe,
     RandomAdvertisementUrlPipe,
     TruncatePipe,
-    StripHtmlPipe
+    StripHtmlPipe,
+    LinkifyPipe
   ],
 })
 export class PipeModule {}

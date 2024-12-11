@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 import { CustomerService } from 'src/app/@shared/services/customer.service';
 import { SeoService } from 'src/app/@shared/services/seo.service';
 import { SocketService } from 'src/app/@shared/services/socket.service';
+
 declare var turnstile: any;
 
 @Component({
@@ -38,7 +39,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
   msg = '';
   type = 'danger';
   theme = '';
-  captchaToken = '';
   passwordHidden: boolean = true;
   @ViewChild('captcha', { static: false }) captchaElement: ElementRef;
   constructor(
@@ -72,7 +72,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
       image: `${environment.webUrl}assets/images/landingpage/HinduSocial-Logo.jpg`,
     };
     this.theme = localStorage.getItem('theme');
-    // this.seoService.updateSeoMetaData(data);
   }
 
   ngOnInit(): void {
@@ -90,13 +89,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // this.loadCloudFlareWidget();
   }
+
   loadCloudFlareWidget() {
     turnstile?.render(this.captchaElement.nativeElement, {
       sitekey: environment.siteKey,
       theme: this.theme === 'dark' ? 'light' : 'dark',
       callback: function (token) {
         localStorage.setItem('captcha-token', token);
-        console.log(`Challenge Success ${token}`);
         if (!token) {
           this.msg = 'invalid captcha kindly try again!';
           this.type = 'danger';
@@ -140,9 +139,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
                   this.sharedService.onlineUserList.push(ele.userId);
                 }
               });
+              // this.onlineUserList = data;
             });
+            // Redirect to a new page after reload
             this.toastService.success('Logged in successfully');
-            location.reload();
+            this.setCookiesForTube();
+            window.location.reload();
             this.router.navigate([`/home`]);
           } else {
             this.loginMessage = data.mesaage;
@@ -196,5 +198,27 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.type = 'success';
       }
     });
+  }
+
+  setCookiesForTube() {
+    const authToken = localStorage.getItem('auth-token');
+    if (authToken) {
+      // const cookieValue = `authToken=${authToken}; path=/; secure; samesite=None; max-age=86400`; // expires in 1 day
+      const cookieValue = `authToken=${authToken}; domain=.hindu.social; path=/; secure; samesite=None; max-age=2592000`; //expires in 1 month
+      document.cookie = cookieValue;
+    }
+  }
+
+  onClick(event: MouseEvent): void {
+    event.preventDefault();
+    let listener = (e: ClipboardEvent) => {
+      let clipboard = e.clipboardData || window["clipboardData"];
+      clipboard.setData("text", 'support@hindu.social');
+      e.preventDefault();
+      this.toastService.success('Email address copied');
+    };
+    document.addEventListener("copy", listener, false)
+    document.execCommand("copy");
+    document.removeEventListener("copy", listener, false);
   }
 }

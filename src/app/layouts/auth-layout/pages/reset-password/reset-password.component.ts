@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,15 +12,15 @@ import { AuthService } from 'src/app/@shared/services/auth.service';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit {
   @ViewChild('changePassword') changePassword: NgForm | any;
-  showPassword = false;
   loading = false;
   submitted = false;
   msg = '';
   type = '';
   userAccessToken: any;
   passwordHidden: boolean = true;
+
   constructor(
     private modalService: NgbModal,
     private router: Router,
@@ -33,9 +33,13 @@ export class ResetPasswordComponent {
     this.route.queryParams.subscribe((params) => {
       this.userAccessToken = params['accesstoken'];
     });
-
     this.spinner.hide();
   }
+
+  ngOnInit(): void {
+    // localStorage.setItem('auth-token', this.userAccessToken);
+  }
+
   togglePasswordVisibility(passwordInput: HTMLInputElement) {
     passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
     this.passwordHidden = !this.passwordHidden;
@@ -64,29 +68,31 @@ export class ResetPasswordComponent {
     // const pattern =
     //   '(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[a-z])(?=.*[0-9].*[0-9]).{8}';
 
-    if (!this.changePassword.form.controls['newPassword'].value.match(pattern)) {
-      this.msg =
-        'Password must be a minimum of 5 characters';
-        this.type = 'danger'
+    if (
+      !this.changePassword.form.controls['newPassword'].value.match(pattern)
+    ) {
+      this.msg = 'Password must be a minimum of 5 characters';
+      this.type = 'danger';
       // this.msg =
       //   'Password must be a minimum of 8 characters and include one uppercase letter, one lowercase letter, and one special character';
       return false;
     }
-   return true;
+    return true;
   }
 
   forgotPasswordSubmit(form: NgForm) {
-    localStorage.setItem('auth-token', this.userAccessToken);
     this.submitted = true;
     if (form.form.invalid) {
       return;
     }
     this.loading = true;
     this.authService
-      .setPassword({
-        token: this.userAccessToken,
-        password: this.changePassword.form.controls['confirmPassword'].value,
-      })
+      .setPassword(
+        {
+          token: this.userAccessToken,
+          password: this.changePassword.form.controls['confirmPassword'].value,
+        }
+      )
       .subscribe({
         next: (result) => {
           this.submitted = false;
@@ -94,15 +100,12 @@ export class ResetPasswordComponent {
           this.msg = 'New password set successfully!';
           this.type = 'success';
           this.changePassword.reset();
-          // setTimeout(() => {
-          // }, 2300);
-          localStorage.clear();
           this.router.navigate(['/login']);
         },
         error: (error) => {
           this.loading = false;
           this.submitted = false;
-          this.msg = 'You have entered the wrong password or username.';
+          this.msg = 'You have entered the wrong password or username';
           this.type = 'danger';
         },
       });

@@ -20,8 +20,11 @@ export class HoverDropdownDirective {
     target: HTMLElement
   ) {
     if (target.tagName === 'A' && target.hasAttribute('data-id')) {
+      const profileId = +localStorage.getItem('profileId');
       const id = +target.getAttribute('data-id');
-      this.createDropdown(target, id);
+      if (id !== profileId) {
+        this.createDropdown(target, id);
+      }
     }
   }
 
@@ -50,7 +53,9 @@ export class HoverDropdownDirective {
     this.customerService.getProfile(id).subscribe({
       next: (res: any) => {
         if (res.data && res.data.length > 0) {
-          const profilePicUrl = res.data[0]?.ProfilePicName || '/assets/images/avtar/placeholder-user.png';
+          const profilePicUrl =
+            res.data[0]?.ProfilePicName ||
+            '/assets/images/avtar/placeholder-user.png';
           const content = `
                 <div class="d-flex flex-column">
                   <img
@@ -77,11 +82,7 @@ export class HoverDropdownDirective {
           this.dropdownElement.innerHTML = content;
           this.renderer.appendChild(document.body, this.dropdownElement);
           const anchorRect = anchorElement.getBoundingClientRect();
-          this.renderer.setStyle(
-            this.dropdownElement, 
-            'position', 
-            'absolute'
-          );
+          this.renderer.setStyle(this.dropdownElement, 'position', 'absolute');
           this.renderer.setStyle(
             this.dropdownElement,
             'top',
@@ -101,7 +102,7 @@ export class HoverDropdownDirective {
           if (button) {
             button.addEventListener('click', (e) => {
               e.stopPropagation();
-              this.copyToClipboard(`${anchorElement.innerText}`);
+              this.copyToClipboard(anchorElement);
             });
           }
           const msgButton = this.dropdownElement.querySelector(
@@ -131,14 +132,21 @@ export class HoverDropdownDirective {
     }
   }
 
-  private copyToClipboard(text: string) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    this.toastService.success('Link has been copied to clipboard');
+  private copyToClipboard(text) {
+    const linkHref = text.getAttribute('href');
+    const linkText = text.textContent;
+    if (linkHref && linkText) {
+      const trimmedLink = linkHref.split('/settings/view-profile/')[1];
+      const finalLink = `/settings/view-profile/${trimmedLink}`;
+      const finalAnchorTag = `<a href="${finalLink}" class="text-danger" data-id="${trimmedLink}">${linkText}</a>`;
+      const textarea = document.createElement('textarea');
+      textarea.value = finalAnchorTag;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      this.toastService.success('Link has been copied to clipboard');
+    }
   }
 
   private selectMessaging(data) {
@@ -153,6 +161,12 @@ export class HoverDropdownDirective {
         queryParams: { chatUserData: encodedUserData },
       })
       .toString();
-    window.open(url, '_blank');
+    // window.open(url, '_blank');
+    this.router.navigateByUrl(url);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick() {
+    this.hideDropdown();
   }
 }

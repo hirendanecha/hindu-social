@@ -1,5 +1,5 @@
 <div class="d-block d-lg-none chat-list-btn">
-  <div class="d-flex justify-content-between p-3 mx-10">
+  <div class="d-flex justify-content-between p-3 mx-sm-10 mx-2">
     <button
       class="button profile-active d-flex align-items-center gap-2"
       (click)="openChatListSidebar()"
@@ -7,6 +7,15 @@
       <fa-icon [icon]="['fas', 'sliders']" class="font-20-px" />
       <span>Contacts</span>
     </button>
+
+    <button
+      class="btn button btn-sm d-flex align-items-center justify-content-center h-36-px"
+      (click)="invitePeople()"
+    >
+      <fa-icon [icon]="['fas', 'plus-circle']" class="font-20-px m-1" />
+      <span>Invite to chat</span>
+    </button>
+
     <div class="btn-group cus-dropdown d-flex gap-3">
       <div ngbDropdown class="d-inline-block">
         <button class="dropdown-btn" ngbDropdownToggle>

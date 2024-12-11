@@ -15,20 +15,23 @@
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2022",
+      "es2022",
       "dom"
-    ]
+    ],
+    "module": "es2022", // or "esnext"
+    "target": "es2022", // or a compatible version
+    "moduleResolution": "node",
+    "esModuleInterop": true, // Enables interop between CommonJS and ES Modules
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+    
   }
 }

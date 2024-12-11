@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { CustomerService } from './customer.service';
-import { PostService } from './post.service';
 import { CommunityService } from './community.service';
+import { PostService } from './post.service';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
 import { SocketService } from './socket.service';
 
@@ -20,11 +20,22 @@ export class SharedService {
   linkMetaData: {};
   advertizementLink: any = [];
   onlineUserList: any = [];
+
   private isRoomCreatedSubject: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   private bc = new BroadcastChannel('user_data_channel');
   loginUserInfo = new BehaviorSubject<any>(null);
   loggedInUser$ = this.loginUserInfo.asObservable();
+
+  //trigger invite to chat modal
+  public openModalSubject = new Subject<void>();
+  openModal$ = this.openModalSubject.asObservable();
+
+  private isNotifySubject = new BehaviorSubject<boolean>(false);
+
+  // Expose as an observable
+  isNotify$ = this.isNotifySubject.asObservable();
+
   callId: string;
   constructor(
     public modalService: NgbModal,
@@ -114,6 +125,7 @@ export class SharedService {
           ele.notificationToProfileId === id;
           return ele;
         });
+        // this.notificationList = res?.data;
       },
       error: (error) => {
         console.log(error);
@@ -166,10 +178,12 @@ export class SharedService {
       },
     });
   }
+
   updateIsRoomCreated(value: boolean): void {
     this.isRoomCreatedSubject.next(value);
   }
 
+  // Method to get an Observable that emits isRoomCreated changes
   getIsRoomCreatedObservable(): Observable<boolean> {
     return this.isRoomCreatedSubject.asObservable();
   }
@@ -179,7 +193,8 @@ export class SharedService {
   }
 
   generateSessionKey(): void {
-    const sessionKey = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const sessionKey =
+      Math.random().toString(36).substring(2) + Date.now().toString(36);
     sessionStorage.setItem('uniqueSessionKey', sessionKey);
   }
 
@@ -216,5 +231,18 @@ export class SharedService {
         }
       },
     });
+  }
+
+  triggerOpenModal() {
+    this.openModalSubject.next();
+  }
+
+  setNotify(value: boolean): void {
+    this.isNotifySubject.next(value);
+  }
+
+  // Method to get the current value
+  getNotify(): boolean {
+    return this.isNotifySubject.getValue();
   }
 }

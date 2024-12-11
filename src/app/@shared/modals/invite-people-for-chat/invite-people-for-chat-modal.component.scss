@@ -1,0 +1,13 @@
+:host {
+  .search-user-list {
+    max-height: 300px;
+    overflow: scroll;
+  }
+  .avatar-img {
+    max-width: 40px;
+  }
+
+  .dropdown-menu {
+    position: relative;
+  }
+}

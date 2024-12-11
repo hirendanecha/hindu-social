@@ -106,7 +106,20 @@ export class CustomerService {
 
   readUnreadNotification(id: number, isRead: string): Observable<any> {
     return this.http.get(
+      // `${this.baseUrl}/edit-notification/${id}?isRead=${isRead}`
       `${this.baseUrl}/edit-notification/${id}?isRead=${isRead}&q=${Date.now()}`
+    );
+  }
+
+  readAllNotification(id: number): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/read-all-notification/${id}?q=${Date.now()}`
+    );
+  }
+
+  deleteAllNotification(id: number): Observable<any> {
+    return this.http.delete(
+      `${this.baseUrl}/delete-all-notification/${id}?q=${Date.now()}`
     );
   }
 

@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -19,13 +20,16 @@ import {
 import { SocketService } from 'src/app/@shared/services/socket.service';
 import { SharedService } from 'src/app/@shared/services/shared.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as moment from 'moment';
-import { ToastService } from 'src/app/@shared/services/toast.service';
-import { ConferenceLinkComponent } from 'src/app/@shared/modals/create-conference-link/conference-link-modal.component';
-import { MessageService } from 'src/app/@shared/services/message.service';
 import { EncryptDecryptService } from 'src/app/@shared/services/encrypt-decrypt.service';
 import { CreateGroupModalComponent } from 'src/app/@shared/modals/create-group-modal/create-group-modal.component';
+import moment from 'moment';
+import { ToastService } from 'src/app/@shared/services/toast.service';
+import { QrScanModalComponent } from 'src/app/@shared/modals/qrscan-modal/qrscan-modal.component';
 import { AppQrModalComponent } from 'src/app/@shared/modals/app-qr-modal/app-qr-modal.component';
+import { MessageService } from 'src/app/@shared/services/message.service';
+import { ConferenceLinkComponent } from 'src/app/@shared/modals/create-conference-link/conference-link-modal.component';
+import { UserService } from 'src/app/@shared/services/user.service';
+import { InvitePeopleForChatModalComponent } from 'src/app/@shared/modals/invite-people-for-chat/invite-people-for-chat-modal.component';
 
 @Component({
   selector: 'app-profile-chats-sidebar',
@@ -48,8 +52,8 @@ export class ProfileChatsSidebarComponent
   selectedChatUser: any;
   showUserProfile: boolean = false;
 
-  isMessageSoundEnabled: boolean;
-  isCallSoundEnabled: boolean;
+  isMessageSoundEnabled: boolean = true;
+  isCallSoundEnabled: boolean = true;
   backCanvas: boolean = true;
   isChatLoader = false;
   selectedButton: string = 'chats';
@@ -71,7 +75,8 @@ export class ProfileChatsSidebarComponent
     private router: Router,
     private toasterService: ToastService,
     public encryptDecryptService: EncryptDecryptService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private cdr: ChangeDetectorRef
   ) {
     this.profileId = +localStorage.getItem('profileId');
     // const notificationSound =
@@ -100,6 +105,12 @@ export class ProfileChatsSidebarComponent
 
   ngOnInit(): void {
     // this.chatData = history.state.chatUserData;
+    this.sharedService.loginUserInfo.subscribe((user) => {
+      this.isCallSoundEnabled =
+        user?.callNotificationSound === 'Y' ? true : false;
+      this.isMessageSoundEnabled =
+        user?.messageNotificationSound === 'Y' ? true : false;
+    });
     this.route.queryParams.subscribe((params) => {
       if (params['chatUserData']) {
         this.chatData = JSON.parse(decodeURIComponent(params['chatUserData']));
@@ -113,11 +124,9 @@ export class ProfileChatsSidebarComponent
     if (this.chatData && !this.backCanvas) {
       this.checkRoom();
     }
-    this.sharedService.loginUserInfo.subscribe((user) => {
-      this.isCallSoundEnabled =
-        user?.callNotificationSound === 'Y' ? true : false;
-      this.isMessageSoundEnabled =
-        user?.messageNotificationSound === 'Y' ? true : false;
+
+    this.sharedService.openModal$.subscribe(() => {
+      this.invitePeople();
     });
   }
 
@@ -178,6 +187,7 @@ export class ProfileChatsSidebarComponent
         (user: any) => user.isAccepted === 'N'
       );
     });
+    this.cdr.markForCheck();
     return this.chatList;
   }
 
@@ -196,6 +206,7 @@ export class ProfileChatsSidebarComponent
     if (this.searchText) {
       this.searchText = null;
     }
+    this.cdr.markForCheck();
   }
 
   goToViewProfile(): void {
@@ -223,7 +234,8 @@ export class ProfileChatsSidebarComponent
   }
 
   clearChatList() {
-    this.onNewChat?.emit({});
+    this.onNewChat?.emit(null);
+    this.selectedChatUser = null;
   }
 
   selectButton(buttonType: string): void {
@@ -238,6 +250,7 @@ export class ProfileChatsSidebarComponent
       this.groupList = data;
       this.mergeUserChatList();
     });
+    this.cdr.markForCheck();
   }
 
   mergeUserChatList(): void {
@@ -261,6 +274,7 @@ export class ProfileChatsSidebarComponent
       });
       this.messageService.chatList.push(this.newChatList);
     }
+    this.cdr.markForCheck();
   }
 
   createNewGroup() {
@@ -298,7 +312,7 @@ export class ProfileChatsSidebarComponent
       this.socketService?.deleteRoom(data, (data: any) => {
         this.getChatList();
         this.getGroupList();
-        this.onNewChat?.emit({});
+        this.onNewChat?.emit(null);
       });
     } else if (item.groupId) {
       const data = {
@@ -308,7 +322,7 @@ export class ProfileChatsSidebarComponent
       this.socketService.removeGroupMember(data, (res) => {
         this.getChatList();
         this.getGroupList();
-        this.onNewChat?.emit({});
+        this.onNewChat?.emit(null);
       });
     }
   }
@@ -328,7 +342,7 @@ export class ProfileChatsSidebarComponent
         this.socketService?.resendChatInvite(data, (data: any) => {
           this.getChatList();
           this.getGroupList();
-          this.onNewChat?.emit({});
+          this.onNewChat?.emit(null);
           this.toasterService.success('invitation sent successfully.');
         });
       } else {
@@ -362,6 +376,7 @@ export class ProfileChatsSidebarComponent
       this.sharedService.userData.userStatus = res.status;
       this.sharedService.getLoginUserDetails(this.sharedService.userData);
       // localStorage.setItem('userData', JSON.stringify(localUserData));
+      this.cdr.markForCheck();
     });
   }
   findUserStatus(id: string): string {
@@ -371,6 +386,7 @@ export class ProfileChatsSidebarComponent
     const status = user?.status;
     return status;
   }
+
   checkRoom(): void {
     const oldUserChat = {
       profileId1: this.profileId,
@@ -378,7 +394,7 @@ export class ProfileChatsSidebarComponent
     };
     this.socketService.checkRoom(oldUserChat, (res: any) => {
       const data = res.find((obj) => obj.isDeleted === 'N');
-      if (data && data.id) {
+      if (data && data.id && !this.chatData.GroupId) {
         const existingUser = {
           roomId: data.id,
           profileId: data.profileId1,
@@ -391,6 +407,17 @@ export class ProfileChatsSidebarComponent
         };
         this.selectedChatUser = existingUser.roomId;
         this.onNewChat?.emit(existingUser);
+      } else if (this.chatData.GroupId) {
+        const redirectToGroup = {
+          groupId: this.chatData.GroupId,
+          groupName: this.chatData.GroupName,
+          isAccepted: this.chatData?.isAccepted || 'Y',
+          lastMessageText: this.chatData?.lastMessageText,
+          profileImage: this.chatData?.ProfilePicName,
+          ProfilePicName: this.chatData?.ProfilePicName,
+          createdBy: this.chatData?.Id,
+        };
+        this.onNewChat?.emit(redirectToGroup);
       } else {
         const newUser = {
           Id: this.chatData.Id,
@@ -399,6 +426,22 @@ export class ProfileChatsSidebarComponent
           unReadMessage: 0,
         };
         this.onNewChat?.emit(newUser);
+      }
+    });
+    this.cdr.markForCheck();
+  }
+
+  invitePeople(): void {
+    const modalRef = this.modalService.open(InvitePeopleForChatModalComponent, {
+      centered: true,
+      size: 'md',
+    });
+    modalRef.componentInstance.chatList = this.chatList;
+    modalRef.componentInstance.pendingChatList = this.pendingChatList;
+
+    modalRef.result.then((res) => {
+      if (res !== 'cancel') {
+        this.onChat(res);
       }
     });
   }

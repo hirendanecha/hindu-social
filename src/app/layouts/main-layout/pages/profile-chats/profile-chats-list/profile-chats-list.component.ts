@@ -17,9 +17,9 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import * as moment from 'moment';
+import moment from 'moment';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { OutGoingCallModalComponent } from 'src/app/@shared/modals/outgoing-call-modal/outgoing-call-modal.component';
 import { EncryptDecryptService } from 'src/app/@shared/services/encrypt-decrypt.service';
 import { MessageService } from 'src/app/@shared/services/message.service';
@@ -101,7 +101,7 @@ export class ProfileChatsListComponent
   messageInputValue: string = '';
   firstTimeScroll = false;
   activePage = 1;
-  pageSize = 25;
+  pageSize = 40;
   hasMoreData = false;
   typingData: any = {};
   isTyping = false;
@@ -129,7 +129,11 @@ export class ProfileChatsListComponent
   unreadMessage: any = {};
   relevantMembers: any = [];
   postMessageTags: any[];
+  showButton = true;
+  isScrollUp = false;
   @ViewChildren('message') messageElements: QueryList<ElementRef>;
+  private scrollSubject = new Subject<any>();
+
   constructor(
     private socketService: SocketService,
     public sharedService: SharedService,
@@ -152,63 +156,22 @@ export class ProfileChatsListComponent
     this.userId = +this.route.snapshot.paramMap.get('id');
     this.profileId = +localStorage.getItem('profileId');
     this.callRoomId = +localStorage.getItem('callRoomId');
-    // const authToken = localStorage.getItem('auth-token')
-    // this.qrLink = `${environment.qrLink}${this.profileId}?token=${authToken}`;
-
     const data = {
-      title: 'Hindu.social Chat',
+      title: 'Buzz Chat',
       url: `${location.href}`,
       description: '',
     };
     this.seoService.updateSeoMetaData(data);
     this.isOnCall = this.router.url.includes('/facetime/') || false;
+    this.scrollSubject
+      .pipe(debounceTime(200))
+      .subscribe((event) => this.handleScroll(event));
   }
   ngAfterViewInit(): void {
+    this.originalFavicon = document.querySelector('link[rel="icon"]');
     if (this.callRoomId && !this.sidebarClass) {
       localStorage.removeItem('callRoomId');
       this.callRoomId = null;
-    }
-
-    if (!this.sidebarClass) {
-      const reqObj = {
-        profileId: this.profileId,
-      };
-      this.socketService?.checkCall(reqObj, (data: any) => {
-        if (data?.isOnCall === 'Y' && data?.callLink) {
-          var callSound = new Howl({
-            src: [
-              'https://s3.us-east-1.wasabisys.com/freedom-social/famous_ringtone.mp3',
-            ],
-            loop: true,
-          });
-          this.soundControlService.initTabId();
-          const modalRef = this.modalService.open(IncomingcallModalComponent, {
-            centered: true,
-            size: 'sm',
-            backdrop: 'static',
-          });
-          const callData = {
-            Username: '',
-            link: data?.callLink,
-            roomId: data.roomId,
-            groupId: data.groupId,
-            ProfilePicName: this.sharedService?.userData?.ProfilePicName,
-          };
-          modalRef.componentInstance.calldata = callData;
-          modalRef.componentInstance.sound = callSound;
-          modalRef.componentInstance.title = 'Join existing call...';
-          modalRef.result.then((res) => {
-            if (res === 'cancel') {
-              const callLogData = {
-                profileId: this.profileId,
-                roomId: callData?.roomId,
-                groupId: callData?.groupId,
-              };
-              this.socketService?.endCall(callLogData);
-            }
-          });
-        }
-      });
     }
   }
 
@@ -226,6 +189,7 @@ export class ProfileChatsListComponent
           this.userChat?.groupId === data?.groupId) &&
         data?.sentBy !== this.profileId
       ) {
+        this.scrollToBottom();
         let index = this.messageList?.findIndex((obj) => obj?.id === data?.id);
         if (data?.isDeleted) {
           this.messageList = this.messageList.filter(
@@ -238,7 +202,7 @@ export class ProfileChatsListComponent
             );
           });
         } else if (this.messageList[index]) {
-          if (data?.parentMessage) {
+          if (data?.parentMessage?.messageText) {
             data.parentMessage.messageText =
               this.encryptDecryptService?.decryptUsingAES256(
                 data?.parentMessage?.messageText
@@ -249,15 +213,15 @@ export class ProfileChatsListComponent
           );
           this.messageList[index] = data;
           this.filteredMessageList?.forEach((ele: any) => {
-            const indext = ele.messages?.findIndex(
+            const index = ele.messages?.findIndex(
               (obj) => obj?.id === data?.id
             );
-            if (ele.messages[indext]) {
-              ele.messages[indext] = data;
+            if (ele.messages[index]) {
+              ele.messages[index] = data;
             }
           });
         } else {
-          if (data?.parentMessage) {
+          if (data?.parentMessage?.messageText) {
             data.parentMessage.messageText =
               this.encryptDecryptService?.decryptUsingAES256(
                 data?.parentMessage?.messageText
@@ -268,7 +232,6 @@ export class ProfileChatsListComponent
               data?.messageText
             );
           }
-          this.scrollToBottom();
           if (data !== null) {
             // this.messageList.push(data);
             const url = data?.messageText || null;
@@ -300,9 +263,7 @@ export class ProfileChatsListComponent
                 groupId: data?.groupId,
                 date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
               };
-              this.socketService.switchChat(oldChat, (data) => {
-                console.log(data);
-              });
+              this.socketService.switchChat(oldChat, (data) => {});
             }
             this.socketService.readGroupMessage(data, (readUsers) => {
               this.readMessagesBy = readUsers.filter(
@@ -314,15 +275,10 @@ export class ProfileChatsListComponent
         if (this.userChat.roomId === data?.roomId) {
           const readData = {
             ids: [data?.id],
-            profileId: data.sentBy,
+            profileId: data?.sentBy,
           };
           this.socketService.readMessage(readData, (res) => {
-            if (res && this.sharedService.isNotify) {
-              this.originalFavicon['href'] = '/assets/images/icon.jpg';
-              this.sharedService.isNotify = false;
-            }
-            // console.log(res);
-            return;
+            this.notificationNavigation();
           });
         }
       }
@@ -344,7 +300,6 @@ export class ProfileChatsListComponent
           });
         });
       }
-      // console.log(this.sharedService.onlineUserList);
     });
     this.socketService.socket?.emit('online-users');
     if (this.userChat.groupId) {
@@ -357,24 +312,25 @@ export class ProfileChatsListComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.originalFavicon = document.querySelector('link[rel="icon"]');
-    if (this.userChat?.groupId) {
-      this.activePage = 1;
-      this.messageList = [];
-      this.filteredMessageList = [];
-      this.hasMoreData = false;
-      this.getGroupDetails(this.userChat.groupId);
-      this.resetData();
-    } else {
-      this.groupData = null;
-    }
+    // if (this.userChat?.groupId) {
+    //   // this.activePage = 1;
+    //   this.messageList = [];
+    //   this.filteredMessageList = [];
+    //   this.hasMoreData = false;
+    //   this.getGroupDetails(this.userChat.groupId);
+    //   this.resetData();
+    // } else {
+    //   this.groupData = null;
+    // }
     if (this.userChat?.roomId || this.userChat?.groupId) {
-      this.notificationNavigation();
-      this.activePage = 1;
+      // this.notificationNavigation();
+      // this.activePage = 1;
       this.messageList = [];
       this.filteredMessageList = [];
       this.resetData();
-      this.getMessageList();
+      this.getGroupDetails(this.userChat?.groupId);
+      this.goToFirstPage();
+      // this.getMessageList();
       this.hasMoreData = false;
       this.socketService.socket?.on('get-users', (data) => {
         const index = data.findIndex((ele) => {
@@ -388,7 +344,6 @@ export class ProfileChatsListComponent
             });
           });
         }
-        // console.log(this.sharedService.onlineUserList);
       });
       this.findUserStatus(this.userChat.profileId);
     }
@@ -397,6 +352,7 @@ export class ProfileChatsListComponent
     // });
     this.socketService.socket?.on('typing', (data) => {
       this.typingData = data;
+      this.cdr.markForCheck();
     });
   }
 
@@ -417,7 +373,6 @@ export class ProfileChatsListComponent
         profileId2: this.userChat?.Id || this.userChat?.profileId,
       },
       (data: any) => {
-        // console.log(data);
         this.userChat = { ...data?.room };
         this.newRoomCreated.emit(true);
       }
@@ -447,27 +402,21 @@ export class ProfileChatsListComponent
       /<img\s+[^>]*src="data:image\/.*?;base64,[^\s]*"[^>]*>|<img\s+[^>]*src=""[^>]*>/g;
     cleanedText = cleanedText.replace(regex, '');
     const divregex = /<div\s*>\s*<\/div>/g;
-    if (cleanedText.replace(divregex, '').trim() === '') return null;
+    if (
+      cleanedText
+        .replace(divregex, '')
+        .replace(/<(?!img\b)[^>]*>/gi, '')
+        .replace(/&nbsp;/gi, '')
+        .replace(/\s+/g, '')
+        .trim() === ''
+    )
+      return null;
     return this.encryptDecryptService?.encryptUsingAES256(cleanedText) || null;
   }
 
-  // prepareMessage(text: string): string | null {
-  //   const regex =
-  //     /<img\s+[^>]*src="data:image\/.*?;base64,[^\s]*"[^>]*>|<img\s+[^>]*src=""[^>]*>/g;
-  //   let cleanedText = text.replace(regex, '');
-  //   const divregex = /<div\s*>\s*<\/div>/g;
-  //   if (cleanedText.replace(divregex, '').trim() === '') return null;
-  //   return this.encryptDecryptService?.encryptUsingAES256(cleanedText);
-  // }
-
-  // send btn
   sendMessage(): void {
     this.chatObj['tags'] = getTagUsersFromAnchorTags(this.postMessageTags);
     if (this.chatObj.id) {
-      // const message =
-      //   this.chatObj.msgText !== null
-      //     ? this.encryptDecryptService?.encryptUsingAES256(this.chatObj.msgText)
-      //     : null;
       const message =
         this.chatObj.msgText !== null
           ? this.prepareMessage(this.chatObj.msgText)
@@ -483,6 +432,12 @@ export class ProfileChatsListComponent
         parentMessageId: this.chatObj.parentMessageId || null,
         tags: this.chatObj?.['tags'],
       };
+      if (!data.messageMedia && !data.messageText && !data.parentMessageId) {
+        this.isFileUploadInProgress = false;
+        this.isLoading = false;
+        // this.toastService.danger('please enter message!');
+        return;
+      }
       this.socketService?.editMessage(data, (editMsg: any) => {
         this.isFileUploadInProgress = false;
         if (editMsg) {
@@ -541,67 +496,80 @@ export class ProfileChatsListComponent
         tags: this.chatObj?.['tags'],
       };
       this.userChat?.roomId ? (data['isRead'] = 'N') : null;
-
-      this.socketService.sendMessage(data, async (data: any) => {
+      if (!data.messageMedia && !data.messageText && !data.parentMessageId) {
         this.isFileUploadInProgress = false;
-        this.scrollToBottom();
-        this.newRoomCreated?.emit(true);
+        this.isLoading = false;
+        // this.toastService.danger('please enter message!');
+        return;
+      } else {
+        this.socketService.sendMessage(data, async (data: any) => {
+          this.isFileUploadInProgress = false;
+          this.scrollToBottom();
+          this.newRoomCreated?.emit(true);
 
-        if (this.filteredMessageList.length > 0) {
-          data.messageText =
-            data.messageText != null
-              ? this.encryptDecryptService?.decryptUsingAES256(data.messageText)
-              : null;
-          if (data.parentMessage?.messageText) {
-            data.parentMessage.messageText =
-              this.encryptDecryptService?.decryptUsingAES256(
-                data.parentMessage?.messageText
-              );
+          if (this.filteredMessageList.length > 0) {
+            data.messageText =
+              data.messageText != null
+                ? this.encryptDecryptService?.decryptUsingAES256(
+                    data.messageText
+                  )
+                : null;
+            if (data.parentMessage?.messageText) {
+              data.parentMessage.messageText =
+                this.encryptDecryptService?.decryptUsingAES256(
+                  data.parentMessage?.messageText
+                );
+            }
+            const text = data.messageText?.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
+            const matches = text?.match(
+              /(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/
+            );
+            if (matches?.[0]) {
+              data['metaData'] = await this.getMetaDataFromUrlStr(matches?.[0]);
+              this.scrollToBottom();
+            }
           }
-          const text = data.messageText?.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
-          const matches = text?.match(
-            /(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/
-          );
-          if (matches?.[0]) {
-            data['metaData'] = await this.getMetaDataFromUrlStr(matches?.[0]);
-            this.scrollToBottom();
+          this.messageList.push(data);
+          this.readMessageRoom = data?.isRead;
+          // this.messageIndex = null;
+          // if (this.userChat.groupId === data.groupId) {
+          //   this.readMessagesBy = [];
+          //   this.socketService.readGroupMessage(data, (readUsers) => {
+          //     this.readMessagesBy = readUsers.filter(
+          //       (item) => item.ID !== this.profileId
+          //     );
+          //   });
+          // }
+          if (this.filteredMessageList.length > 0) {
+            const lastIndex = this.filteredMessageList.length - 1;
+            if (
+              this.filteredMessageList[lastIndex] &&
+              !this.uploadTo.roomId &&
+              !this.uploadTo.groupId
+            ) {
+              this.filteredMessageList[lastIndex]?.['messages'].push(data);
+            }
+          } else {
+            const array = new MessageDatePipe(
+              this.encryptDecryptService
+            ).transform([data]);
+            this.filteredMessageList = array;
           }
-        }
-        this.messageList.push(data);
-        this.readMessageRoom = data?.isRead;
-        // this.messageIndex = null;
-        // if (this.userChat.groupId === data.groupId) {
-        //   this.readMessagesBy = [];
-        //   this.socketService.readGroupMessage(data, (readUsers) => {
-        //     this.readMessagesBy = readUsers.filter(
-        //       (item) => item.ID !== this.profileId
-        //     );
-        //   });
-        // }
-        if (this.filteredMessageList.length > 0) {
-          const lastIndex = this.filteredMessageList.length - 1;
-          if (
-            this.filteredMessageList[lastIndex] &&
-            !this.uploadTo.roomId &&
-            !this.uploadTo.groupId
-          ) {
-            this.filteredMessageList[lastIndex]?.['messages'].push(data);
-          }
-        } else {
-          const array = new MessageDatePipe(
-            this.encryptDecryptService
-          ).transform([data]);
-          this.filteredMessageList = array;
-        }
-        this.resetData();
-      });
+          this.resetData();
+        });
+      }
+    }
+    if (this.activePage > 1) {
+      this.goToFirstPage();
     }
     this.startTypingChat(false);
   }
 
   loadMoreChats() {
-    this.activePage = this.activePage + 1;
-    this.getMessageList();
+    if (this.hasMoreData) {
+      this.activePage = this.activePage + 1;
+      this.getMessageList();
+    }
   }
 
   // getMessages
@@ -624,6 +592,7 @@ export class ProfileChatsListComponent
     if (file.type.includes('application/')) {
       this.selectedFile = file;
       this.pdfName = file?.name;
+      // this.chatObj.msgText = null;
       this.viewUrl = URL.createObjectURL(file);
     } else if (file.type.includes('video/')) {
       this.selectedFile = file;
@@ -673,7 +642,7 @@ export class ProfileChatsListComponent
 
   uploadPostFileAndCreatePost(): void {
     if (!this.isFileUploadInProgress) {
-      if (this.chatObj.msgText || this.selectedFile.name) {
+      if (this.chatObj?.msgText || this.selectedFile?.name) {
         if (this.selectedFile) {
           this.isFileUploadInProgress = true;
           const param = {
@@ -681,6 +650,11 @@ export class ProfileChatsListComponent
             groupId: this.userChat?.groupId,
           };
           this.scrollToBottom();
+          const existingChat = this.chatObj?.msgText;
+          if (existingChat?.replace(/<br\s*\/?>|\s+/g, '')?.length > 0) {
+            this.chatObj.msgMedia = null;
+            this.sendMessage();
+          }
           this.uploadFilesService
             .uploadFile(this.selectedFile, param)
             .pipe(takeUntil(this.cancelUpload$))
@@ -695,7 +669,8 @@ export class ProfileChatsListComponent
                 } else if (event.type === HttpEventType.Response) {
                   if (event?.body?.roomId !== this.userChat?.roomId) {
                     this.uploadTo.roomId = event.body.roomId;
-                  } else if (event?.body?.groupId !== this.userChat?.groupId) {
+                  }
+                  if (event?.body?.groupId !== this.userChat?.groupId) {
                     this.uploadTo.groupId = event.body.groupId;
                   }
                   this.isFileUploadInProgress = false;
@@ -742,6 +717,7 @@ export class ProfileChatsListComponent
         this.messageInputValue = null;
       }, 10);
     }
+    this.cdr.markForCheck();
   }
 
   displayLocalTime(utcDateTime: string): string {
@@ -898,75 +874,7 @@ export class ProfileChatsListComponent
     );
   }
 
-  // getMetaDataFromUrlStr(url: string): Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     if (url !== this.metaData?.url) {
-  //       this.isMetaLoader = true;
-  //       this.ngUnsubscribe.next();
-  //       const unsubscribe$ = new Subject<void>();
-
-  //       this.postService
-  //         .getMetaData({ url })
-  //         .pipe(takeUntil(unsubscribe$))
-  //         .subscribe({
-  //           next: (res: any) => {
-  //             this.isMetaLoader = false;
-  //             if (res?.meta?.image) {
-  //               const urls = res.meta?.image?.url;
-  //               const imgUrl = Array.isArray(urls) ? urls?.[0] : urls;
-
-  //               const metatitles = res?.meta?.title;
-  //               const metatitle = Array.isArray(metatitles)
-  //                 ? metatitles?.[0]
-  //                 : metatitles;
-
-  //               const metaursl = Array.isArray(url) ? url?.[0] : url;
-  //               this.metaData = {
-  //                 title: metatitle,
-  //                 metadescription: res?.meta?.description,
-  //                 metaimage: imgUrl,
-  //                 metalink: metaursl,
-  //                 url: url,
-  //               };
-  //               resolve(this.metaData);
-  //             } else {
-  //               const metatitles = res?.meta?.title;
-  //               const metatitle = Array.isArray(metatitles)
-  //                 ? metatitles?.[0]
-  //                 : metatitles;
-  //               const metaursl = Array.isArray(url) ? url?.[0] : url;
-  //               const metaLinkData = {
-  //                 title: metatitle,
-  //                 metadescription: res?.meta?.description,
-  //                 metalink: metaursl,
-  //                 url: url,
-  //               };
-  //               resolve(metaLinkData);
-  //             }
-  //           },
-  //           error: (err) => {
-  //             this.metaData.metalink = url;
-  //             this.isMetaLoader = false;
-  //             this.spinner.hide();
-  //             reject(err);
-  //           },
-  //           complete: () => {
-  //             unsubscribe$.next();
-  //             unsubscribe$.complete();
-  //           },
-  //         });
-  //     } else {
-  //       resolve(this.metaData);
-  //     }
-  //   });
-  // }
-
   getMetaDataFromUrlStr(url: string): Promise<any> {
-    // return new Promise((resolve, reject) => {
-    // if (url === this.metaData?.url) {
-    //   resolve(this.metaData);
-    //   return;
-    // }
     return new Promise((resolve) => {
       if (url === this.metaData?.url) {
         resolve(this.metaData);
@@ -975,51 +883,53 @@ export class ProfileChatsListComponent
       this.isMetaLoader = true;
       this.ngUnsubscribe.next();
       const unsubscribe$ = new Subject<void>();
-      this.postService
-        .getMetaData({ url })
-        .pipe(takeUntil(unsubscribe$))
-        .subscribe({
-          next: (res: any) => {
-            this.isMetaLoader = false;
-            const meta = res.meta || {};
-            const imageUrl = Array.isArray(meta.image?.url)
-              ? meta.image.url[0]
-              : meta.image?.url;
-            const metaTitle = Array.isArray(meta.title)
-              ? meta.title[0]
-              : meta.title;
-            const metaDescription =
-              meta.description === 'undefined'
-                ? 'Post content'
-                : meta.description;
-
-            const metaData = {
-              title: metaTitle,
-              metadescription:
-                metaDescription === 'undefined'
+      setTimeout(() => {
+        this.postService
+          .getMetaData({ url })
+          .pipe(takeUntil(unsubscribe$))
+          .subscribe({
+            next: (res: any) => {
+              this.isMetaLoader = false;
+              const meta = res.meta || {};
+              const imageUrl = Array.isArray(meta.image?.url)
+                ? meta.image.url[0]
+                : meta.image?.url;
+              const metaTitle = Array.isArray(meta.title)
+                ? meta.title[0]
+                : meta.title;
+              const metaDescription =
+                meta.description === 'undefined'
                   ? 'Post content'
-                  : metaDescription,
-              metaimage: imageUrl,
-              metalink: url,
-              url: url,
-            };
-            this.metaData = metaData;
-            resolve(metaData);
-          },
-          error: (err) => {
-            this.isMetaLoader = false;
-            // reject(err);
-            const metaUrl = {
-              metalink: url,
-              url: url,
-            };
-            resolve(metaUrl);
-          },
-          complete: () => {
-            unsubscribe$.next();
-            unsubscribe$.complete();
-          },
-        });
+                  : meta.description;
+
+              const metaData = {
+                title: metaTitle,
+                metadescription:
+                  metaDescription === 'undefined'
+                    ? 'Post content'
+                    : metaDescription,
+                metaimage: imageUrl,
+                metalink: url,
+                url: url,
+              };
+              this.metaData = metaData;
+              resolve(metaData);
+            },
+            error: (err) => {
+              this.isMetaLoader = false;
+              // reject(err);
+              const metaUrl = {
+                metalink: url,
+                url: url,
+              };
+              resolve(metaUrl);
+            },
+            complete: () => {
+              unsubscribe$.next();
+              unsubscribe$.complete();
+            },
+          });
+      }, 100);
     });
   }
 
@@ -1060,7 +970,6 @@ export class ProfileChatsListComponent
     // } else {
     // }
     let uuId = uuid();
-    console.log(uuId);
     localStorage.setItem('uuId', uuId);
     if (this.userChat?.roomId) {
       const buzzRingData = {
@@ -1078,7 +987,7 @@ export class ProfileChatsListComponent
           this.groupData?.groupName ||
           this.sharedService?.userData?.Username + ' incoming call...',
         notificationToProfileId: this.userChat.profileId,
-        domain: 'hindu.social',
+        domain: 'freedom.buzz',
         uuId: uuId,
       };
       this.customerService.startCallToBuzzRing(buzzRingData).subscribe({
@@ -1106,7 +1015,7 @@ export class ProfileChatsListComponent
           this.groupData?.groupName ||
           this.sharedService?.userData?.Username + ' incoming call...',
         notificationToProfileIds: groupMembers,
-        domain: 'hindu.social',
+        domain: 'freedom.buzz',
         uuId: uuId,
       };
       this.customerService
@@ -1122,7 +1031,7 @@ export class ProfileChatsListComponent
     modalRef.result.then((res) => {
       if (!window.document.hidden) {
         if (res === 'missCalled') {
-          this.chatObj.msgText = 'You have a missed call';
+          this.chatObj.msgText = 'Missed call';
           this.sendMessage();
 
           const callLogData = {
@@ -1144,7 +1053,7 @@ export class ProfileChatsListComponent
               this.groupData?.groupName ||
               this?.userChat.Username + 'incoming call...',
             notificationToProfileId: this.userChat.profileId,
-            domain: 'hindu.social',
+            domain: 'freedom.buzz',
             uuId: uuId,
           };
           this.customerService.startCallToBuzzRing(buzzRingData).subscribe({
@@ -1205,7 +1114,8 @@ export class ProfileChatsListComponent
     }
     return null;
   }
-  focusTagInput(){
+
+  focusTagInput() {
     if (this.selectedFile) {
       const tagUserInput = document.querySelector(
         'app-tag-user-input .tag-input-div'
@@ -1264,7 +1174,6 @@ export class ProfileChatsListComponent
     modalRef.componentInstance.groupId = this.userChat?.groupId;
     modalRef.result.then((res) => {
       if (res !== 'cancel') {
-        console.log(res);
         if (Object.keys(res).includes('isUpdate')) {
           this.socketService?.createGroup(res, (data: any) => {
             this.groupData = data;
@@ -1297,14 +1206,15 @@ export class ProfileChatsListComponent
   delayedStartTypingChat() {
     setTimeout(() => {
       this.startTypingChat(false);
-    }, 3000);
+    }, 100);
   }
 
   notificationNavigation() {
     const isRead = localStorage.getItem('isRead');
     if (isRead === 'Y') {
-      this.originalFavicon['href'] = '/assets/images/icon.jpg';
-      this.sharedService.isNotify = false;
+      this.originalFavicon.href = '/assets/images/icon.jpg';
+      // this.sharedService.isNotify = false;
+      this.sharedService.setNotify(false);
       // localStorage.setItem('isRead', 'Y');
     }
   }
@@ -1343,6 +1253,7 @@ export class ProfileChatsListComponent
       this.sharedService.getLoginUserDetails(this.sharedService.userData);
       // localUserData.userStatus = res.status;
       // localStorage.setItem('userData', JSON.stringify(localUserData));
+      this.cdr.markForCheck();
     });
   }
 
@@ -1356,66 +1267,350 @@ export class ProfileChatsListComponent
     this.isLoading = true;
     this.socketService.getMessages(messageObj, (res) => {
       this.filterChatMessage(res);
-      this.isLoading = false;
     });
   }
+
+  // filterChatMessage(data): void {
+  //   if (!data?.data?.length && data?.pagination?.totalItems === 0) {
+  //     this.filteredMessageList = [];
+  //     return;
+  //   }
+  //   if (this.activePage === 1) {
+  //     this.scrollToBottom();
+  //   }
+  //   if (data?.data.length > 0) {
+  //     // this.messageList = [...this.messageList, ...data.data];
+  //     this.messageList = data.data;
+  //     data.data.sort(
+  //       (a, b) =>
+  //         new Date(a?.createdDate).getTime() -
+  //         new Date(b?.createdDate).getTime()
+  //     );
+  //     this.readMessagesBy = data?.readUsers?.filter(
+  //       (item) => item.ID !== this.profileId
+  //     );
+  //   } else {
+  //     this.hasMoreData = false;
+  //   }
+  //   if (this.activePage < data.pagination.totalPages) {
+  //     this.hasMoreData = true;
+  //   }
+  //   if (this.filteredMessageList.length > 0) {
+  //     this.chatContent.nativeElement.scrollTop = 101;
+  //   }
+  //   const array = new MessageDatePipe(this.encryptDecryptService).transform(
+  //     data.data
+  //   );
+  //   // const uniqueDates = array.filter((dateObj) => {
+  //   //   return !this.filteredMessageList.some(
+  //   //     (existingDateObj) => existingDateObj.date === dateObj.date
+  //   //   );
+  //   // });
+
+  //   let uniqueDates = [];
+  //   array.forEach((dateObj) => {
+  //     const existingDateObj = this.filteredMessageList.find(
+  //       (existingDateObj) => existingDateObj.date === dateObj.date
+  //     );
+  //     if (existingDateObj) {
+  //       existingDateObj.messages = existingDateObj.messages.concat(
+  //         dateObj.messages
+  //       );
+  //       existingDateObj.messages.sort((a, b) => a.id - b.id);
+  //     } else {
+  //       uniqueDates.push(dateObj);
+  //     }
+  //   });
+  //   // this.filteredMessageList = [...uniqueDates, ...this.filteredMessageList];
+  //   this.filteredMessageList = [...uniqueDates, ...this.filteredMessageList.filter(message =>
+  //     !uniqueDates.some(uniqueMessage => uniqueMessage.id === message.id)
+  //   )];
+  //   if (this.filteredMessageList[this.filteredMessageList.length - 1]) {
+  //     const lastMessageList =
+  //       this.filteredMessageList[this.filteredMessageList.length - 1].messages;
+  //     this.readMessageRoom = lastMessageList[lastMessageList.length - 1].isRead;
+  //   }
+  //   if (this.userChat?.groupId) {
+  //     this.socketService.socket.on('read-message-user', (data) => {
+  //       this.readMessagesBy = data?.filter(
+  //         (item) => item.ID !== this.profileId
+  //       );
+  //       this.messageIndex = null;
+  //     });
+  //     const date = moment(new Date()).utc();
+  //     const oldChat = {
+  //       profileId: this.profileId,
+  //       groupId: this.userChat.groupId,
+  //       date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
+  //     };
+  //     this.socketService.switchChat(oldChat, (data) => {});
+  //   } else {
+  //     const ids = [];
+  //     this.filteredMessageList.map((element) => {
+  //       element.messages.map((e: any) => {
+  //         if (e.isRead === 'N' && e.sentBy !== this.profileId) {
+  //           return ids.push(e.id);
+  //         } else {
+  //           return e;
+  //         }
+  //       });
+  //     });
+  //     if (ids.length) {
+  //       const data = {
+  //         ids: ids,
+  //         profileId: this.userChat.profileId,
+  //       };
+  //       this.socketService.readMessage(data, (res) => {
+  //         return;
+  //       });
+  //     }
+  //   }
+  //   this.filteredMessageList.map((element) => {
+  //     return (element.messages = element?.messages.filter(async (e: any) => {
+  //       const url = e?.messageText || null;
+  //       const text = url?.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
+  //       const matches = text?.match(
+  //         /(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/
+  //       );
+  //       if (matches?.[0]) {
+  //         e['metaData'] = await this.getMetaDataFromUrlStr(matches?.[0]);
+  //       } else {
+  //         return e;
+  //       }
+  //     }));
+  //   });
+  //   if (this.userChat?.roomId) {
+  //     this.unreadMessage = {};
+  //     for (let group of this.filteredMessageList) {
+  //       const unreadMessage = group.messages.find(
+  //         (message: any) => message.isRead === 'N'
+  //       );
+  //       if (unreadMessage) {
+  //         this.unreadMessage = { date: group.date, message: unreadMessage };
+  //         break;
+  //       }
+  //     }
+  //     // this.checkLastMessageOfRoom();
+  //   }
+  //   // if (this.userChat?.groupId) {
+  //   //   for (let group of this.filteredMessageList) {
+  //   //     this.groupData?.memberList?.forEach((member) => {
+  //   //       const matchingMessage = group.messages.find(
+  //   //         (msg) =>
+  //   //           member?.switchDate < msg.createdDate &&
+  //   //           member?.profileId !== this.profileId &&
+  //   //           msg.sentBy == this.profileId
+  //   //       );
+
+  //   //       if (matchingMessage) {
+  //   //         member['message'] = matchingMessage;
+  //   //         const existUser = this.relevantMembers.find(
+  //   //           (e) => e?.profileId === member?.profileId
+  //   //         );
+  //   //         if (existUser) {
+  //   //           this.readMessagesBy = this.readMessagesBy.filter((e) => {
+  //   //             return e.ID !== existUser?.profileId;
+  //   //           });
+  //   //         }
+  //   //         if (!existUser) {
+  //   //           this.relevantMembers.push(member);
+  //   //         }
+  //   //       }
+  //   //     });
+  //   //   }
+  //   // }
+  //   if (this.userChat?.groupId) {
+  //     for (let group of this.filteredMessageList) {
+  //       this.groupData?.memberList?.forEach((member) => {
+  //         const matchingMessage = group.messages.find(
+  //           (msg) =>
+  //             member?.switchDate < msg.createdDate &&
+  //             member?.profileId !== this.profileId &&
+  //             msg.sentBy === this.profileId
+  //         );
+
+  //         if (matchingMessage) {
+  //           member['message'] = matchingMessage;
+  //           const existingUserIndex = this.relevantMembers.findIndex(
+  //             (e) => e?.profileId === member?.profileId
+  //           );
+
+  //           if (existingUserIndex > -1) {
+  //             this.readMessagesBy = this.readMessagesBy.filter(
+  //               (e) =>
+  //                 e.ID !== this.relevantMembers[existingUserIndex]?.profileId
+  //             );
+  //           } else {
+  //             this.relevantMembers.push(member);
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   filterChatMessage(data): void {
     if (!data?.data?.length && data?.pagination?.totalItems === 0) {
       this.filteredMessageList = [];
       return;
     }
-    if (this.activePage === 1) {
-      this.scrollToBottom();
-    }
-    if (data?.data.length > 0) {
-      this.messageList = [...this.messageList, ...data.data];
-      data.data.sort(
-        (a, b) =>
-          new Date(a?.createdDate).getTime() -
-          new Date(b?.createdDate).getTime()
-      );
-      this.readMessagesBy = data?.readUsers?.filter(
-        (item) => item.ID !== this.profileId
-      );
+
+    if (data?.data?.length > 0) {
+      this.isLoading = false;
+      this.processMessageData(data);
+      this.hasMoreData = this.activePage < data.pagination.totalPages;
     } else {
       this.hasMoreData = false;
     }
-    if (this.activePage < data.pagination.totalPages) {
-      this.hasMoreData = true;
-    }
-    if (this.filteredMessageList.length > 0) {
-      this.chatContent.nativeElement.scrollTop = 48;
-    }
-    const array = new MessageDatePipe(this.encryptDecryptService).transform(
-      data.data
-    );
-    // const uniqueDates = array.filter((dateObj) => {
-    //   return !this.filteredMessageList.some(
-    //     (existingDateObj) => existingDateObj.date === dateObj.date
-    //   );
-    // });
+    this.updateScrollPosition();
+    this.processUnreadMessages();
+    this.processGroupMessages();
+    this.processMetaData();
+    this.readMessages();
+    this.cdr.detectChanges();
+  }
 
-    let uniqueDates = [];
-    array.forEach((dateObj) => {
+  // private updateScrollPosition(): void {
+  //   if (this.activePage === 1 && !this.isScrollUp) {
+  //     this.scrollToBottom();
+  //   }
+  //   if (this.activePage > 1 && this.isScrollUp) {
+  //     this.chatContent.nativeElement.scrollTop = new Number(
+  //       this.chatContent.nativeElement.scrollHeight -
+  //         this.chatContent.nativeElement.clientWidth -
+  //         350
+  //     );
+  //   } else {
+  //     this.chatContent.nativeElement.scrollTop = 350;
+  //   }
+  // }
+
+  private updateScrollPosition(): void {
+    setTimeout(() => {
+      const chatElement = this.chatContent.nativeElement;
+      if (this.activePage === 1) {
+        chatElement.scrollTop = chatElement.scrollHeight;
+      } else if (this.activePage > 1 && this.isScrollUp) {
+        chatElement.scrollTop =
+          chatElement.scrollHeight - chatElement.clientHeight - 350;
+      } else {
+        chatElement.scrollTop = 350;
+      }
+    }, 0);
+  }
+
+  private processMessageData(data): void {
+    const isActivePage = this.activePage === data.pagination.totalPages;
+    const sortedData = data.data.sort(
+      (a, b) =>
+        new Date(a?.createdDate).getTime() - new Date(b?.createdDate).getTime()
+    );
+    if (isActivePage) {
+      this.mergeMessagesIntoFilteredList(
+        new MessageDatePipe(this.encryptDecryptService).transform(sortedData)
+      );
+    } else {
+      this.messageList = sortedData;
+      this.filteredMessageList = [];
+      this.mergeMessagesIntoFilteredList(
+        new MessageDatePipe(this.encryptDecryptService).transform(
+          this.messageList
+        )
+      );
+    }
+    this.filteredMessageList.sort((a, b) => this.compareDates(a.date, b.date));
+    this.readMessagesBy = data?.readUsers?.filter(
+      (item) => item.ID !== this.profileId
+    );
+  }
+
+  private compareDates(dateA: string, dateB: string): number {
+    const today = new Date();
+    const parsedDateA = dateA === "Today" ? today : new Date(dateA);
+    const parsedDateB = dateB === "Today" ? today : new Date(dateB);
+    return parsedDateA.getTime() - parsedDateB.getTime();
+  }
+
+  private mergeMessagesIntoFilteredList(newMessages: any[]): void {
+    for (const dateObj of newMessages) {
       const existingDateObj = this.filteredMessageList.find(
-        (existingDateObj) => existingDateObj.date === dateObj.date
+        (existing) => existing.date === dateObj.date
       );
       if (existingDateObj) {
-        existingDateObj.messages = existingDateObj.messages.concat(
-          dateObj.messages
-        );
-        existingDateObj.messages.sort((a, b) => a.id - b.id);
+        existingDateObj.messages = [
+          ...existingDateObj.messages,
+          ...dateObj.messages,
+        ].sort((a, b) => a.id - b.id);
       } else {
-        uniqueDates.push(dateObj);
+        this.filteredMessageList.push(dateObj);
       }
-    });
-    this.filteredMessageList = [...uniqueDates, ...this.filteredMessageList];
-    if (this.filteredMessageList[this.filteredMessageList.length - 1]) {
-      const lastMessageList =
-        this.filteredMessageList[this.filteredMessageList.length - 1].messages;
-      this.readMessageRoom = lastMessageList[lastMessageList.length - 1].isRead;
     }
+  }
+  private processMetaData(): void {
+    if (this.filteredMessageList.length) {
+      this.filteredMessageList.map((element) => {
+        return (element.messages = element?.messages.filter(async (e: any) => {
+          const url = e?.messageText || null;
+          const text = url?.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
+          const matches = text?.match(
+            /(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/
+          );
+          if (matches?.[0]) {
+            e['metaData'] = await this.getMetaDataFromUrlStr(matches?.[0]);
+          } else {
+            return e;
+          }
+        }));
+      });
+    }
+  }
+  private processUnreadMessages(): void {
+    if (this.userChat?.roomId) {
+      this.unreadMessage = {};
+      for (const group of this.filteredMessageList) {
+        const unreadMessage = group.messages.find(
+          (message: any) => message.isRead === 'N'
+        );
+        if (unreadMessage) {
+          this.unreadMessage = { date: group.date, message: unreadMessage };
+          break;
+        }
+      }
+    }
+  }
+
+  private processGroupMessages(): void {
+    if (this.userChat?.groupId) {
+      for (const group of this.filteredMessageList) {
+        this.groupData?.memberList?.forEach((member) => {
+          const matchingMessage = group.messages.find(
+            (msg) =>
+              member?.switchDate < msg.createdDate &&
+              member?.profileId !== this.profileId &&
+              msg.sentBy === this.profileId
+          );
+
+          if (matchingMessage) {
+            member['message'] = matchingMessage;
+            const existingUserIndex = this.relevantMembers.findIndex(
+              (e) => e?.profileId === member?.profileId
+            );
+
+            if (existingUserIndex > -1) {
+              this.readMessagesBy = this.readMessagesBy.filter(
+                (e) =>
+                  e.ID !== this.relevantMembers[existingUserIndex]?.profileId
+              );
+            } else {
+              this.relevantMembers.push(member);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  private readMessages(): void {
     if (this.userChat?.groupId) {
       this.socketService.socket.on('read-message-user', (data) => {
         this.readMessagesBy = data?.filter(
@@ -1446,64 +1641,9 @@ export class ProfileChatsListComponent
           ids: ids,
           profileId: this.userChat.profileId,
         };
+        console.log(data);
         this.socketService.readMessage(data, (res) => {
           return;
-        });
-      }
-    }
-    this.filteredMessageList.map((element) => {
-      return (element.messages = element?.messages.filter(async (e: any) => {
-        const url = e?.messageText || null;
-        const text = url?.replace(/<br\s*\/?>|<[^>]*>/g, ' ');
-        const matches = text?.match(
-          /(?:https?:\/\/|www\.)[^\s<]+(?:\s|<br\s*\/?>|$)/
-        );
-        if (matches?.[0]) {
-          e['metaData'] = await this.getMetaDataFromUrlStr(matches?.[0]);
-        } else {
-          return e;
-        }
-      }));
-    });
-    if (this.userChat?.roomId) {
-      this.unreadMessage = {};
-      for (let group of this.filteredMessageList) {
-        const unreadMessage = group.messages.find(
-          (message: any) => message.isRead === 'N'
-        );
-        if (unreadMessage) {
-          this.unreadMessage = { date: group.date, message: unreadMessage };
-          break;
-        }
-      }
-      // this.checkLastMessageOfRoom();
-    }
-    if (this.userChat?.groupId) {
-      console.log('relevant', this.relevantMembers);
-      for (let group of this.filteredMessageList) {
-        this.groupData?.memberList?.forEach((member) => {
-          const matchingMessage = group.messages.find(
-            (msg) =>
-              member?.switchDate < msg.createdDate &&
-              member?.profileId !== this.profileId &&
-              msg.sentBy == this.profileId
-          );
-
-          if (matchingMessage) {
-            member['message'] = matchingMessage;
-            const existUser = this.relevantMembers.find(
-              (e) => e?.profileId === member?.profileId
-            );
-            console.log(existUser);
-            if (existUser) {
-              this.readMessagesBy = this.readMessagesBy.filter((e) => {
-                return e.ID !== existUser?.profileId;
-              });
-            }
-            if (!existUser) {
-              this.relevantMembers.push(member);
-            }
-          }
         });
       }
     }
@@ -1529,13 +1669,47 @@ export class ProfileChatsListComponent
   }
 
   scrollToHighlighted(index: number) {
+    // this.messageElements.forEach((element) => {
+    //   const currentHighlighted =
+    //     element.nativeElement.querySelector('.highlighted');
+    //   if (currentHighlighted) {
+    //     this.renderer.removeClass(currentHighlighted, 'highlighted');
+    //   }
+    // });
+    // const highlightedElements = this.messageElements
+    //   .toArray()
+    //   .filter(
+    //     (element) => element.nativeElement.querySelector('.highlight') !== null
+    //   );
+
+    // if (index >= 0 && index < highlightedElements.length) {
+    //   const element = highlightedElements[index];
+    //   const highlightedSpan = element.nativeElement.querySelector('.highlight');
+
+    //   if (highlightedSpan) {
+    //     this.renderer.addClass(highlightedSpan, 'highlighted');
+    //     element.nativeElement.scrollIntoView({
+    //       behavior: 'smooth',
+    //       block: 'center',
+    //     });
+    //   }
+    // }
+
+    // Remove the 'highlighted' class from any currently highlighted element
     this.messageElements.forEach((element) => {
+      // const currentHighlighted =
+      //   element.nativeElement.querySelector('.highlighted');
+      // if (currentHighlighted) {
+      //   this.renderer.removeClass(currentHighlighted, 'highlighted');
+      // }
       const highlightedSpans =
         element.nativeElement.querySelectorAll('.highlighted');
       highlightedSpans.forEach((span) => {
         this.renderer.removeClass(span, 'highlighted');
       });
     });
+
+    // Find all elements that contain highlighted words
     const highlightedElements = this.messageElements
       .toArray()
       .filter(
@@ -1548,6 +1722,7 @@ export class ProfileChatsListComponent
       const highlightedSpans =
         element.nativeElement.querySelectorAll('.highlight');
 
+      // Iterate through each highlighted word within the element
       highlightedSpans.forEach((span) => {
         this.renderer.addClass(span, 'highlighted');
       });
@@ -1562,8 +1737,6 @@ export class ProfileChatsListComponent
   }
 
   onSearch(event): void {
-    // this.searchQuery = event.target.value;
-    // console.log(event.target.value);
     if (event.target.value) {
       this.scrollToHighlighted(this.currentHighlightedIndex);
     } else {
@@ -1604,7 +1777,6 @@ export class ProfileChatsListComponent
     if (highlightedElements.length > 0) {
       this.currentHighlightedIndex =
         (this.currentHighlightedIndex + 1) % highlightedElements.length;
-      // console.log(this.currentHighlightedIndex);
 
       this.scrollToHighlighted(this.currentHighlightedIndex);
     }
@@ -1619,10 +1791,29 @@ export class ProfileChatsListComponent
   }
 
   onScroll(event: any): void {
+    this.scrollSubject.next(event);
+  }
+
+  handleScroll(event: any): void {
     const element = event.target;
-    if (element.scrollTop < 100 && this.hasMoreData && !this.isLoading) {
+    if (element.scrollTop < 48 && this.activePage) {
+      this.isScrollUp = true;
       this.loadMoreChats();
     }
+    if (
+      element.scrollTop + element.clientHeight >= element.scrollHeight - 48 &&
+      this.activePage > 1
+    ) {
+      this.isScrollUp = false;
+      this.activePage -= 1;
+      this.getMessageList();
+    }
+    if (element.scrollTop < element.scrollHeight - element.clientHeight - 300) {
+      this.showButton = true;
+    } else {
+      this.showButton = false;
+    }
+    this.cdr.detectChanges();
   }
 
   checkLastMessageOfRoom(): void {
@@ -1640,5 +1831,12 @@ export class ProfileChatsListComponent
         this.socketService.sendNotificationEmail(data);
       }
     }
+  }
+
+  goToFirstPage(): void {
+    this.activePage = 1;
+    this.showButton = false;
+    this.isScrollUp = false;
+    this.getMessagesBySocket();
   }
 }

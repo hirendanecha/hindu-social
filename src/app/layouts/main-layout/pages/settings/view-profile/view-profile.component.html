@@ -92,21 +92,6 @@
                 >Uploaded Files</a
               >
             </li>
-            <ng-container 
-            *ngIf="+routeProfileId === +profileId"
-            >
-            <li
-              class="nav-item"
-              role="presentation"
-              (click)="activeTab = 4; getUserAppoinments(profileId)"
-            >
-              <a
-                class="nav-link d-center"
-                [ngClass]="activeTab === 4 ? 'active' : ''"
-                >Appointments</a
-              >
-            </li>
-          </ng-container>
           </ul>
         </div>
       </div>
@@ -246,10 +231,11 @@
                       {{ item.postcreationdate | dateDay }}</span
                     >
                   </h6>
+                  <!-- <span class="ms-1 cursor" (click)="viewUserPost(item.id)">{{ item?.pdfName }} </span> -->
+                  <!-- <a class="ms-1 cursor" [routerLink]="'/post/' + item?.id" target="_blank">{{ item?.pdfName }}</a> -->
                   <a
                     class="ms-1 cursor c-color"
                     [href]="item?.pdfUrl"
-                    target="_blank"
                     >{{ item?.pdfName }}</a
                   >
                 </div>
@@ -300,62 +286,6 @@
           <div>
             <h6 class="text-center">No Files Available</h6>
           </div>
-        </ng-template>
-      </ng-container>
-      <ng-container *ngIf="activeTab === 4">
-        <ng-container *ngIf="appointmentList.length; else noData">
-        <div class="card rounded shadow border-0 appointment-table">
-          <div class="card-body rounded">
-            <h5 class="m-0">Appointment Details</h5>
-            <div class="table-responsive">
-              <table class="table table-hover w-100">
-                <thead>
-                  <tr class="text-center">
-                    <th>Profile</th>
-                    <th>Community Name</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let appointment of appointmentList">
-                      <td>
-                        <img
-                          src="{{ appointment?.ProfilePicName }}"
-                          alt="Profile Pic"
-                          class="w-40-px rounded-5"
-                        />
-                      </td>
-                      <td>
-                        {{ appointment?.Username || appointment.FirstName }}
-                      </td>
-                      <td>
-                        {{
-                          appointment?.appointmentDateTime | date : "yyyy-MM-dd"
-                        }}
-                      </td>
-                      <td>
-                        {{ displayLocalTime(appointment.appointmentDateTime) }}
-                      </td>
-                      <td (click)="getStatus(appointment) === 'Scheduled' ? appointmentCancelation(appointment) : ''">
-                        <button
-                          class="btn btn-sm w-84-px"
-                          [ngClass]="getStatus(appointment) === 'Scheduled' ? 'btn-success' : 'btn-danger'">
-                          {{ getStatus(appointment) }}
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <ng-template #noData> 
-          <span class="text-center">
-            No appoinment found
-          </span>
         </ng-template>
       </ng-container>
     </div>

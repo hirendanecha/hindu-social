@@ -28,6 +28,22 @@
     max-width: 300px;
   }
 
+  .marketing-link-box{
+    max-width: 663px;
+
+    .slug-text{
+      max-width: calc(100% - 13rem);
+      display: -webkit-inline-box !important;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-bottom: 6px;
+      // color: var(--primary-color);
+      text-align: start;
+    }
+  }
+
   ::ng-deep {
     .carousel-item {
       transition: none;
@@ -199,10 +215,12 @@
     span,
     p {
       color: var(--input-text) !important;
+      white-space: normal;
     }
     a {
       color: var(--bs-danger-rgb) !important;
       font-weight: 600 !important;
+      white-space: normal;
     }
   }
   .tag-input-div {

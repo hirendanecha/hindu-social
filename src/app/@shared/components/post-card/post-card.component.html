@@ -13,7 +13,7 @@
   <img
     class="w-48-px h-48-px rounded-4 d-none d-lg-block"
     loading="lazy"
-    data-src="{{ post.ProfilePicName }}"
+    data-src="{{ post.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
     onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
     alt="avatar"
   />
@@ -24,7 +24,7 @@
         <img
           class="w-48-px h-48-px rounded-4"
           loading="lazy"
-          data-src="{{ post.ProfilePicName }}"
+          data-src="{{ post.ProfilePicName || '/assets/images/avtar/placeholder-user.png' }}"
           onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
           alt="avatar"
         />
@@ -46,32 +46,34 @@
                 class="d-flex align-items-center"
                 (mouseover)="showHoverBox = true"
               >
+              <a class="h6 m-0" [href]="webUrl + 'settings/view-profile/' + post.profileid">
                 {{ (post?.Username || post?.FirstName)?.split(" ")?.join("") }}
+              </a>
                 <!-- [ngbTooltip]="post.postcreationdate | date : ' h:mm a MMM d, y'" -->
                 <div>
                   <fa-icon
-                    class="ms-2 me-sm-1 font-12-px cursor"
+                    class="ms-2 me-sm-1 font-12-px"
                     [icon]="['fas', 'clock']"
                     placement="bottom"
                   />
                   {{ post?.postcreationdate | dateDay }}
                 </div>
               </div>
-              <ng-container *ngIf="post?.groupName">
+              <ng-container *ngIf="post?.groupName || post?.communityName">
                 <div class="d-none d-sm-flex ms-2 mt-1">
                   <span>posted on</span>&nbsp;
-                  <a
-                    [href]="'/research/detail/grpm/' + post?.groupLink"
-                    target="_blank"
+                  <a 
+                    [href]="post?.groupLink ? '/research/detail/grpm/' + post?.groupLink : post?.pageType === 'community' ? '/communities/' + post?.slug : '/pages/' + post?.slug" 
                     class="m-0"
                   >
-                    <span
+                    <span 
                       class="fw-bold m-0 posted-group-text align-items-center"
-                      [title]="post?.groupName"
-                      >{{ post?.groupName }}</span
+                      [title]="post?.groupName || post?.communityName">{{ post?.groupName ||
+                      post?.communityName}}</span
                     >
                   </a>
-                  &nbsp;<span>Group</span>
+                  &nbsp;<span>{{post?.groupName ? 'Group' : post?.pageType === 'community' ? 'Community' : 'Page'
+                    }}</span>
                 </div>
               </ng-container>
             </div>
@@ -87,19 +89,19 @@
               <img
                 class="w-48-px h-48-px rounded-4"
                 loading="lazy"
-                data-src="{{ post?.ProfilePicName }}"
+                data-src="{{ post?.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
                 onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                 alt="avatar"
               />
               <div class="d-flex gap-3 align-items-baseline">
-                <a class="h6 cursor mt-2" [href]="webUrl + 'settings/view-profile/' + post.profileid" target="_blank">
+                <a class="h6 cursor mt-2" [href]="webUrl + 'settings/view-profile/' + post.profileid">
                   &#64;{{ (post?.Username || post?.FirstName)?.split(" ")?.join("") }}
                 </a>
                 
                 <button>
                   <a
                     class="droplist d-flex align-items-center gap-2"
-                    [appCopyClipboard]="'@' + post.Username"
+                    [appCopyClipboard]="opyData(post)"
                   >
                     <fa-icon [icon]="['fas', 'copy']" />
                   </a>
@@ -107,9 +109,9 @@
               </div>
 
               <div
-                class="d-flex"
+                class="d-flex p-3 subscribe-button"
                 *ngIf="
-                  profileId != post.profileid && tokenService.getCredentials()
+                  profileId != post.profileid && tokenService.getCredentials() && !shareButton
                 "
               >
                 <button>
@@ -140,7 +142,6 @@
                     <span>Stop See First</span>
                   </a>
                 </button>
-                
               </div>
               <div
                 class="d-flex mt-2"
@@ -162,7 +163,6 @@
                   <a
                     class="droplist d-flex align-items-center gap-2"
                     routerLink="/platforms"
-                    target="_blank"
                   >
                     <fa-icon [icon]="['fas', 'table-list']" />
                     <span>Platforms</span>
@@ -216,7 +216,6 @@
                 <a
                   class="droplist d-flex align-items-center gap-2"
                   [href]="tubeUrl + '/video/' + post.id"
-                  target="_blank"
                 >
                   <fa-icon [icon]="['fas', 'play']" />
                   <span>Large Player</span>
@@ -279,7 +278,7 @@
                     <span>Download</span>
                   </a>
                 </button>
-                <button ngbDropdownItem *ngIf="!isViewProfile">
+                <button ngbDropdownItem *ngIf="!shareButton">
                   <a
                     class="droplist d-flex align-items-center gap-2"
                     (click)="editPost(post)"
@@ -313,8 +312,8 @@
       </div>
     </div>
     <div
-      class="d-none d-lg-flex text-center justify-content-center align-items-center h-24-px w-100 mt-lg-4 ms-2 ms-lg-0"
-      *ngIf="profileId != post.profileid && tokenService.getCredentials()"
+      class="subscribe-btns d-none d-lg-flex text-center justify-content-center align-items-center h-24-px w-100 mt-lg-4 ms-2 ms-lg-0 mb-lg-4"
+      *ngIf="profileId != post.profileid && tokenService.getCredentials() && !shareButton"
     >
       <button>
         <a
@@ -350,7 +349,6 @@
         <span>posted on</span>&nbsp;
         <a
           [href]="'/research/detail/grpm/' + post?.groupLink"
-          target="_blank"
           class="m-0"
         >
           <span
@@ -367,17 +365,19 @@
         {{ post.albumname }}
       </div>
     </ng-container>
-    <p
+
+    <p *ngIf="post?.postdescription else addDummySpace"
       class="post-description mdtxt m-0 mt-4 pb-3"
       [innerHTML]="
         post?.postdescription
           | stripHtml
-          | truncate : (showFullDesc ? -1 : 600)
+          | truncate : (showFullDesc ? -1 : 1000)
+          | linkify
           | noSanitize" hoverDropdown
     ></p>
-
-    <ng-container *ngIf="(post?.postdescription | stripHtml).length > 600">
-      <button (click)="showFullDescription()" class="text-danger">
+    <ng-template #addDummySpace><div class="mt-4 pb-3"></div></ng-template>
+    <ng-container *ngIf="(post?.postdescription | stripHtml).length > 1000">
+      <button (click)="showFullDescription()" class="c-text-color fw-bold">
         {{ showFullDesc ? "Read Less" : "Read More" }}
       </button>
     </ng-container>
@@ -466,6 +466,7 @@
         <p class="d-lg-block d-none m-0">Likes</p>
       </button>
       <div>
+        <!-- placement="top-start" -->
         <div ngbDropdown class="d-inline-block z-2" #myDrop="ngbDropdown">
           <button type="button" id="emojiModel" ngbDropdownToggle>
             <img src="https://s3.us-east-1.wasabisys.com/freedom-social/freedom-emojies/Nerd.gif" width="60" height="60" alt="Emoji">Reaction</button>
@@ -504,13 +505,14 @@
       <div class="d-flex mt-5 gap-3 align-items-start">
         <img
           loading="lazy"
-          data-src="{{ sharedService?.userData?.ProfilePicName }}"
+          data-src="{{ sharedService?.userData?.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
           class="w-40-px h-40-px rounded-3 d-none d-sm-flex"
           alt="icon"
         />
 
         <div class="px-sm-3 gap-2 align-items-center w-100">
-          <div [attr.id]="'comment-' + post.id"
+          <div
+            [attr.id]="'comment-' + post.id"
             class="d-flex align-items-center custom-width-comment position-relative"
           >
             <!-- <div
@@ -528,7 +530,7 @@
               (onDataChange)="onTagUserInputChangeEvent($event, post.id)"
             />
 
-            <div class="d-flex gap-2 lign-items-center align-items-center">
+            <div class="d-flex gap-2 position-absolute end-0 align-items-center set-icons">
               <!-- Emojis -->
               <!-- <div ngbDropdown placement="top-end" class="d-inline-block">
                 <button type="button" id="emojiModel" ngbDropdownToggle title="Emojis">
@@ -574,7 +576,7 @@
             <div class="position-relative w-56-px h-56-px mt-2">
               <img
                 loading="lazy"
-                data-src="{{ commentData?.imageUrl }}"
+                data-src="{{ commentData?.imageUrl || '/assets/images/avtar/placeholder-user.png' }}"
                 class="w-56-px h-56-px rounded-4"
                 onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                 alt="icon"
@@ -605,7 +607,7 @@
                 <img
                   loading="lazy"
                   class="w-40-px h-40-px rounded-3"
-                  data-src="{{ comment?.ProfilePicName }}"
+                  data-src="{{ comment?.ProfilePicName || '/assets/images/avtar/placeholder-user.png' }}"
                   onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                   alt="avatar"
                 />
@@ -615,9 +617,9 @@
                   class="top-area px-4 py-3 d-flex flex-column gap-2 align-items-start justify-content-start"
                 >
                   <div
-                    class="d-flex justify-content-between align-items-center w-100"
+                    class="d-flex justify-content-between align-items-center w-100 position-relative" (mouseout)="showCommentHoverBox = null"
                   >
-                    <h6 class="m-0 text-transform">
+                    <h6 class="m-0 text-transform cursor" (mouseover)="showCommentHoverBox = comment.id">
                       {{
                         (comment.Username || comment.FirstName)
                           .split(" ")
@@ -628,6 +630,40 @@
                         {{ comment.createdDate | dateDay }}</span
                       >
                     </h6>
+                    <!-- commenthoverbox -->
+                    <div [class.show]="showCommentHoverBox === comment.id" class="hover-box-container shadow" (mouseover)="showCommentHoverBox = comment.id"
+                      *ngIf="(breakpointService?.screen | async).lg.gatherThen">
+                      <div class="d-flex flex-column">
+                        <img class="w-48-px h-48-px rounded-4" loading="lazy"
+                          data-src="{{ comment?.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
+                          onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';" alt="avatar" />
+                        <div class="d-flex gap-3 align-items-baseline">
+                          <a class="h6 cursor mt-2" [href]="webUrl + 'settings/view-profile/' + comment.profileId">
+                            &#64;{{ (comment?.Username || comment?.FirstName)?.split(" ")?.join("") }}
+                          </a>
+                          <button>
+                            <a class="droplist d-flex align-items-center gap-2" [appCopyClipboard]="opyData(comment)">
+                              <fa-icon [icon]="['fas', 'copy']" />
+                            </a>
+                          </button>
+                        </div>
+                        <div class="d-flex mt-2" *ngIf="profileId != comment.profileId && tokenService.getCredentials()">
+                          <button>
+                            <a class="droplist d-flex align-items-center gap-2" (click)="selectMessaging(comment)">
+                              <fa-icon [icon]="['fas', 'envelope']" />
+                              <span>Messaging</span>
+                            </a>
+                          </button>
+                          <span class="me-2 ms-2">|</span>
+                          <button>
+                            <a class="droplist d-flex align-items-center gap-2" routerLink="/platforms">
+                              <fa-icon [icon]="['fas', 'table-list']" />
+                              <span>Platforms</span>
+                            </a>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
                     <ng-container
                       *ngIf="
@@ -670,11 +706,19 @@
                     </ng-container>
                   </div>
 
-                  <ng-container *ngIf="comment?.comment">
-                      <p
-                        class="mdtxt mb-0 comment-description"
-                        [innerHTML]="comment.comment | noSanitize" hoverDropdown
-                      ></p>
+                 <ng-container *ngIf="comment?.comment">
+                  <p
+                    class="mdtxt mb-0 comment-description"
+                    [innerHTML]="comment.comment | stripHtml
+                    | truncate : (showFullDescMap[comment?.id] ? -1 : 450)
+                    | linkify | noSanitize"
+                    hoverDropdown
+                  ></p>
+                  <ng-container *ngIf="(comment.comment | stripHtml).length > 450">
+                    <button (click)="showFullDescription('comment', comment?.id)" class="c-text-color fw-bold">
+                      {{ showFullDescMap[comment?.id] ? "Read Less" : "Read More" }}
+                    </button>
+                  </ng-container>
                     <ng-container *ngIf="comment.descImg">
                       <app-img-preview
                         [src]="comment.descImg"
@@ -687,7 +731,7 @@
                   <ng-container *ngIf="comment.imageUrl">
                     <app-img-preview
                       [src]="comment?.imageUrl"
-                      classes="h-48-px w-48-px rounded-2"
+                      classes="h-100 w-100 rounded-2"
                     />
                   </ng-container>
                 </div>
@@ -752,7 +796,7 @@
                         onTagUserReplayInputChangeEvent($event, post.id, (comment.parentCommentId ? comment.parentCommentId : comment.id))
                       "
                     />
-                    <div class="file-input d-flex align-items-center gap-2">
+                    <div class="file-input d-flex align-items-center gap-2 position-absolute end-0 set-icons">
                       <div class="file-upload d-flex">
                         <label class="file">
                           <input
@@ -786,7 +830,7 @@
                     <div class="position-relative w-52-px h-52-px mb-2 mt-2">
                       <img
                         loading="lazy"
-                        data-src="{{ commentData?.imageUrl }}"
+                        data-src="{{ commentData?.imageUrl || '/assets/images/avtar/placeholder-user.png' }}"
                         class="w-100 h-100 rounded-4"
                         onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                         alt="icon"
@@ -814,7 +858,7 @@
                     >
                       <img
                         loading="lazy"
-                        data-src="{{ reply.ProfilePicName }}"
+                        data-src="{{ reply.ProfilePicName || '/assets/images/avtar/placeholder-user.png' }}"
                         class="w-40-px h-40-px rounded-3"
                         alt="icon"
                         onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
@@ -822,12 +866,12 @@
 
                       <div class="info-item w-100">
                         <div
-                          class="top-area px-4 py-3 d-flex flex-column gap-2 align-items-start justify-content-start"
+                          class="top-area px-4 py-3 d-flex flex-column gap-2 align-items-start justify-content-start position-relative"
                         >
                           <div
-                            class="d-flex justify-content-between align-items-center w-100"
+                            class="d-flex justify-content-between align-items-center w-100 reply-hover" (mouseout)="showCommentHoverBox = null"
                           >
-                            <h6 class="m-0 align-items-center text-transform">
+                            <h6 class="m-0 align-items-center text-transform cursor" (mouseover)="showCommentHoverBox = reply.id">
                               {{
                                 (reply.Username || reply.FirstName)
                                   .split(" ")
@@ -841,6 +885,40 @@
                                 {{ reply?.createdDate | dateDay }}</span
                               >
                             </h6>
+                            <!-- replycommenthoverbox -->
+                            <div [class.show]="showCommentHoverBox === reply.id" class="hover-box-container shadow" (mouseover)="showCommentHoverBox = reply.id"
+                            *ngIf="(breakpointService?.screen | async).lg.gatherThen">
+                            <div class="d-flex flex-column">
+                              <img class="w-48-px h-48-px rounded-4" loading="lazy"
+                                data-src="{{ reply?.ProfilePicName || '/assets/images/avtar/placeholder-user.png'}}"
+                                onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';" alt="avatar" />
+                              <div class="d-flex gap-3 align-items-baseline">
+                                <a class="h6 cursor mt-2" [href]="webUrl + 'settings/view-profile/' + reply.profileId">
+                                  &#64;{{ (reply?.Username || reply?.FirstName)?.split(" ")?.join("") }}
+                                </a>
+                                <button>
+                                  <a class="droplist d-flex align-items-center gap-2" [appCopyClipboard]="opyData(reply)">
+                                    <fa-icon [icon]="['fas', 'copy']" />
+                                  </a>
+                                </button>
+                              </div>
+                              <div class="d-flex mt-2" *ngIf="profileId != reply.profileId && tokenService.getCredentials()">
+                                <button>
+                                  <a class="droplist d-flex align-items-center gap-2" (click)="selectMessaging(reply)">
+                                    <fa-icon [icon]="['fas', 'envelope']" />
+                                    <span>Messaging</span>
+                                  </a>
+                                </button>
+                                <span class="me-2 ms-2">|</span>
+                                <button>
+                                  <a class="droplist d-flex align-items-center gap-2" routerLink="/platforms">
+                                    <fa-icon [icon]="['fas', 'table-list']" />
+                                    <span>Platforms</span>
+                                  </a>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
 
                             <ng-container
                               *ngIf="
@@ -887,9 +965,17 @@
 
                           <ng-container *ngIf="reply?.comment">
                             <p
-                              class="mdtxt mb-0 comment-description"
-                              [innerHTML]="reply?.comment | noSanitize" hoverDropdown
-                            ></p>
+                            class="mdtxt mb-0 comment-description"
+                            [innerHTML]="reply?.comment | stripHtml
+                            | truncate : (showFullDescMap[reply?.id] ? -1 : 450)
+                            | linkify | noSanitize"
+                            hoverDropdown
+                          ></p>
+                          <ng-container *ngIf="(reply.comment | stripHtml).length > 450">
+                            <button (click)="showFullDescription('reply', reply?.id)" class="c-text-color fw-bold">
+                              {{ showFullDescMap[reply?.id] ? "Read Less" : "Read More" }}
+                            </button>
+                          </ng-container>
                             <ng-container *ngIf="reply.descImg">
                               <app-img-preview
                                 [src]="reply.descImg"
@@ -902,7 +988,7 @@
                           <ng-container *ngIf="reply.imageUrl">
                             <app-img-preview
                               [src]="reply?.imageUrl"
-                              classes="h-48-px w-48-px rounded-2"
+                              classes="h-100 w-100 rounded-2"
                             />
                           </ng-container>
                         </div>
@@ -961,7 +1047,7 @@
                           onTagUserReplayInputChangeEvent($event, post.id, (comment.parentCommentId ? comment.parentCommentId : comment.id))
                         "
                       />
-                      <div class="file-input d-flex align-items-center gap-2">
+                      <div class="file-input d-flex align-items-center gap-2 position-absolute end-0 set-icons">
                         <div class="file-upload d-flex">
                           <label class="file">
                             <input
@@ -995,7 +1081,7 @@
                       <div class="position-relative w-52-px h-52-px mb-2 mt-2">
                         <img
                           loading="lazy"
-                          data-src="{{ commentData?.imageUrl }}"
+                          data-src="{{ commentData?.imageUrl || '/assets/images/avtar/placeholder-user.png'}}"
                           class="w-100 h-100 rounded-4"
                           onerror="this.onerror=null;this.src='/assets/images/avtar/placeholder-user.png';"
                           alt="icon"

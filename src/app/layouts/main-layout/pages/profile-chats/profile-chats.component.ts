@@ -1,4 +1,6 @@
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   NgZone,
@@ -13,7 +15,7 @@ import { SocketService } from 'src/app/@shared/services/socket.service';
 import { ConfirmationModalComponent } from 'src/app/@shared/modals/confirmation-modal/confirmation-modal.component';
 import { BreakpointService } from 'src/app/@shared/services/breakpoint.service';
 import { take } from 'rxjs';
-import * as moment from 'moment';
+import moment from 'moment';
 import { AppQrModalComponent } from 'src/app/@shared/modals/app-qr-modal/app-qr-modal.component';
 import { ConferenceLinkComponent } from 'src/app/@shared/modals/create-conference-link/conference-link-modal.component';
 import { Router } from '@angular/router';
@@ -25,6 +27,7 @@ import { ToastService } from 'src/app/@shared/services/toast.service';
   selector: 'app-profile-chat-list',
   templateUrl: './profile-chats.component.html',
   styleUrls: ['./profile-chats.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileChartsComponent implements OnInit, OnDestroy {
   activeIdTab: string = 'local';
@@ -64,12 +67,13 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     private router: Router,
     private customerService: CustomerService,
     private tokenStorageService: TokenStorageService,
-    private toasterService: ToastService
+    private toasterService: ToastService,
+    private cdr : ChangeDetectorRef
   ) {
     this.profileId = +localStorage.getItem('profileId');
-    if (this.sharedService.isNotify) {
-      this.sharedService.isNotify = false;
-    }
+    // if (this.sharedService.isNotify) {
+    //   this.sharedService.isNotify = false;
+    // }
     // const data = this.tokenStorageService.getUser();
     // this.sharedService.getLoginUserDetails(data);
   }
@@ -96,7 +100,6 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     this.ngZone.runOutsideAngular(() => {
       window.addEventListener('resize', this.onResize.bind(this));
     });
-
     this.sharedService.loginUserInfo.subscribe((user) => {
       this.isCallSoundEnabled =
         user?.callNotificationSound === 'Y' ? true : false;
@@ -115,7 +118,6 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
   }
 
   onChatPost(userName: any) {
-    // console.log('old-user-chat', this.userChat);
     if (this.userChat?.groupId) {
       const date = moment(new Date()).utc();
       this.oldChat = {
@@ -123,13 +125,10 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
         groupId: this.userChat.groupId,
         date: moment(date).format('YYYY-MM-DD HH:mm:ss'),
       };
-      this.socketService.switchChat(this.oldChat, (data) => {
-        console.log(data);
-      });
+      this.socketService.switchChat(this.oldChat, (data) => {});
     }
-
     this.userChat = userName;
-    // console.log('new-user-chat', this.userChat);
+    this.cdr.markForCheck();
   }
 
   onNewChatRoom(isRoomCreated) {
@@ -164,6 +163,7 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
       .catch((reason) => {
         this.isSidebarOpen = false;
       });
+    this.cdr.markForCheck();
   }
 
   mobileShortCutPopup() {
@@ -227,6 +227,10 @@ export class ProfileChartsComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(ConferenceLinkComponent, {
       centered: true,
     });
+  }
+
+  invitePeople(): void {
+    this.sharedService.triggerOpenModal();
   }
 
   ngOnDestroy(): void {

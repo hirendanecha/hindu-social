@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-12 col-md-8 col-lg-7 col-xl-6 mx-auto d-flex flex-column">
-    <div class="d-flex justify-content-center pb-0 my-20" routerLink="/">
+    <div class="d-flex justify-content-center my-20" routerLink="/">
       <img
         src="/assets/images/landingpage/HinduSocial-Logo.jpg"
         class=" rounded"
@@ -24,10 +24,10 @@
         #signInForm="ngForm"
         [formGroup]="loginForm"
         (ngSubmit)="signInForm.form.valid && onSubmit()"
-        *ngIf="!isLoggedIn"
         novalidate
         autocomplete="none"
       >
+        <!-- *ngIf="!isLoggedIn" -->
         <div
           class="alert alert-{{ type }}"
           role="alert"
@@ -63,7 +63,7 @@
             <label class="form-label"
               >Password<span class="text-danger">*</span></label
             >
-            <a class="fw-500 c-pointer" (click)="forgotPasswordOpen()"
+            <a class="h6 fw-bold c-pointer custom-primary" (click)="forgotPasswordOpen()"
               >Forgot Password ?</a
             >
           </div>
@@ -102,8 +102,11 @@
     </div>
   </div>
   <div class="text-center mt-3">
-    <p class="text-danger">
-      If you are having technical issues, email <a href="mailto:support@hindu.social">{{'support@hindu.social'}}</a>
+    <p class="h6 fw-light">
+      If you are having technical issues, email
+      <a class="h5 c-pointer custom-primary" (click)="onClick($event)">{{ "support@hindu.social" }}
+        <fa-icon class="font-16-px ms-1" [icon]="['fas', 'copy']" />
+      </a>
     </p>
   </div>
 </div>

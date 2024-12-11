@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MessageService } from '../../services/message.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { NgbActiveOffcanvas, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { GalleryImgPreviewComponent } from '../gallery-img-preview/gallery-img-preview.component';
 import { ToastService } from '../../services/toast.service';
 import { FILE_EXTENSIONS, FILE_EXTENSIONS_Video } from '../../constant/file-extensions';
-import { GalleryImgPreviewComponent } from '../gallery-img-preview/gallery-img-preview.component';
 
 @Component({
   selector: 'app-media-gallery',

@@ -18,7 +18,7 @@
           <h3 class="text-center">
             Virtually Divine, Truly Yours: Join the Pious Pulse of our Hindu Haven.
           </h3>
-          <!-- <img src="/assets/images/landingpage/HinduSocial-Logo.jpg" alt="" /> -->
+          <!-- <img src="/assets/images/banner/freedom-buzz.jpeg" alt="" /> -->
         </div>
       </div>
     </div>
@@ -215,13 +215,24 @@
         </div>
 
         <div class="col-12 col-md-6 mb-3">
-          <label class="form-label">Mobile</label>
-          <input type="number" class="input-area" name="MobileNo" placeholder="Enter your mobile number" 
-            formControlName="MobileNo" />
-          <!-- <div class="text-danger" *ngIf="
+          <label class="form-label"
+            >Mobile
+            <!-- <span class="text-danger">*</span> -->
+          </label>
+          <input
+            type="number"
+            class="input-area"
+            name="MobileNo"
+            placeholder="Enter your mobile number"
+            formControlName="MobileNo"
+          />
+          <!-- <div
+            class="text-danger"
+            *ngIf="
               registerForm.get('MobileNo').hasError('required') &&
               registerForm.get('MobileNo').touched
-            ">
+            "
+          >
             Mobile number is required.
           </div> -->
         </div>
@@ -252,19 +263,18 @@
         <div class="col-12 col-md-6 mb-3">
           <label class="form-label"
             >Zip Code
-            <span class="text-danger">*</span>
+            <!-- <span class="text-danger">*</span> -->
           </label>
           <input
             type="text"
             class="input-area"
-            required=""
             placeholder="Enter your zip code"
             formControlName="Zip"
             name="Zip"
             #zipCode
             (input)="convertToUppercase($event)"
           />
-          <div
+          <!-- <div
             class="text-danger"
             *ngIf="
               registerForm.get('Zip').hasError('required') &&
@@ -272,26 +282,26 @@
             "
           >
             Zip code is required.
-          </div>
+          </div> -->
         </div>
 
         <div class="col-12 col-md-6 mb-3">
           <label class="form-label"
-            >State
-            <span class="text-danger">*</span>
+            >State or Region
+            <!-- <span class="text-danger">*</span> -->
           </label>
           <select
             id="State"
             name="State"
-            required=""
             class="input-area w-100"
             formControlName="State"
           >
             <option *ngFor="let item of allStateData">
               {{ item.state }}
             </option>
+            <option value="Other">Other</option>
           </select>
-          <div
+          <!-- <div
             class="text-danger"
             *ngIf="
               registerForm.get('State').hasError('required') &&
@@ -299,7 +309,7 @@
             "
           >
             State is required.
-          </div>
+          </div> -->
         </div>
 
         <div class="col-12 col-md-6 mb-3">
@@ -349,21 +359,20 @@
           </div> -->
         </div>
       </div>
-      <div class="form-check ps-0 my-4 d-flex">
+      <!-- <div class="form-check ps-0 my-4 d-flex">
         <div id="captcha" #captcha></div>
-      </div>
-      <div class="form-check ps-0 my-4 d-flex">
+      </div> -->
+      <div class="form-check ps-0 my-4 align-items-center d-flex">
         <input
           type="checkbox"
           class="p-0 check-box"
           required
           formControlName="TermAndPolicy"
         />
-        <label class="form-check-label ms-2 c-pointer">
+        <label class="form-check-label ms-2 c-pointer fw-light">
           I agree to the Freedom.buzz
-          <a href="/user-agreement" target="_blank">Terms of Use</a> and
-          <a href="/privacy-policy" target="_blank">Privacy Policy</a>.
-          <span class="text-danger">*</span>
+          <a class="custom-primary fw-bold" href="/user-agreement" >Terms of Use</a> and
+          <a class="custom-primary fw-bold" href="/privacy-policy" >Privacy Policy.<span class="text-danger">*</span></a>
         </label>
       </div>
 
@@ -378,7 +387,10 @@
   </div>
 </div>
 <div class="text-center mt-3">
-  <p class="text-danger">
-    If you are having technical issues, email <a href="mailto:support@hindu.social">{{'support@hindu.social'}}</a>
+  <p class="h6 fw-light">
+    If you are having technical issues, email
+    <a class="h5 c-pointer custom-primary" (click)="onClick($event)">{{ "support@hindu.social" }}
+      <fa-icon class="font-16-px ms-1" [icon]="['fas', 'copy']" />
+    </a>
   </p>
 </div>

@@ -136,8 +136,8 @@ export class VideoPostModalComponent implements AfterViewInit {
   // }
   
   uploadImgAndSubmit(): void {
-    if (this.postData.videoduration > 121) {
-          this.toastService.danger('Please upload less then 2minutes video!');
+    if (this.postData.videoduration > 301) {
+          this.toastService.danger('Please upload a video less than 5 minutes!');
         } else {
           if (
             this.postData?.profileid &&

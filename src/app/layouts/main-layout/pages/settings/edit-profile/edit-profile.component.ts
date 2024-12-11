@@ -24,6 +24,7 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./edit-profile.component.scss'],
 })
 export class EditProfileComponent implements OnInit, AfterViewInit {
+  resetImageClosebtn = true;
   customer: Customer = new Customer();
   allCountryData: any;
   confirm_password = '';
@@ -69,6 +70,11 @@ export class EditProfileComponent implements OnInit, AfterViewInit {
     UserID: new FormControl<number | null>(null),
     profileId: new FormControl<number | null>(null),
     IsActive: new FormControl('Y'),
+    messageNotificationEmail: new FormControl(''),
+    postNotificationEmail: new FormControl(''),
+    tagNotificationSound: new FormControl(''),
+    messageNotificationSound: new FormControl(''),
+    callNotificationSound: new FormControl(''),
   });
 
   constructor(
@@ -104,6 +110,11 @@ export class EditProfileComponent implements OnInit, AfterViewInit {
         CoverPicName: this.customer?.CoverPicName || '',
         UserID: this.customer?.UserID || +this.userId,
         profileId: this.profileId || +this.profileId,
+        tagNotificationSound: user?.tagNotificationSound || null,
+        postNotificationEmail: user?.postNotificationEmail || null,
+        messageNotificationSound: user?.messageNotificationSound || null,
+        callNotificationSound: user?.callNotificationSound || null,
+        messageNotificationEmail: user?.messageNotificationEmail || null
       });
     });
   }
@@ -140,7 +151,6 @@ export class EditProfileComponent implements OnInit, AfterViewInit {
     };
     this.customerService.updateNotificationSound(soundObj).subscribe({
       next: (res) => {
-        console.log(res);
         this.toastService.success(res.message);
         this.sharedService.getUserDetails();
       },
@@ -239,6 +249,7 @@ export class EditProfileComponent implements OnInit, AfterViewInit {
             if (!res.error) {
               this.toastService.success(res.message);
               this.sharedService.getUserDetails();
+              this.resetImageClosebtn = false;
             } else {
               this.toastService.danger(res?.message);
             }
@@ -254,10 +265,12 @@ export class EditProfileComponent implements OnInit, AfterViewInit {
 
   onProfileImgChange(event: any): void {
     this.profileImg = event;
+    this.resetImageClosebtn = true;
   }
 
   onProfileCoverImgChange(event: any): void {
     this.profileCoverImg = event;
+    this.resetImageClosebtn = true;
   }
 
   deleteAccount(): void {

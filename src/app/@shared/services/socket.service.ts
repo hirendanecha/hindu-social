@@ -106,8 +106,13 @@ export class SocketService {
   readNotification(params, callback: (data: any) => void) {
     this.socket?.emit('isReadNotification', params, callback);
   }
+
   getMeta(params) {
     this.socket?.emit('get-meta', params);
+  }
+
+  delePosts(params) {
+    this.socket?.emit('deletePost', params);
   }
 
   // socket for chat

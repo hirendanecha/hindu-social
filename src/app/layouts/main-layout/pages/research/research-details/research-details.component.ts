@@ -8,7 +8,7 @@ import { TokenStorageService } from 'src/app/@shared/services/token-storage.serv
 @Component({
   selector: 'app-research-details',
   templateUrl: './research-details.component.html',
-  styleUrls: ['./research-details.component.scss']
+  styleUrls: ['./research-details.component.scss'],
 })
 export class ResearchDetailsComponent {
   groupDetails: any = {};
@@ -34,6 +34,7 @@ export class ResearchDetailsComponent {
 
   GetGroupBasicDetails(): void {
     this.spinner.show();
+    // const uniqueLink = this.route.snapshot.paramMap.get('uniqueLink');
     this.route.paramMap.subscribe((param: any) => {
       const uniqueLink = param.get('uniqueLink');
       this.profileService.getGroupBasicDetails(uniqueLink).subscribe({
@@ -46,7 +47,7 @@ export class ResearchDetailsComponent {
               );
             }
             const data = {
-              title: `Hindu.social Research ${this.groupDetails?.PageTitle}`,
+              title: `Freedom.Buzz Research ${this.groupDetails?.PageTitle}`,
               url: `${location.href}`,
               description: this.groupDetails?.PageDescription,
               image:
@@ -54,7 +55,6 @@ export class ResearchDetailsComponent {
                 this.groupDetails?.ProfilePicName,
             };
             this.seoService.updateSeoMetaData(data);
-            console.log(this.groupDetails);
             this.GetGroupPostById();
           }
           this.spinner.hide();
